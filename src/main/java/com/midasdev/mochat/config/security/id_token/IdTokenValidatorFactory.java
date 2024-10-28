@@ -1,5 +1,6 @@
 package com.midasdev.mochat.config.security.id_token;
 
+import com.midasdev.mochat.config.security.Oauth.OauthProvider;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
@@ -7,5 +8,12 @@ import org.springframework.stereotype.Component;
 @RequiredArgsConstructor
 public class IdTokenValidatorFactory {
 
+    private final KakaoIdTokenValidator kakaoIdTokenValidator;
+
+    public IdTokenValidator getValidator(OauthProvider oauthProvider) {
+        return switch (oauthProvider) {
+            case KAKAO -> kakaoIdTokenValidator;
+        };
+    }
 
 }
