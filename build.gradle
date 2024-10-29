@@ -30,6 +30,9 @@ dependencies {
     // validations
     implementation 'org.springframework.boot:spring-boot-starter-validation'
 
+    // spring cloud open feign
+    implementation 'org.springframework.cloud:spring-cloud-starter-openfeign:4.1.2'
+
     // ehcache
     implementation 'org.ehcache:ehcache:3.10.8'
 
