@@ -30,6 +30,9 @@ dependencies {
     // validations
     implementation 'org.springframework.boot:spring-boot-starter-validation'
 
+    // ehcache
+    implementation 'org.ehcache:ehcache:3.10.8'
+
     // spring security
     implementation 'org.springframework.boot:spring-boot-starter-security'
     implementation 'org.springframework.boot:spring-boot-starter-oauth2-client'
