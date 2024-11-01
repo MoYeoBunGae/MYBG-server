@@ -2,6 +2,7 @@ package com.midasdev.mochat.auth.service;
 
 import com.midasdev.mochat.auth.dto.TokenRequestUser;
 import com.midasdev.mochat.auth.dto.request.AuthRequest;
+import com.midasdev.mochat.config.security.Oauth.OauthProvider;
 import com.midasdev.mochat.config.security.id_token.IdToken;
 import com.midasdev.mochat.config.security.id_token.IdTokenValidator;
 import com.midasdev.mochat.config.security.id_token.IdTokenValidatorFactory;
@@ -18,9 +19,10 @@ public class AuthService {
 
     public TokenRequestUser extractUserInfo(AuthRequest authRequest) {
 
-        String idTokenFromRequest = jwtValidator.extractIdToken(authRequest.authToken());
-        IdTokenValidator validator = idTokenValidatorFactory.getValidator(authRequest.oauthProvider());
-        IdToken idToken = validator.validate(idTokenFromRequest);
+        OauthProvider oauthProvider = authRequest.oauthProvider();
+        String idTokenFromRequest = jwtValidator.extractIdTokenFromAuthToken(authRequest.authToken());
+        IdTokenValidator validator = idTokenValidatorFactory.getValidator(oauthProvider);
+        IdToken idToken = validator.validate(idTokenFromRequest, oauthProvider);
         return new TokenRequestUser(authRequest.oauthProvider(), idToken.getSub(), idToken.getName());
     }
 
