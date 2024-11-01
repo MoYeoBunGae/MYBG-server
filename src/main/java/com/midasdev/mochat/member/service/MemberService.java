@@ -13,7 +13,7 @@ public class MemberService {
 
     private final MemberSpringDataRepository memberSpringDataRepository;
     public Optional<Member> findMemberByOauthAccount(TokenRequestUser tokenRequestUser) {
-        return memberSpringDataRepository.findMemberByOauthAccountAndDeletedIsFalse(tokenRequestUser.toOauthAccount());
+        return memberSpringDataRepository.findMemberByOauthAccountAndDeletedIsFalse(tokenRequestUser.oauthAccount());
     }
 
 }
