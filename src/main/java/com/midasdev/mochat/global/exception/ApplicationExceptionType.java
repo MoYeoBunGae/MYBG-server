@@ -14,6 +14,7 @@ public enum ApplicationExceptionType {
     JWT_MALFORMED(HttpStatus.BAD_REQUEST, "ERR_JWT_002", "JWT가 손상되었습니다."),
     JWT_UNSUPPORTED(HttpStatus.BAD_REQUEST, "ERR_JWT_003", "지원되지 않는 JWT 입니다."),
     JWT_INVALID_SIGNATURE(HttpStatus.BAD_REQUEST, "ERR_JWT_004", "signature가 유효하지 않습니다."),
+    JWT_PARSING_EXCEPTION(HttpStatus.BAD_REQUEST, "ERR_JWT_005", "JWT {0}에 {1}에 대한 값이 없거나 유효하지 않습니다."),
 
     // token
     /**
@@ -23,8 +24,9 @@ public enum ApplicationExceptionType {
      */
     TOKEN_TYPE_MISMATCH(HttpStatus.BAD_REQUEST, "ERR_TOKEN_001", "토큰 타입이 맞지 않습니다. (전달된 토큰 : {0}, 필요한 토큰 {1})"),
 
-    // jwk
-    OIDC_PUBLIC_KEY_PARSING_EXCEPTION(HttpStatus.INTERNAL_SERVER_ERROR, "ERR_JWK_001", "Provider {0}의 인증 public keys 에서 에러가 발생했습니다."),
+    // oidc public key
+    OIDC_PUBLIC_KEY_PARSING_EXCEPTION(HttpStatus.INTERNAL_SERVER_ERROR, "ERR_OIDC_001", "Provider {0}의 인증 public keys 에서 에러가 발생했습니다."),
+    OIDC_PUBLIC_KEY_CONVERTING_EXCEPTION(HttpStatus.INTERNAL_SERVER_ERROR, "ERR_OIDC_002", "Public Key 연산 중 에러가 발생했습니다. - Converting"),
 
     // global
     FILTER_OR_API_EXCEPTION(HttpStatus.INTERNAL_SERVER_ERROR, "ERR_GLOBAL_001", "Filter 에러 또는 API 로직 중 처리되지 못한 에러 발생 : {0}"),

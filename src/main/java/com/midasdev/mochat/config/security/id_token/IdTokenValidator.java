@@ -5,7 +5,11 @@ import com.midasdev.mochat.config.security.jwt.JwtClaimResolver;
 import com.midasdev.mochat.config.security.jwt.JwtValidator;
 import com.midasdev.mochat.global.exception.ApplicationException;
 import com.midasdev.mochat.global.exception.ApplicationExceptionType;
+import com.nimbusds.jose.JOSEException;
 import com.nimbusds.jose.jwk.JWKSet;
+import io.jsonwebtoken.Claims;
+import io.jsonwebtoken.Jws;
+import java.security.Key;
 import java.text.ParseException;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -19,7 +23,7 @@ public abstract class IdTokenValidator {
 
     public IdToken validate(String idTokenFromRequest, OauthProvider oauthProvider) {
         // 1. Public key를 가져온다.
-        JWKSet key = getPublicKeys(oauthProvider);
+        JWKSet keySet = getPublicKeys(oauthProvider);
 
         // 2. IdToken의 kid로 적절한 public key를 가져온다 -> kakao 검증 글 참고
         // 2-1. Kid 가져오기
@@ -28,6 +32,16 @@ public abstract class IdTokenValidator {
         // Public key로 검증한다.
 //        Jws<Claims> claims = jwtValidator.validateJWT(idTokenFromRequest, key);
 //        log.info("claims : {}", claims);
+        // 2-2. kid에 맞는 public key 가져오기
+        Key publicKey;
+        try {
+            publicKey = keySet.getKeyByKeyId(kid).toRSAKey().toRSAPublicKey();
+        } catch (JOSEException e) {
+            throw new ApplicationException(ApplicationExceptionType.OIDC_PUBLIC_KEY_CONVERTING_EXCEPTION);
+        }
+
+        // 3. Public key로 검증한다.
+        Jws<Claims> claims = jwtValidator.validateJWT(idTokenFromRequest, publicKey);
 
 
         return null;

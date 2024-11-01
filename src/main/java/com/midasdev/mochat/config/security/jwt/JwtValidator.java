@@ -10,6 +10,7 @@ import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.MalformedJwtException;
 import io.jsonwebtoken.UnsupportedJwtException;
 import io.jsonwebtoken.security.SignatureException;
+import java.security.Key;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
@@ -34,6 +35,26 @@ public class JwtValidator {
         try {
             return Jwts.parserBuilder()
                        .setSigningKey(jwtProperty.getKey())
+                       .build()
+                       .parseClaimsJws(token);
+        } catch (ExpiredJwtException e) {
+            throw new ApplicationException(ApplicationExceptionType.JWT_EXPIRED);
+        } catch (UnsupportedJwtException e) {
+            throw new ApplicationException(ApplicationExceptionType.JWT_UNSUPPORTED);
+        } catch (MalformedJwtException e) {
+            throw new ApplicationException(ApplicationExceptionType.JWT_MALFORMED);
+        } catch (SignatureException e) {
+            throw new ApplicationException(ApplicationExceptionType.JWT_INVALID_SIGNATURE);
+        } catch (Exception e) {
+            log.error("JWT parsing 중 처리되지 않은 Exception 발생", e);
+            throw new ApplicationException(ApplicationExceptionType.UNDEFINED_EXCEPTION, "unknown jwt parsing exception");
+        }
+    }
+
+    public Jws<Claims> validateJWT(String token, Key key) {
+        try {
+            return Jwts.parserBuilder()
+                       .setSigningKey(key)
                        .build()
                        .parseClaimsJws(token);
         } catch (ExpiredJwtException e) {
