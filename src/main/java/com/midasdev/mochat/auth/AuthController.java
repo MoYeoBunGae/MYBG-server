@@ -32,7 +32,7 @@ public class AuthController {
         TokenRequestUser tokenRequestUser = authService.extractUserInfo(authRequest);
 
         // 2. 회원가입 여부 (데이터 있는지)
-        Optional<Member> memberOptional = memberService.findMemberByOauthAccount();
+        Optional<Member> memberOptional = memberService.findMemberByOauthAccount(tokenRequestUser);
 
         // 3. 등록되지 않은 회원이라면 등록하기
         Member member = memberOptional.orElse(memberService.register(tokenRequestUser));

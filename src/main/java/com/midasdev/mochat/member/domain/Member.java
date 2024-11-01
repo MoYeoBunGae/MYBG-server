@@ -43,6 +43,6 @@ public class Member {
     private String profileImageUrl;
 
     @Column(nullable = false)
-    private Boolean isDeleted;
+    private Boolean deleted;
 
 }
