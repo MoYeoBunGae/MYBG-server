@@ -8,8 +8,10 @@ import com.midasdev.mochat.config.security.id_token.IdTokenValidator;
 import com.midasdev.mochat.config.security.id_token.IdTokenValidatorFactory;
 import com.midasdev.mochat.config.security.jwt.JwtValidator;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class AuthService {
@@ -23,7 +25,7 @@ public class AuthService {
         String idTokenFromRequest = jwtValidator.extractIdTokenFromAuthToken(authRequest.authToken());
         IdTokenValidator validator = idTokenValidatorFactory.getValidator(oauthProvider);
         IdToken idToken = validator.validate(idTokenFromRequest, oauthProvider);
-        return new TokenRequestUser(authRequest.oauthProvider(), idToken.getSub(), idToken.getName());
+        return new TokenRequestUser(authRequest.oauthProvider(), idToken.sub(), idToken.nickname());
     }
 
 }

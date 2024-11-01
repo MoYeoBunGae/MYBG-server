@@ -4,6 +4,8 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.midasdev.mochat.global.exception.ApplicationException;
 import com.midasdev.mochat.global.exception.ApplicationExceptionType;
+import io.jsonwebtoken.Claims;
+import io.jsonwebtoken.Jws;
 import java.io.IOException;
 import java.util.Base64;
 import java.util.Map;
@@ -27,5 +29,9 @@ public class JwtClaimResolver {
         }
 
         return headerData.get(key).toString();
+    }
+
+    public String getFromClaim(Jws<Claims> claimsJws, String key) {
+        return (String) claimsJws.getBody().get(key);
     }
 }

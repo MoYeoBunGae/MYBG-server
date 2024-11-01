@@ -3,6 +3,7 @@ package com.midasdev.mochat.config.security.id_token;
 import com.midasdev.mochat.config.security.Oauth.OauthProvider;
 import com.midasdev.mochat.config.security.jwt.JwtClaimResolver;
 import com.midasdev.mochat.config.security.jwt.JwtValidator;
+import com.midasdev.mochat.config.security.jwt.TokenAttribute;
 import com.midasdev.mochat.global.exception.ApplicationException;
 import com.midasdev.mochat.global.exception.ApplicationExceptionType;
 import com.nimbusds.jose.JOSEException;
@@ -29,9 +30,6 @@ public abstract class IdTokenValidator {
         // 2-1. Kid 가져오기
         String kid = jwtClaimResolver.extractValueWithoutValidation(idTokenFromRequest, "kid");
 
-        // Public key로 검증한다.
-//        Jws<Claims> claims = jwtValidator.validateJWT(idTokenFromRequest, key);
-//        log.info("claims : {}", claims);
         // 2-2. kid에 맞는 public key 가져오기
         Key publicKey;
         try {
@@ -43,8 +41,11 @@ public abstract class IdTokenValidator {
         // 3. Public key로 검증한다.
         Jws<Claims> claims = jwtValidator.validateJWT(idTokenFromRequest, publicKey);
 
+        // 4. IdToken의 sub 와 nickname을 가져온다. (모두 OpenId 표준)
+        String sub = jwtClaimResolver.getFromClaim(claims, TokenAttribute.SUB.getAttribute());
+        String nickname = jwtClaimResolver.getFromClaim(claims, TokenAttribute.NICKNAME.getAttribute());
 
-        return null;
+        return new IdToken(sub, nickname);
     }
 
     // TODO: Cacheable에 대해 고민해보기
