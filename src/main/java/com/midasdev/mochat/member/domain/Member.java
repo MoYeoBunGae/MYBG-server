@@ -15,6 +15,8 @@ import lombok.Builder;
 import lombok.Builder.Default;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.ColumnDefault;
+import org.hibernate.annotations.DynamicInsert;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 @Getter
@@ -22,11 +24,13 @@ import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 @Builder
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
+@DynamicInsert
 @EntityListeners(AuditingEntityListener.class)
 public class Member {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "member_id")
     private Long id;
 
     @Embedded
@@ -39,10 +43,11 @@ public class Member {
     @Column(nullable = false)
     private String name;
 
-    @Column
+    @Column(nullable = false)
     private String profileImageUrl;
 
     @Column(nullable = false)
+    @ColumnDefault("false")
     private Boolean deleted;
 
 }
