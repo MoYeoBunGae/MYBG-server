@@ -11,9 +11,21 @@ import org.springframework.stereotype.Service;
 @RequiredArgsConstructor
 public class MemberService {
 
+    private final DefaultProfileImageService defaultProfileImageService;
     private final MemberSpringDataRepository memberSpringDataRepository;
+
     public Optional<Member> findMemberByOauthAccount(TokenRequestUser tokenRequestUser) {
         return memberSpringDataRepository.findMemberByOauthAccountAndDeletedIsFalse(tokenRequestUser.oauthAccount());
+    }
+
+    public Member register(TokenRequestUser tokenRequestUser) {
+        Member member = Member.builder()
+                              .oauthAccount(tokenRequestUser.oauthAccount())
+                              .name(tokenRequestUser.nickname())
+                              .profileImageUrl(defaultProfileImageService.createRandomProfileImageUrl())
+                              .build();
+
+        return memberSpringDataRepository.save(member);
     }
 
 }
