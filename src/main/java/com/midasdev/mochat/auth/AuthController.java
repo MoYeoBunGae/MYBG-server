@@ -36,7 +36,7 @@ public class AuthController {
         Optional<Member> memberOptional = memberService.findMemberByOauthAccount(tokenRequestUser);
 
         // 3. 등록되지 않은 회원이라면 등록하기
-        Member member = memberOptional.orElse(memberService.register(tokenRequestUser));
+        Member member = memberOptional.orElseGet(() -> memberService.register(tokenRequestUser));
 
         // 4. accessToken, refreshToken 발급
         AuthorizationToken generatedToken = authService.issueAuthorizationToken(member);
