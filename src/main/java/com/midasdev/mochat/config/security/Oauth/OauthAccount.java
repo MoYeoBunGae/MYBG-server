@@ -21,4 +21,5 @@ public class OauthAccount {
 
     @Column(nullable = false)
     private String oauthSub;
+
 }

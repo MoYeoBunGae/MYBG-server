@@ -12,13 +12,15 @@ public record AuthResponse(
         Long memberId,
         String memberName
 ) {
+
     public static AuthResponse from(Member member, AuthorizationToken authorizationToken, boolean isNewMember) {
         return AuthResponse.builder()
-                .isNewMember(isNewMember)
-                .accessToken(authorizationToken.getAccessToken())
-                .refreshToken(authorizationToken.getRefreshToken())
-                .memberId(member.getId())
-                .memberName(member.getName())
-                .build();
+                           .isNewMember(isNewMember)
+                           .accessToken(authorizationToken.getAccessToken())
+                           .refreshToken(authorizationToken.getRefreshToken())
+                           .memberId(member.getId())
+                           .memberName(member.getName())
+                           .build();
     }
+
 }
