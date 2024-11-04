@@ -49,4 +49,16 @@ public class JwtProvider {
     }
 
 
+    public AuthorizationToken createAuthorizationToken(Long memberId) {
+        String accessToken = generateToken(memberId, TokenType.ACCESS);
+        String refreshToken = generateToken(memberId, TokenType.REFRESH);
+        return new AuthorizationToken(GrantType.BEARER, accessToken, refreshToken);
+    }
+
+    private String generateToken(Long memberId, TokenType tokenType) {
+        Claims claims = new DefaultClaims();
+        claims.put(TokenAttribute.TYPE.getAttribute(), tokenType);
+        return generateToken(String.valueOf(memberId), claims, jwtProperty.getAccessTokenExpiredSecond());
+    }
+
 }

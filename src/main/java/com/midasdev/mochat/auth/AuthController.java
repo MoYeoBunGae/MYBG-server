@@ -2,6 +2,7 @@ package com.midasdev.mochat.auth;
 
 import com.midasdev.mochat.auth.dto.TokenRequestUser;
 import com.midasdev.mochat.auth.dto.request.AuthRequest;
+import com.midasdev.mochat.auth.dto.response.AuthResponse;
 import com.midasdev.mochat.auth.service.AuthService;
 import com.midasdev.mochat.config.security.jwt.AuthorizationToken;
 import com.midasdev.mochat.member.domain.Member;
@@ -26,7 +27,7 @@ public class AuthController {
     private final MemberService memberService;
 
     @PostMapping
-    public ResponseEntity<AuthorizationToken> generateToken(@RequestBody @Valid AuthRequest authRequest) {
+    public ResponseEntity<AuthResponse> generateToken(@RequestBody @Valid AuthRequest authRequest) {
 
         // 1. authtoken 검증 -> idtoken 검증 -> 유저 정보 반환
         TokenRequestUser tokenRequestUser = authService.extractUserInfo(authRequest);
@@ -40,7 +41,7 @@ public class AuthController {
         // 4. accessToken, refreshToken 발급
         AuthorizationToken generatedToken = authService.issueAuthorizationToken(member);
 
-        return ResponseEntity.ok(generatedToken);
+        return ResponseEntity.ok(AuthResponse.from(member, generatedToken, memberOptional.isEmpty()));
 
     }
 
