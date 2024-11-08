@@ -9,6 +9,9 @@ import org.springframework.http.HttpStatus;
 @AllArgsConstructor
 public enum ApplicationExceptionType {
 
+    // authentication
+    TOKEN_AUTHENTICATION_EXCEPTION(HttpStatus.FORBIDDEN, "ERR_AUTH_001", "토큰 인증에 실패했습니다. : {0}"),
+
     // jwt
     JWT_EXPIRED(HttpStatus.BAD_REQUEST, "ERR_JWT_001", "JWT 기한이 만료되었습니다."),
     JWT_MALFORMED(HttpStatus.BAD_REQUEST, "ERR_JWT_002", "JWT가 손상되었습니다."),

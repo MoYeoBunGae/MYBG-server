@@ -1,5 +1,7 @@
 package com.midasdev.mochat.config.security.handler;
 
+import com.midasdev.mochat.global.exception.ApplicationExceptionType;
+import com.midasdev.mochat.global.util.ExceptionResponseWriter;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
@@ -15,9 +17,9 @@ import org.springframework.stereotype.Component;
 public class DefaultAuthenticationEntryPoint extends Http403ForbiddenEntryPoint {
 
     @Override
-    public void commence(HttpServletRequest request, HttpServletResponse response, AuthenticationException arg2) throws IOException {
-        log.info("Authentication Fail...");
-        super.commence(request, response, arg2);
+    public void commence(HttpServletRequest request, HttpServletResponse response, AuthenticationException e) throws IOException {
+        log.error("Authentication Fail...", e);
+        ExceptionResponseWriter.writeException(response, ApplicationExceptionType.TOKEN_AUTHENTICATION_EXCEPTION, e.getMessage());
     }
 
 }
