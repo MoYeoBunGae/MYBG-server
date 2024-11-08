@@ -33,6 +33,11 @@ dependencies {
 
     // spring cloud open feign
     implementation 'org.springframework.cloud:spring-cloud-starter-openfeign:4.1.2'
+    constraints {
+        implementation('commons-io:commons-io:2.15.1') {
+            because 'commons-io:commons-io:2.13.0 (and under versions) has a security vulnerability'
+        }
+    }
 
     // ehcache
     implementation 'org.ehcache:ehcache:3.10.8'
