@@ -10,7 +10,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 @FeignClient(name = "KakaoOauthClient", url = "https://kauth.kakao.com")
 public interface KakaoOauthClient {
 
-    @Cacheable(value = Cache.OIDC_PUBLIC_KEYS)
+    @Cacheable(value = Cache.OIDC_PUBLIC_KEYS, key = "'kakao'")
     @GetMapping("/.well-known/jwks.json")
     String getKakaoOidcPublicKeys();
 }

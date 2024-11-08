@@ -1,7 +1,6 @@
 package com.midasdev.mochat.config.cache;
 
 import com.midasdev.mochat.global.cache.Cache;
-import com.nimbusds.jose.jwk.JWKSet;
 import java.time.Duration;
 import javax.cache.CacheManager;
 import javax.cache.Caching;
@@ -24,10 +23,10 @@ public class CacheConfig {
         CachingProvider provider = Caching.getCachingProvider();
         CacheManager cacheManager = provider.getCacheManager();
 
-        CacheConfiguration<String, JWKSet> configuration =
+        CacheConfiguration<String, String> configuration =
                 CacheConfigurationBuilder.newCacheConfigurationBuilder(
                                                  String.class,
-                                                 JWKSet.class,
+                                                 String.class,
                                                  ResourcePoolsBuilder.heap(10)
                                          )
                                          .withExpiry(ExpiryPolicyBuilder.timeToLiveExpiration(Duration.ofDays(7)))
