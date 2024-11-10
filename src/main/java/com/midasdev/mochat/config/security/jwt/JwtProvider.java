@@ -32,7 +32,8 @@ public class JwtProvider {
 
     public String creatAuthTokenForOidcUser(OidcUser oidcUser) {
         Map<String, Object> attributes = new HashMap<>();
-        attributes.put("idToken", oidcUser.getIdToken().getTokenValue());
+        attributes.put(TokenAttribute.ID_TOKEN.getAttribute(), oidcUser.getIdToken().getTokenValue());
+        attributes.put(TokenAttribute.TYPE.getAttribute(), TokenType.AUTH);
         Claims claims = new DefaultClaims(attributes);
         return generateToken(oidcUser.getSubject(), claims, jwtProperty.getAccessTokenExpiredSecond());
     }
@@ -47,5 +48,17 @@ public class JwtProvider {
                    .compact();
     }
 
+
+    public AuthorizationToken createAuthorizationToken(Long memberId) {
+        String accessToken = generateToken(memberId, TokenType.ACCESS);
+        String refreshToken = generateToken(memberId, TokenType.REFRESH);
+        return new AuthorizationToken(GrantType.BEARER, accessToken, refreshToken);
+    }
+
+    private String generateToken(Long memberId, TokenType tokenType) {
+        Claims claims = new DefaultClaims();
+        claims.put(TokenAttribute.TYPE.getAttribute(), tokenType);
+        return generateToken(String.valueOf(memberId), claims, jwtProperty.getAccessTokenExpiredSecond());
+    }
 
 }

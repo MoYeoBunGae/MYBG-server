@@ -1,5 +1,6 @@
 package com.midasdev.mochat.config.security;
 
+import com.midasdev.mochat.config.security.filter.ExceptionHandlerFilter;
 import io.micrometer.observation.ObservationRegistry;
 import io.micrometer.observation.ObservationTextPublisher;
 import java.util.List;
@@ -13,6 +14,7 @@ import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configurers.CsrfConfigurer;
 import org.springframework.security.oauth2.client.oidc.userinfo.OidcUserService;
+import org.springframework.security.oauth2.client.web.OAuth2LoginAuthenticationFilter;
 import org.springframework.security.web.AuthenticationEntryPoint;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
@@ -28,6 +30,7 @@ public class SecurityConfig {
 
     public final AuthenticationSuccessHandler authenticationSuccessHandler;
     public final AuthenticationEntryPoint authenticationEntryPoint;
+    private final ExceptionHandlerFilter exceptionHandlerFilter;
 
     @Value("${client.url}")
     private String clientUrl;
@@ -41,7 +44,7 @@ public class SecurityConfig {
         return httpSecurity
                 .exceptionHandling(config ->
                                            config.authenticationEntryPoint(authenticationEntryPoint))
-                .securityMatcher("/api/**")
+//                .securityMatcher("/api/**", "")
                 .authorizeHttpRequests(
                         request ->
                                 request.requestMatchers(permitUrlPatterns)
@@ -55,6 +58,7 @@ public class SecurityConfig {
                         .userInfoEndpoint(config -> config.oidcUserService(oidcUserService()))
                         .successHandler(authenticationSuccessHandler)
                 )
+                .addFilterBefore(exceptionHandlerFilter, OAuth2LoginAuthenticationFilter.class)
                 .build();
     }
 

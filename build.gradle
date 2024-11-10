@@ -26,6 +26,21 @@ repositories {
 dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
     implementation 'org.springframework.boot:spring-boot-starter-web'
+    implementation 'org.springframework.boot:spring-boot-starter-cache'
+
+    // validations
+    implementation 'org.springframework.boot:spring-boot-starter-validation'
+
+    // spring cloud open feign
+    implementation 'org.springframework.cloud:spring-cloud-starter-openfeign:4.1.2'
+    constraints {
+        implementation('commons-io:commons-io:2.15.1') {
+            because 'commons-io:commons-io:2.13.0 (and under versions) has a security vulnerability'
+        }
+    }
+
+    // ehcache
+    implementation 'org.ehcache:ehcache:3.10.8'
 
     // spring security
     implementation 'org.springframework.boot:spring-boot-starter-security'

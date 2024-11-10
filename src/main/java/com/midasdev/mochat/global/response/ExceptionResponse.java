@@ -16,4 +16,11 @@ public record ExceptionResponse(String httpStatus, String errorCode, String mess
                                 .build();
     }
 
+    public static ExceptionResponse from(ApplicationExceptionType exceptionType, Object... args) {
+        return ExceptionResponse.builder()
+                                .httpStatus(exceptionType.getHttpStatus().toString())
+                                .errorCode(exceptionType.getExceptionCode())
+                                .message(exceptionType.getErrorMessage(args))
+                                .build();
+    }
 }

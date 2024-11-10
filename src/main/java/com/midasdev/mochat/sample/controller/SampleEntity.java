@@ -1,7 +1,17 @@
 package com.midasdev.mochat.sample.controller;
 
-import jakarta.persistence.*;
-import lombok.*;
+import com.midasdev.mochat.global.audit.BaseEntity;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.Table;
+import lombok.AccessLevel;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 @Entity
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
@@ -9,7 +19,7 @@ import lombok.*;
 @Table(name = "sample")
 @Getter
 @Builder
-public class SampleEntity {
+public class SampleEntity extends BaseEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -24,4 +34,5 @@ public class SampleEntity {
     public static SampleEntity getSample() {
         return SampleEntity.builder().name("stark").age(30).build();
     }
+
 }
