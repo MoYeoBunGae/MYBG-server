@@ -1,5 +1,8 @@
 package com.midasdev.mochat.config.security.jwt;
 
+import lombok.Getter;
+
+@Getter
 public enum GrantType {
     BEARER("Bearer");
 

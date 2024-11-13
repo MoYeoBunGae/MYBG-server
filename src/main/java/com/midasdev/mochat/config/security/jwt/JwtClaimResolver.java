@@ -9,10 +9,14 @@ import io.jsonwebtoken.Jws;
 import java.io.IOException;
 import java.util.Base64;
 import java.util.Map;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
 @Component
+@RequiredArgsConstructor
 public class JwtClaimResolver {
+
+    private final JwtValidator jwtValidator;
 
     public String extractValueWithoutValidation(String token, String key) {
         return extractFromHeader(token, key);
@@ -23,7 +27,8 @@ public class JwtClaimResolver {
         byte[] decodedHeader = Base64.getDecoder().decode(headerToken);
         Map<String, Object> headerData;
         try {
-            headerData = new ObjectMapper().readValue(decodedHeader, new TypeReference<>() {});
+            headerData = new ObjectMapper().readValue(decodedHeader, new TypeReference<>() {
+            });
         } catch (IOException e) {
             throw new ApplicationException(ApplicationExceptionType.JWT_PARSING_EXCEPTION, "HEADER", key);
         }
@@ -31,7 +36,13 @@ public class JwtClaimResolver {
         return headerData.get(key).toString();
     }
 
+    public String extractValue(String token, TokenType tokenType, String key) {
+        Jws<Claims> claimsJws = jwtValidator.validate(token, tokenType);
+        return getFromClaim(claimsJws, key);
+    }
+
     public String getFromClaim(Jws<Claims> claimsJws, String key) {
         return (String) claimsJws.getBody().get(key);
     }
+
 }
