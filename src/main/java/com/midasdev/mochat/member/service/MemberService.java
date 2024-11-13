@@ -20,6 +20,10 @@ public class MemberService {
         return memberSpringDataRepository.findMemberByOauthAccountAndDeletedIsFalse(tokenRequestUser.oauthAccount());
     }
 
+    public Optional<Member> findMemberById(Long memberId) {
+        return memberSpringDataRepository.findById(memberId);
+    }
+
     @Transactional
     public Member register(TokenRequestUser tokenRequestUser) {
         Member member = Member.builder()

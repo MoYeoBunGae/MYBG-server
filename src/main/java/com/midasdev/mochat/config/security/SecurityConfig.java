@@ -1,6 +1,7 @@
 package com.midasdev.mochat.config.security;
 
 import com.midasdev.mochat.config.security.filter.ExceptionHandlerFilter;
+import com.midasdev.mochat.config.security.filter.JwtAuthenticationFilter;
 import io.micrometer.observation.ObservationRegistry;
 import io.micrometer.observation.ObservationTextPublisher;
 import java.util.List;
@@ -18,6 +19,7 @@ import org.springframework.security.oauth2.client.web.OAuth2LoginAuthenticationF
 import org.springframework.security.web.AuthenticationEntryPoint;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
@@ -31,6 +33,7 @@ public class SecurityConfig {
     public final AuthenticationSuccessHandler authenticationSuccessHandler;
     public final AuthenticationEntryPoint authenticationEntryPoint;
     private final ExceptionHandlerFilter exceptionHandlerFilter;
+    private final JwtAuthenticationFilter jwtAuthenticationFilter;
 
     @Value("${client.url}")
     private String clientUrl;
@@ -59,6 +62,7 @@ public class SecurityConfig {
                         .successHandler(authenticationSuccessHandler)
                 )
                 .addFilterBefore(exceptionHandlerFilter, OAuth2LoginAuthenticationFilter.class)
+                .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class) // TODO 필터체인 분리
                 .build();
     }
 
