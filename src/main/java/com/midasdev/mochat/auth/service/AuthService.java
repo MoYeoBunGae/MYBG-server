@@ -44,4 +44,10 @@ public class AuthService {
         return authorizationToken;
     }
 
+    public AuthorizationToken issueAuthorizationToken(Long memberId) {
+        AuthorizationToken authorizationToken = jwtProvider.createAuthorizationToken(memberId);
+        refreshTokenRedisRepository.save(RefreshToken.from(memberId, authorizationToken));
+        return authorizationToken;
+    }
+
 }

@@ -2,9 +2,14 @@ package com.midasdev.mochat.auth;
 
 import com.midasdev.mochat.auth.dto.TokenRequestUser;
 import com.midasdev.mochat.auth.dto.request.AuthRequest;
+import com.midasdev.mochat.auth.dto.request.TokenReIssueRequest;
 import com.midasdev.mochat.auth.dto.response.AuthResponse;
+import com.midasdev.mochat.auth.dto.response.TokenReIssueResponse;
 import com.midasdev.mochat.auth.service.AuthService;
 import com.midasdev.mochat.config.security.jwt.AuthorizationToken;
+import com.midasdev.mochat.config.security.jwt.JwtClaimResolver;
+import com.midasdev.mochat.config.security.jwt.TokenAttribute;
+import com.midasdev.mochat.config.security.jwt.constant.JwtComponent;
 import com.midasdev.mochat.member.domain.Member;
 import com.midasdev.mochat.member.service.MemberService;
 import jakarta.validation.Valid;
@@ -25,6 +30,7 @@ public class AuthController {
 
     private final AuthService authService;
     private final MemberService memberService;
+    private final JwtClaimResolver jwtClaimResolver;
 
     @PostMapping
     public ResponseEntity<AuthResponse> generateToken(@RequestBody @Valid AuthRequest authRequest) {
@@ -43,6 +49,24 @@ public class AuthController {
 
         return ResponseEntity.ok(AuthResponse.from(member, generatedToken, memberOptional.isEmpty()));
 
+    }
+
+    @PostMapping("/reissue")
+    public ResponseEntity<TokenReIssueResponse> reIssueToken(@RequestBody TokenReIssueRequest tokenReIssueRequest) {
+        Long memberId = Long.valueOf(
+                jwtClaimResolver.extractValueWithoutValidation(tokenReIssueRequest.refreshToken(), TokenAttribute.SUB.getAttribute(),
+                                                               JwtComponent.BODY));
+
+        // 1. Body의 refreshToken이 member의 refreshToken과 일치하는지 확인
+        memberService.verifyRefreshToken(memberId, tokenReIssueRequest.refreshToken());
+        // 2. 일치한다면 새로운 accessToken, refreshToken 발급
+        AuthorizationToken generatedToken = authService.issueAuthorizationToken(memberId);
+        TokenReIssueResponse tokenReIssueResponse = TokenReIssueResponse.builder()
+                                                                        .memberId(memberId)
+                                                                        .accessToken(generatedToken.getAccessToken())
+                                                                        .refreshToken(generatedToken.getRefreshToken())
+                                                                        .build();
+        return ResponseEntity.ok(tokenReIssueResponse);
     }
 
 }
