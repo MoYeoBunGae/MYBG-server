@@ -15,6 +15,7 @@ import com.midasdev.mochat.config.security.jwt.TokenAttribute;
 import com.midasdev.mochat.config.security.jwt.TokenType;
 import com.midasdev.mochat.config.security.jwt.repository.RefreshTokenRedisRepository;
 import com.midasdev.mochat.member.domain.Member;
+import com.midasdev.mochat.member.service.MemberService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -28,6 +29,7 @@ public class AuthService {
     private final JwtProvider jwtProvider;
     private final IdTokenValidatorFactory idTokenValidatorFactory;
     private final RefreshTokenRedisRepository refreshTokenRedisRepository;
+    private final MemberService memberService;
 
     public TokenRequestUser extractUserInfo(AuthRequest authRequest) {
 
@@ -48,6 +50,11 @@ public class AuthService {
         AuthorizationToken authorizationToken = jwtProvider.createAuthorizationToken(memberId);
         refreshTokenRedisRepository.save(RefreshToken.from(memberId, authorizationToken));
         return authorizationToken;
+    }
+
+    public void logoutMember(Long memberId) {
+        Member member = memberService.findMemberById(memberId);
+        refreshTokenRedisRepository.deleteById(member.getId());
     }
 
 }

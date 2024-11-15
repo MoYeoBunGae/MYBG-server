@@ -16,6 +16,7 @@ import jakarta.validation.Valid;
 import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -67,6 +68,12 @@ public class AuthController {
                                                                         .refreshToken(generatedToken.getRefreshToken())
                                                                         .build();
         return ResponseEntity.ok(tokenReIssueResponse);
+    }
+
+    @PostMapping("/logout")
+    public ResponseEntity<String> logout(@AuthenticationPrincipal Member member) {
+        authService.logoutMember(member.getId());
+        return ResponseEntity.ok(String.format("Member %d is logged out", member.getId()));
     }
 
 }

@@ -26,8 +26,9 @@ public class MemberService {
         return memberSpringDataRepository.findMemberByOauthAccountAndDeletedIsFalse(tokenRequestUser.oauthAccount());
     }
 
-    public Optional<Member> findMemberById(Long memberId) {
-        return memberSpringDataRepository.findById(memberId);
+    public Member findMemberById(Long memberId) {
+        return memberSpringDataRepository.findById(memberId).orElseThrow(() -> new ApplicationException(
+                ApplicationExceptionType.MEMBER_NOT_FOUND_BY_ID, memberId));
     }
 
     @Transactional
@@ -44,6 +45,7 @@ public class MemberService {
     public void verifyRefreshToken(Long memberId, String refreshToken) {
         // TEST: 저장된 refreshToken 여부에 대한 테스트
         // TEST: refreshToken 일치 여부에 대한 테스트
+        // REFACTOR: AuthService로 이동
         RefreshToken refreshTokenFromRedis = refreshTokenRedisRepository.findById(memberId)
                                                                         .orElseThrow(() -> new ApplicationException(
                                                                                 ApplicationExceptionType.REFRESH_TOKEN_NOT_FOUND, memberId));
