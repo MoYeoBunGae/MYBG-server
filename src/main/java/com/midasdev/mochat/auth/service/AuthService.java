@@ -10,8 +10,10 @@ import com.midasdev.mochat.config.security.id_token.IdTokenValidatorFactory;
 import com.midasdev.mochat.config.security.jwt.AuthorizationToken;
 import com.midasdev.mochat.config.security.jwt.JwtClaimResolver;
 import com.midasdev.mochat.config.security.jwt.JwtProvider;
+import com.midasdev.mochat.config.security.jwt.RefreshToken;
 import com.midasdev.mochat.config.security.jwt.TokenAttribute;
 import com.midasdev.mochat.config.security.jwt.TokenType;
+import com.midasdev.mochat.config.security.jwt.repository.RefreshTokenRedisRepository;
 import com.midasdev.mochat.member.domain.Member;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -25,6 +27,7 @@ public class AuthService {
     private final JwtClaimResolver jwtClaimResolver;
     private final JwtProvider jwtProvider;
     private final IdTokenValidatorFactory idTokenValidatorFactory;
+    private final RefreshTokenRedisRepository refreshTokenRedisRepository;
 
     public TokenRequestUser extractUserInfo(AuthRequest authRequest) {
 
@@ -36,7 +39,9 @@ public class AuthService {
     }
 
     public AuthorizationToken issueAuthorizationToken(Member member) {
-        return jwtProvider.createAuthorizationToken(member.getId());
+        AuthorizationToken authorizationToken = jwtProvider.createAuthorizationToken(member.getId());
+        refreshTokenRedisRepository.save(RefreshToken.from(member.getId(), authorizationToken));
+        return authorizationToken;
     }
 
 }
