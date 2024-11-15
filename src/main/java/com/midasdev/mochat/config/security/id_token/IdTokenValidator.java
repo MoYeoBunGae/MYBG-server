@@ -4,6 +4,7 @@ import com.midasdev.mochat.config.security.Oauth.OauthProvider;
 import com.midasdev.mochat.config.security.jwt.JwtClaimResolver;
 import com.midasdev.mochat.config.security.jwt.JwtValidator;
 import com.midasdev.mochat.config.security.jwt.TokenAttribute;
+import com.midasdev.mochat.config.security.jwt.constant.JwtComponent;
 import com.midasdev.mochat.global.exception.ApplicationException;
 import com.midasdev.mochat.global.exception.ApplicationExceptionType;
 import com.nimbusds.jose.JOSEException;
@@ -28,7 +29,7 @@ public abstract class IdTokenValidator {
 
         // 2. IdToken의 kid로 적절한 public key를 가져온다 -> kakao 검증 글 참고
         // 2-1. Kid 가져오기
-        String kid = jwtClaimResolver.extractValueWithoutValidation(idTokenFromRequest, "kid");
+        String kid = jwtClaimResolver.extractValueWithoutValidation(idTokenFromRequest, TokenAttribute.KID.getAttribute(), JwtComponent.HEADER);
 
         // 2-2. kid에 맞는 public key 가져오기
         Key publicKey;

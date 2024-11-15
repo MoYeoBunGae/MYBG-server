@@ -42,7 +42,7 @@ public class JwtProvider {
         Instant expiredTime = Instant.now().plus(validationSecond, ChronoUnit.SECONDS);
         return Jwts.builder()
                    .setSubject(subject)
-                   .setClaims(claims)
+                   .addClaims(claims)
                    .signWith(jwtProperty.getKey(), SignatureAlgorithm.HS512)
                    .setExpiration(Date.from(expiredTime))
                    .compact();

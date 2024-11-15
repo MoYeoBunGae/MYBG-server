@@ -22,13 +22,13 @@ public class JwtValidator {
 
     private final JwtProperty jwtProperty;
 
-    public String validate(String token, TokenType tokenType) {
+    public Jws<Claims> validate(String token, TokenType tokenType) {
         Jws<Claims> claim = validateJWT(token);
         String type = (String) claim.getBody().get(TokenAttribute.TYPE.getAttribute());
         Assertion.with(type)
                  .setValidation(tokenType::match)
                  .validateOrThrow(() -> new ApplicationException(ApplicationExceptionType.TOKEN_TYPE_MISMATCH, type, tokenType));
-        return (String) claim.getBody().get(TokenAttribute.ID_TOKEN.getAttribute());
+        return claim;
     }
 
     public Jws<Claims> validateJWT(String token) {
@@ -69,10 +69,6 @@ public class JwtValidator {
             log.error("JWT parsing 중 처리되지 않은 Exception 발생", e);
             throw new ApplicationException(ApplicationExceptionType.UNDEFINED_EXCEPTION, "unknown jwt parsing exception");
         }
-    }
-
-    public String extractIdTokenFromAuthToken(String authToken) {
-        return validate(authToken, TokenType.AUTH);
     }
 
 }
