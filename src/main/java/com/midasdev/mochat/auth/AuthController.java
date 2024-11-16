@@ -59,7 +59,7 @@ public class AuthController {
                                                                JwtComponent.BODY));
 
         // 1. Body의 refreshToken이 member의 refreshToken과 일치하는지 확인
-        memberService.verifyRefreshToken(memberId, tokenReIssueRequest.refreshToken());
+        authService.verifyRefreshToken(memberId, tokenReIssueRequest.refreshToken());
         // 2. 일치한다면 새로운 accessToken, refreshToken 발급
         AuthorizationToken generatedToken = authService.issueAuthorizationToken(memberId);
         TokenReIssueResponse tokenReIssueResponse = TokenReIssueResponse.builder()
