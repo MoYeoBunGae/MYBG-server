@@ -58,7 +58,6 @@ public class AuthService {
     public void verifyRefreshToken(Long memberId, String refreshToken) {
         // TEST: 저장된 refreshToken 여부에 대한 테스트
         // TEST: refreshToken 일치 여부에 대한 테스트
-        // REFACTOR: AuthService로 이동
         RefreshToken refreshTokenFromRedis = refreshTokenRedisRepository.findById(memberId)
                                                                         .orElseThrow(() -> new ApplicationException(
                                                                                 ApplicationExceptionType.REFRESH_TOKEN_NOT_FOUND, memberId));
