@@ -16,6 +16,7 @@ import jakarta.validation.Valid;
 import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -58,7 +59,7 @@ public class AuthController {
                                                                JwtComponent.BODY));
 
         // 1. Body의 refreshToken이 member의 refreshToken과 일치하는지 확인
-        memberService.verifyRefreshToken(memberId, tokenReIssueRequest.refreshToken());
+        authService.verifyRefreshToken(memberId, tokenReIssueRequest.refreshToken());
         // 2. 일치한다면 새로운 accessToken, refreshToken 발급
         AuthorizationToken generatedToken = authService.issueAuthorizationToken(memberId);
         TokenReIssueResponse tokenReIssueResponse = TokenReIssueResponse.builder()
@@ -67,6 +68,12 @@ public class AuthController {
                                                                         .refreshToken(generatedToken.getRefreshToken())
                                                                         .build();
         return ResponseEntity.ok(tokenReIssueResponse);
+    }
+
+    @PostMapping("/logout")
+    public ResponseEntity<String> logout(@AuthenticationPrincipal Member member) {
+        authService.logoutMember(member.getId());
+        return ResponseEntity.ok(String.format("Member %d is logged out", member.getId()));
     }
 
 }

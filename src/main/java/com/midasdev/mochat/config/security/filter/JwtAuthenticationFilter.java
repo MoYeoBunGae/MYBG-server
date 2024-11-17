@@ -20,6 +20,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
+import org.springframework.util.StringUtils;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 @Component
@@ -34,8 +35,11 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
             throws ServletException, IOException {
-
         getTokenFromHeader(request).ifPresent((token) -> {
+            Assertion.with(token)
+                    .setValidation(StringUtils::hasText)
+                    .validateOrThrow(() -> new ApplicationException(ApplicationExceptionType.AUTHORIZATION_HEADER_NOT_FOUND));
+
             // 1. Bearer 토큰 검증
             String accessToken = validateBearerToken(token);
 
@@ -53,8 +57,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
     private void setAuthenticationInSecurityContext(Long memberId) {
         // 1. memberId 있는지 검사
-        Member member = memberService.findMemberById(memberId)
-                                     .orElseThrow(() -> new ApplicationException(ApplicationExceptionType.MEMBER_NOT_FOUND_BY_ID, memberId));
+        Member member = memberService.findMemberById(memberId);
         UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(member, null, new ArrayList<>());
 
         // 2. memberId에 대한 인증 정보 저장

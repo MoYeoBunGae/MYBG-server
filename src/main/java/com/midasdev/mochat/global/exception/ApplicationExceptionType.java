@@ -14,6 +14,7 @@ public enum ApplicationExceptionType {
     // authentication
     TOKEN_AUTHENTICATION_EXCEPTION(HttpStatus.FORBIDDEN, "ERR_AUTH_001", "토큰 인증에 실패했습니다. : {0}"),
     NOT_BEARER_TOKEN(HttpStatus.FORBIDDEN, "ERR_AUTH_002", "Bearer Token이 아닙니다."),
+    AUTHORIZATION_HEADER_NOT_FOUND(HttpStatus.FORBIDDEN, "ERR_AUTH_003", "Authorization Header가 없거나 비어있습니다."),
 
     // jwt
     JWT_EXPIRED(HttpStatus.BAD_REQUEST, "ERR_JWT_001", "JWT 기한이 만료되었습니다."),
