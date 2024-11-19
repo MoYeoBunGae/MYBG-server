@@ -1,6 +1,8 @@
 package com.midasdev.mochat.sample.controller;
 
 import com.midasdev.mochat.member.domain.Member;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -19,10 +21,12 @@ public class SampleAuthController {
 
     private final SampleSpringDataRepository sampleSpringDataRepository;
 
+    @Operation(summary = "Sample API", description = "Sample API", security = @SecurityRequirement(name = "BearerAuth"))
     @GetMapping
     public ResponseEntity<List<SampleEntity>> findSample(@AuthenticationPrincipal Member member) {
         log.info("member: {}", member.getId());
         List<SampleEntity> all = sampleSpringDataRepository.findAll();
         return new ResponseEntity<>(all, HttpStatus.OK);
     }
+
 }

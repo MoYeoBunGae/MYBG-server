@@ -12,6 +12,9 @@ import com.midasdev.mochat.config.security.jwt.TokenAttribute;
 import com.midasdev.mochat.config.security.jwt.constant.JwtComponent;
 import com.midasdev.mochat.member.domain.Member;
 import com.midasdev.mochat.member.service.MemberService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import java.util.Optional;
 import lombok.RequiredArgsConstructor;
@@ -23,6 +26,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+@Tag(name = "인증 APIs", description = "로그인, 로그아웃 등 인증과 관련된 API")
 @RestController
 @RequestMapping("/api/v1/auth")
 @RequiredArgsConstructor
@@ -32,7 +36,9 @@ public class AuthController {
     private final AuthService authService;
     private final MemberService memberService;
     private final JwtClaimResolver jwtClaimResolver;
+    // TODO: Swagger API 설명 작성 + request, response, error 등 포맷 확인할 수 있는지 확인
 
+    @Operation(summary = "로그인 API", description = "Social 인증 후 서버에서 발급한 authToken을 통해 accessToken, refreshToken을 발급합니다.")
     @PostMapping
     public ResponseEntity<AuthResponse> generateToken(@RequestBody @Valid AuthRequest authRequest) {
 
@@ -52,6 +58,7 @@ public class AuthController {
 
     }
 
+    @Operation(summary = "access token 재발급 API", description = "refresh token을 통해 새로운 accessToken, refreshToken을 발급합니다.")
     @PostMapping("/reissue")
     public ResponseEntity<TokenReIssueResponse> reIssueToken(@RequestBody TokenReIssueRequest tokenReIssueRequest) {
         Long memberId = Long.valueOf(
@@ -70,6 +77,7 @@ public class AuthController {
         return ResponseEntity.ok(tokenReIssueResponse);
     }
 
+    @Operation(summary = "로그아웃 API", description = "사용자의 refresh token을 삭제하여 로그아웃합니다.", security = @SecurityRequirement(name = "BearerAuth"))
     @PostMapping("/logout")
     public ResponseEntity<String> logout(@AuthenticationPrincipal Member member) {
         authService.logoutMember(member.getId());
