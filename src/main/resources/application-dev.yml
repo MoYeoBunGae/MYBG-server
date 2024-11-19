@@ -48,6 +48,12 @@ management:
       exposure:
         include: health, info
 
+springdoc:
+  swagger-ui:
+    path: ${SWAGGER_UI_PATH}
+  api-docs:
+    path: ${SWAGGER_API_PATH}
+
 # jwt 토큰 정보
 jwt:
   auth-token-expired-second: ${AUTH_TOKEN_EXPIRED_SECOND}
