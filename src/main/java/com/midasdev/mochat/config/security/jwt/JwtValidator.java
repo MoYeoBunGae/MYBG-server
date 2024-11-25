@@ -47,7 +47,7 @@ public class JwtValidator {
             throw new ApplicationException(ApplicationExceptionType.JWT_INVALID_SIGNATURE);
         } catch (Exception e) {
             log.error("JWT parsing 중 처리되지 않은 Exception 발생", e);
-            throw new ApplicationException(ApplicationExceptionType.UNDEFINED_EXCEPTION, "unknown jwt parsing exception");
+            throw new ApplicationException(ApplicationExceptionType.UNDEFINED_EXCEPTION, e.getMessage());
         }
     }
 
@@ -67,7 +67,7 @@ public class JwtValidator {
             throw new ApplicationException(ApplicationExceptionType.JWT_INVALID_SIGNATURE);
         } catch (Exception e) {
             log.error("JWT parsing 중 처리되지 않은 Exception 발생", e);
-            throw new ApplicationException(ApplicationExceptionType.UNDEFINED_EXCEPTION, "unknown jwt parsing exception");
+            throw new ApplicationException(ApplicationExceptionType.UNDEFINED_EXCEPTION, e.getMessage());
         }
     }
 
