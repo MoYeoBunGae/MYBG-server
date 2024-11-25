@@ -35,7 +35,7 @@ public class JwtProvider {
         attributes.put(TokenAttribute.ID_TOKEN.getAttribute(), oidcUser.getIdToken().getTokenValue());
         attributes.put(TokenAttribute.TYPE.getAttribute(), TokenType.AUTH);
         Claims claims = new DefaultClaims(attributes);
-        return generateToken(oidcUser.getSubject(), claims, jwtProperty.getAccessTokenExpiredSecond());
+        return generateToken(oidcUser.getSubject(), claims, jwtProperty.getAuthTokenExpiredSecond());
     }
 
     public String generateToken(String subject, Claims claims, Integer validationSecond) {
