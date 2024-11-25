@@ -11,7 +11,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 @Slf4j
 @RestController
-@RequestMapping("/api/v1/sample")
+@RequestMapping("/api/v1/auth-free")
 @RequiredArgsConstructor
 public class SampleController {
 
