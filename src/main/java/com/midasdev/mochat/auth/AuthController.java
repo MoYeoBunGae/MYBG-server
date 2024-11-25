@@ -36,7 +36,6 @@ public class AuthController {
     private final AuthService authService;
     private final MemberService memberService;
     private final JwtClaimResolver jwtClaimResolver;
-    // TODO: Swagger API 설명 작성 + request, response, error 등 포맷 확인할 수 있는지 확인
 
     @Operation(summary = "로그인 API", description = "Social 인증 후 서버에서 발급한 authToken을 통해 accessToken, refreshToken을 발급합니다.")
     @PostMapping
@@ -77,6 +76,7 @@ public class AuthController {
         return ResponseEntity.ok(tokenReIssueResponse);
     }
 
+    // Refactor: SecurityRequirement name 상수 관리에 대해 생각
     @Operation(summary = "로그아웃 API", description = "사용자의 refresh token을 삭제하여 로그아웃합니다.", security = @SecurityRequirement(name = "BearerAuth"))
     @PostMapping("/logout")
     public ResponseEntity<String> logout(@AuthenticationPrincipal Member member) {
