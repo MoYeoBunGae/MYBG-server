@@ -39,6 +39,9 @@ public class SecurityConfig {
     @Value("${client.url}")
     private String clientUrl;
 
+    @Value("${server.url}")
+    private String serverUrl;
+
     @Value("${security.permitted-urls}")
     private String[] permitUrlPatterns;
 
@@ -77,7 +80,7 @@ public class SecurityConfig {
     public CorsConfigurationSource corsConfigurationSource() {
         // 만약 cors 설정 종류가 많아지면 함수화
         CorsConfiguration config = new CorsConfiguration();
-        config.setAllowedOrigins(List.of(clientUrl));
+        config.setAllowedOrigins(List.of(clientUrl, serverUrl));
         config.addAllowedHeader("*");
         config.addAllowedMethod("*");
 
