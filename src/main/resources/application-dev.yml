@@ -67,6 +67,10 @@ client:
   redirect:
     auth-success: ${CLIENT_REDIRECT_AUTH_SUCCESS_PATH}
 
+# dev server 정보
+server:
+  url: ${DEV_SERVER_URL}
+
 # 인증을 거치지 않는 API 설정
 security:
   permitted-urls: ${SECURITY_PERMITTED_URLS}
