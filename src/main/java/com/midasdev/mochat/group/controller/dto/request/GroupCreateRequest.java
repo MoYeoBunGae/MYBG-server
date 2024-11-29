@@ -1,5 +1,7 @@
 package com.midasdev.mochat.group.controller.dto.request;
 
-public record GroupCreateRequest(String name, String profileImageUrl) {
+import jakarta.validation.constraints.NotBlank;
+
+public record GroupCreateRequest(@NotBlank String name, String profileImageUrl) {
 
 }

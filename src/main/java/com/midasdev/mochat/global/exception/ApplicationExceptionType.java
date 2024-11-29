@@ -4,6 +4,7 @@ import java.text.MessageFormat;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import org.springframework.http.HttpStatus;
+import org.springframework.validation.BindException;
 
 @Getter
 @AllArgsConstructor
@@ -52,7 +53,18 @@ public enum ApplicationExceptionType {
 
     // global
     FILTER_OR_API_EXCEPTION(HttpStatus.INTERNAL_SERVER_ERROR, "ERR_GLOBAL_001", "Filter 에러 또는 API 로직 중 처리되지 못한 에러 발생 : {0}"),
+    /**
+     * - {0} : Exception Message
+     */
+    GLOBAL_BAD_REQEUST(HttpStatus.BAD_REQUEST, "ERR_GLOBAL_002", "잘못된 요청입니다. : {0}"),
     UNDEFINED_EXCEPTION(HttpStatus.INTERNAL_SERVER_ERROR, "ERR_GLOBAL_999", "정의되지 않은 에러입니다. : {0}");
+
+    public static ApplicationExceptionType resolveExceptionType(Exception exception) {
+        if (exception instanceof BindException) {
+            return ApplicationExceptionType.GLOBAL_BAD_REQEUST;
+        }
+        return ApplicationExceptionType.UNDEFINED_EXCEPTION;
+    }
 
     private final HttpStatus httpStatus;
     private final String exceptionCode;
