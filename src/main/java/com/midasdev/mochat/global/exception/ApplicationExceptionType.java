@@ -57,6 +57,10 @@ public enum ApplicationExceptionType {
      * - {0} : Exception Message
      */
     GLOBAL_BAD_REQEUST(HttpStatus.BAD_REQUEST, "ERR_GLOBAL_002", "잘못된 요청입니다. : {0}"),
+    /**
+     * - {0} : Exception Message
+     */
+    GLOBAL_INTERNAL_SERVER_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, "ERR_GLOBAL_003", "서버 내부 에러입니다. : {0}"),
     UNDEFINED_EXCEPTION(HttpStatus.INTERNAL_SERVER_ERROR, "ERR_GLOBAL_999", "정의되지 않은 에러입니다. : {0}");
 
     public static ApplicationExceptionType resolveExceptionType(Exception exception) {

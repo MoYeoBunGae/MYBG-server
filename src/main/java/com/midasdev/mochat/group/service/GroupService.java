@@ -15,12 +15,12 @@ public class GroupService {
     private final GroupSpringDataRepository groupSpringDataRepository;
 
     public Group createGroup(Member member, GroupCreateRequest groupCreateRequest) {
-        InvitationCode invitationCode = InvitationCode.createRandomCode();
         Group group = Group.builder()
                 .owner(member)
                 .name(groupCreateRequest.name())
                 .profileImageUrl(groupCreateRequest.profileImageUrl())
                 .invitationCode(invitationCode)
+                .invitationCode(new InvitationCode())
                 .deleted(false)
                 .build();
 
