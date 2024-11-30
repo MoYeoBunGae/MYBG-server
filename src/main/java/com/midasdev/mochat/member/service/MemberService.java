@@ -1,6 +1,7 @@
 package com.midasdev.mochat.member.service;
 
 import com.midasdev.mochat.auth.dto.TokenRequestUser;
+import com.midasdev.mochat.global.application.DefaultProfileImageService;
 import com.midasdev.mochat.global.application.DefaultProfileImageType;
 import com.midasdev.mochat.global.exception.ApplicationException;
 import com.midasdev.mochat.global.exception.ApplicationExceptionType;

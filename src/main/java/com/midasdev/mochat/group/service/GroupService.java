@@ -6,7 +6,7 @@ import com.midasdev.mochat.group.domain.Group;
 import com.midasdev.mochat.group.domain.InvitationCode;
 import com.midasdev.mochat.group.repository.GroupSpringDataRepository;
 import com.midasdev.mochat.member.domain.Member;
-import com.midasdev.mochat.member.service.DefaultProfileImageService;
+import com.midasdev.mochat.global.application.DefaultProfileImageService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;

@@ -1,6 +1,5 @@
-package com.midasdev.mochat.member.service;
+package com.midasdev.mochat.global.application;
 
-import com.midasdev.mochat.global.application.DefaultProfileImageType;
 import com.midasdev.mochat.global.url.ResourceUrlGenerator;
 import java.util.Random;
 import lombok.RequiredArgsConstructor;
