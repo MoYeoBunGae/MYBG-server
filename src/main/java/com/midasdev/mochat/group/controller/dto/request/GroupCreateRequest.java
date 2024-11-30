@@ -1,7 +1,15 @@
 package com.midasdev.mochat.group.controller.dto.request;
 
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.media.Schema.RequiredMode;
 import jakarta.validation.constraints.NotBlank;
 
-public record GroupCreateRequest(@NotBlank String name, String profileImageUrl) {
+@Schema(description = "그룹 생성 요청")
+public record GroupCreateRequest(
+        @Schema(description = "그룹 이름", example = "test group", requiredMode = RequiredMode.REQUIRED)
+        @NotBlank String name,
+
+        @Schema(description = "그룹 프로필 이미지 URL", example = "https://example.com/image.jpg")
+        String profileImageUrl) {
 
 }
