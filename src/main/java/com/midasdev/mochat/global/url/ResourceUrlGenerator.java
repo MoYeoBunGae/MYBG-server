@@ -19,4 +19,11 @@ public class ResourceUrlGenerator {
                                    .toUriString();
     }
 
+    public String generateS3Url(String path, String file) {
+        return UriComponentsBuilder.fromHttpUrl(cloudFrontUrl)
+                                   .path(path)
+                                   .path(file)
+                                   .toUriString();
+    }
+
 }

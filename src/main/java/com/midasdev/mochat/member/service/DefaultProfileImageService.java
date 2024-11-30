@@ -22,8 +22,19 @@ public class DefaultProfileImageService {
         return resourceUrlGenerator.generateS3Url(ResourcePath.DEFAULT_PROFILE_IMG, getFilename(randomProfileImageNumber));
     }
 
+    public String createRandomProfileImageUrl(DefaultProfileImageType defaultProfileImageType) {
+        Random random = new Random();
+        int randomProfileImageNumber = random.nextInt(defaultProfileImageType.getTotalImage()) + 1;
+        return resourceUrlGenerator.generateS3Url(defaultProfileImageType.getDirectory(),
+                                                  getFilename(defaultProfileImageType.getFilePrefix(), randomProfileImageNumber));
+    }
+
     private String getFilename(int number) {
         return FILE_PREFIX + number + "." + PNG_EXT;
+    }
+
+    private String getFilename(String filePrefix, int number) {
+        return filePrefix + number + "." + PNG_EXT;
     }
 
 }
