@@ -12,13 +12,6 @@ public class ResourceUrlGenerator {
     @Value("${cloudfront.url}")
     private String cloudFrontUrl;
 
-    public String generateS3Url(ResourcePath path, String file) {
-        return UriComponentsBuilder.fromHttpUrl(cloudFrontUrl)
-                                   .path(path.getPath())
-                                   .path(file)
-                                   .toUriString();
-    }
-
     public String generateS3Url(String path, String file) {
         return UriComponentsBuilder.fromHttpUrl(cloudFrontUrl)
                                    .path(path)

@@ -1,7 +1,7 @@
 package com.midasdev.mochat.member.service;
 
 import com.midasdev.mochat.auth.dto.TokenRequestUser;
-import com.midasdev.mochat.config.security.jwt.repository.RefreshTokenRedisRepository;
+import com.midasdev.mochat.global.application.DefaultProfileImageType;
 import com.midasdev.mochat.global.exception.ApplicationException;
 import com.midasdev.mochat.global.exception.ApplicationExceptionType;
 import com.midasdev.mochat.member.domain.Member;
@@ -17,7 +17,6 @@ public class MemberService {
 
     private final DefaultProfileImageService defaultProfileImageService;
     private final MemberSpringDataRepository memberSpringDataRepository;
-    private final RefreshTokenRedisRepository refreshTokenRedisRepository;
 
     @Transactional(readOnly = true)
     public Optional<Member> findMemberByOauthAccount(TokenRequestUser tokenRequestUser) {
@@ -34,7 +33,7 @@ public class MemberService {
         Member member = Member.builder()
                               .oauthAccount(tokenRequestUser.oauthAccount())
                               .name(tokenRequestUser.nickname())
-                              .profileImageUrl(defaultProfileImageService.createRandomProfileImageUrl())
+                              .profileImageUrl(defaultProfileImageService.createRandomProfileImageUrl(DefaultProfileImageType.MEMBER))
                               .build();
 
         return memberSpringDataRepository.save(member);
