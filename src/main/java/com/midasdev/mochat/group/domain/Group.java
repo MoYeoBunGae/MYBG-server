@@ -48,9 +48,8 @@ public class Group {
     @Column(nullable = false)
     private String profileImageUrl;
 
-    @Embedded
     @Column(nullable = false)
-    private InvitationCode invitationCode;
+    private String invitationCode;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "member_id")
@@ -64,12 +63,8 @@ public class Group {
     @Default
     private Audit audit = new Audit();
 
-    public void updateInvitationCode() {
-        if (this.invitationCode == null) {
-            this.invitationCode = new InvitationCode();
-        } else {
-            this.invitationCode.changeCode();
-        }
+    public void updateInvitationCode(String invitationCode) {
+        this.invitationCode = invitationCode;
     }
 
 }

@@ -5,6 +5,7 @@ import com.midasdev.mochat.global.application.DefaultProfileImageType;
 import com.midasdev.mochat.group.controller.dto.request.GroupCreateRequest;
 import com.midasdev.mochat.group.domain.Group;
 import com.midasdev.mochat.group.repository.GroupSpringDataRepository;
+import com.midasdev.mochat.group.service.component.InvitationCodeGenerator;
 import com.midasdev.mochat.member.domain.Member;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -20,6 +21,7 @@ public class GroupService {
 
     private final DefaultProfileImageService defaultProfileImageService;
     private final GroupSpringDataRepository groupSpringDataRepository;
+    private final InvitationCodeGenerator invitationCodeGenerator;
 
     @Transactional
     public Group createGroup(Member member, GroupCreateRequest groupCreateRequest) {
@@ -36,7 +38,7 @@ public class GroupService {
 
         while(true) {
             try {
-                group.updateInvitationCode();
+                group.updateInvitationCode(invitationCodeGenerator.generateRandomCode());
                 return groupSpringDataRepository.save(group);
             } catch (DataIntegrityViolationException e) {
                 log.warn("Duplicated invitation code. Retry to generate invitation code.");
