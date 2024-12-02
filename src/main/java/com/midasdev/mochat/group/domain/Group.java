@@ -64,4 +64,12 @@ public class Group {
     @Default
     private Audit audit = new Audit();
 
+    public void updateInvitationCode() {
+        if (this.invitationCode == null) {
+            this.invitationCode = new InvitationCode();
+        } else {
+            this.invitationCode.changeCode();
+        }
+    }
+
 }

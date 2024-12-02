@@ -27,6 +27,10 @@ public class InvitationCode {
         return code.toString();
     }
 
+    public void changeCode() {
+        this.invitationCode = generateRandomCode();
+    }
+
     private char generateRandomSingleCode() {
         int random = generateRandomNumber(2);
         return switch (random) {
