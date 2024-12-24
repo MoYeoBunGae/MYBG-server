@@ -12,7 +12,7 @@ public record GroupCreateResponse(long groupId, String name, String profileImage
                 .groupId(group.getId())
                 .name(group.getName())
                 .profileImageUrl(group.getProfileImageUrl())
-                .invitationCode(group.getInvitationCode().getInvitationCode())
+                .invitationCode(group.getInvitationCode())
                 .build();
     }
 
