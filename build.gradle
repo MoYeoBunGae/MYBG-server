@@ -52,6 +52,9 @@ dependencies {
     implementation 'io.jsonwebtoken:jjwt-impl:0.11.5'
     implementation 'io.jsonwebtoken:jjwt-jackson:0.11.5'
 
+    // h2 database
+    implementation 'com.h2database:h2'
+
     // actuator
     implementation "org.springframework.boot:spring-boot-starter-actuator"
 
@@ -69,5 +72,8 @@ dependencies {
 }
 
 tasks.named('test') {
+    doFirst {
+        systemProperty 'spring.profiles.active', 'test'
+    }
     useJUnitPlatform()
 }
