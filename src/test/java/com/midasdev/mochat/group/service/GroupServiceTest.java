@@ -14,12 +14,12 @@ import com.midasdev.mochat.group.domain.Group;
 import com.midasdev.mochat.group.repository.GroupSpringDataRepository;
 import com.midasdev.mochat.group.service.component.InvitationCodeGenerator;
 import com.midasdev.mochat.member.domain.Member;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.dao.DataIntegrityViolationException;
 
 @ExtendWith(MockitoExtension.class)
@@ -34,9 +34,9 @@ class GroupServiceTest {
     private GroupService groupService;
 
     @Test
+    @DisplayName("중복된 초대 코드를 가진 그룹 저장시 재시도")
     public void 중복된_초대_코드를_가진_그룹_저장시_재시도() {
         // given
-
         String duplicateCode = "AAAAAAAA";
         String uniqueCode = "BBBBBBBB";
         String groupName = "name";
