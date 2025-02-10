@@ -27,7 +27,7 @@ jobs:
 
       - name: Create environment variable file from ENV_LIST secret
         run: |
-          echo "${{ secrets.MOCHAT_TEST_ENV }}" > .env
+          echo "${{ secrets.MYBG_TEST_ENV }}" > .env
           echo "Environment variable file (.env) created:"
 
       - name: Load environment variables from .env file
@@ -99,11 +99,11 @@ jobs:
           username: ${{ secrets.EC2_SSH_USER }}
           key: ${{ secrets.EC2_SSH_PRIVATE_KEY }}
           script: |
-            echo "${{ secrets.MOCHAT_DEV_ENV }}" > ${{ secrets.MOCHAT_DEV_ENV_PATH }}
+            echo "${{ secrets.MYBG_DEV_ENV }}" > ${{ secrets.MYBG_DEV_ENV_PATH }}
             
-            docker compose -f ${{ secrets.MOCHAT_DEV_COMPOSE }} down
+            docker compose -f ${{ secrets.MYBG_DEV_COMPOSE }} down
             docker pull ${{ secrets.DOCKER_IMAGE_NAME_DEV }}:latest
-            docker compose -f ${{ secrets.MOCHAT_DEV_COMPOSE }} up -d
+            docker compose -f ${{ secrets.MYBG_DEV_COMPOSE }} up -d
 
   dependency-submission:
     runs-on: ubuntu-latest

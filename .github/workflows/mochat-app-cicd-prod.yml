@@ -64,11 +64,11 @@ jobs:
           username: ${{ secrets.EC2_SSH_USER }}
           key: ${{ secrets.EC2_SSH_PRIVATE_KEY }}
           script: |
-            echo "${{ secrets.MOCHAT_ENV }}" > ${{ secrets.MOCHAT_ENV_PATH }}
+            echo "${{ secrets.MYBG_ENV }}" > ${{ secrets.MYBG_ENV_PATH }}
             
-            docker compose -f ${{ secrets.MOCHAT_COMPOSE }} down
+            docker compose -f ${{ secrets.MYBG_COMPOSE }} down
             docker pull ${{ secrets.DOCKER_IMAGE_NAME }}:latest
-            docker compose -f ${{ secrets.MOCHAT_COMPOSE }} up -d
+            docker compose -f ${{ secrets.MYBG_COMPOSE }} up -d
 
   dependency-submission:
     runs-on: ubuntu-latest
