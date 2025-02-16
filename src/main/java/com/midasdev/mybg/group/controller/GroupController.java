@@ -13,9 +13,11 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.validation.annotation.Validated;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 @Tag(name = "Group APIs")
@@ -33,7 +35,13 @@ public class GroupController {
                                                      @Valid @RequestBody GroupCreateRequest groupCreateRequest) {
         Group group = groupService.createGroup(member, groupCreateRequest);
         return ResponseEntity.ok(GroupResponse.from(group));
+    }
 
+    @Operation(summary = "그룹 조회 By 초대코드", description = "초대 코드로 그룹을 조회합니다.", security = @SecurityRequirement(name = "BearerAuth"))
+    @GetMapping("/search")
+    public ResponseEntity<GroupResponse> findGroupByInvitationCode(@RequestParam String invitationCode) {
+        Group group = groupService.findGroupByInvitationCode(invitationCode);
+        return ResponseEntity.ok(GroupResponse.from(group));
     }
 
 }
