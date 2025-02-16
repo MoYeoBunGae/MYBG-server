@@ -1,7 +1,7 @@
 package com.midasdev.mybg.group.controller;
 
 import com.midasdev.mybg.group.controller.dto.request.GroupCreateRequest;
-import com.midasdev.mybg.group.controller.dto.response.GroupCreateResponse;
+import com.midasdev.mybg.group.controller.dto.response.GroupResponse;
 import com.midasdev.mybg.group.domain.Group;
 import com.midasdev.mybg.group.service.GroupService;
 import com.midasdev.mybg.member.domain.Member;
@@ -29,10 +29,10 @@ public class GroupController {
 
     @Operation(summary = "그룹 생성 API", description = "특정 사용자가 그룹을 생성합니다.", security = @SecurityRequirement(name = "BearerAuth"))
     @PostMapping
-    public ResponseEntity<GroupCreateResponse> createGroup(@AuthenticationPrincipal Member member,
-                                                           @Valid @RequestBody GroupCreateRequest groupCreateRequest) {
+    public ResponseEntity<GroupResponse> createGroup(@AuthenticationPrincipal Member member,
+                                                     @Valid @RequestBody GroupCreateRequest groupCreateRequest) {
         Group group = groupService.createGroup(member, groupCreateRequest);
-        return ResponseEntity.ok(GroupCreateResponse.from(group));
+        return ResponseEntity.ok(GroupResponse.from(group));
 
     }
 
