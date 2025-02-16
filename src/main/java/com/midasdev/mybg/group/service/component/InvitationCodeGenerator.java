@@ -9,14 +9,13 @@ import org.springframework.stereotype.Component;
 @NoArgsConstructor
 public class InvitationCodeGenerator {
 
-    private static final int CODE_LENGTH = 8;
     private static final int NUMBER = 0;
     private static final int ALPHABET = 1;
 
     // 숫자 및 영어 대문자 8자리로 이루어진 랜덤 초대 코드 생성
-    public String generateRandomCode() {
+    public String generateRandomCode(int length) {
         StringBuilder code = new StringBuilder();
-        for (int i = 0; i < CODE_LENGTH; i++) {
+        for (int i = 0; i < length; i++) {
             code.append(generateRandomSingleCode());
         }
         return code.toString();

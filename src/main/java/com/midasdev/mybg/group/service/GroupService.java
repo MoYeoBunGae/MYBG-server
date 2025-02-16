@@ -2,6 +2,9 @@ package com.midasdev.mybg.group.service;
 
 import com.midasdev.mybg.global.application.DefaultProfileImageService;
 import com.midasdev.mybg.global.application.DefaultProfileImageType;
+import com.midasdev.mybg.global.exception.ApplicationException;
+import com.midasdev.mybg.global.exception.ApplicationExceptionType;
+import com.midasdev.mybg.global.util.assertion.Assertion;
 import com.midasdev.mybg.group.controller.dto.request.GroupCreateRequest;
 import com.midasdev.mybg.group.domain.Group;
 import com.midasdev.mybg.group.repository.GroupSpringDataRepository;
@@ -18,6 +21,8 @@ import org.springframework.util.StringUtils;
 @Service
 @RequiredArgsConstructor
 public class GroupService {
+
+    private static final int CODE_LENGTH = 8;
 
     private final DefaultProfileImageService defaultProfileImageService;
     private final GroupSpringDataRepository groupSpringDataRepository;
@@ -38,12 +43,25 @@ public class GroupService {
 
         while(true) {
             try {
-                group.updateInvitationCode(invitationCodeGenerator.generateRandomCode());
+                group.updateInvitationCode(invitationCodeGenerator.generateRandomCode(CODE_LENGTH));
                 return groupSpringDataRepository.save(group);
             } catch (DataIntegrityViolationException e) {
                 log.warn("Duplicated invitation code. Retry to generate invitation code.");
             }
         }
+    }
+
+    @Transactional(readOnly = true)
+    public Group findGroupByInvitationCode(String invitationCode) {
+        validateInvitationCode(invitationCode);
+        return groupSpringDataRepository.findByInvitationCode(invitationCode)
+                                        .orElseThrow(() -> new ApplicationException(ApplicationExceptionType.GROUP_NOT_FOUND_BY_INVITATION_CODE, invitationCode));
+    }
+
+    private void validateInvitationCode(String invitationCode) {
+        Assertion.with(invitationCode)
+                 .setValidation(code -> code.length() == CODE_LENGTH)
+                 .validateOrThrow(() -> new ApplicationException(ApplicationExceptionType.INVALID_INVITATION_CODE, invitationCode));
     }
 
 }
