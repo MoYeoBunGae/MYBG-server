@@ -25,6 +25,8 @@ import org.springframework.dao.DataIntegrityViolationException;
 @ExtendWith(MockitoExtension.class)
 class GroupServiceTest {
 
+    private static final int CODE_LENGTH = 8;
+
     @Mock
     private GroupSpringDataRepository groupSpringDataRepository;
     @Mock
@@ -42,7 +44,7 @@ class GroupServiceTest {
         String groupName = "name";
         String profileImageUrl = "profileImageUrl";
 
-        when(invitationCodeGenerator.generateRandomCode())
+        when(invitationCodeGenerator.generateRandomCode(CODE_LENGTH))
                 .thenReturn(duplicateCode)
                 .thenReturn(uniqueCode);
 
@@ -73,7 +75,7 @@ class GroupServiceTest {
         assertThat(createdGroup).isNotNull();
         assertThat(createdGroup.getInvitationCode()).isEqualTo(uniqueCode);
 
-        verify(invitationCodeGenerator, times(2)).generateRandomCode();
+        verify(invitationCodeGenerator, times(2)).generateRandomCode(CODE_LENGTH);
         verify(groupSpringDataRepository, times(2)).save(any(Group.class));
 
     }

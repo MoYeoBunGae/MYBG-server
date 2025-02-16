@@ -19,6 +19,8 @@ import org.springframework.util.StringUtils;
 @RequiredArgsConstructor
 public class GroupService {
 
+    private static final int CODE_LENGTH = 8;
+
     private final DefaultProfileImageService defaultProfileImageService;
     private final GroupSpringDataRepository groupSpringDataRepository;
     private final InvitationCodeGenerator invitationCodeGenerator;
@@ -38,7 +40,7 @@ public class GroupService {
 
         while(true) {
             try {
-                group.updateInvitationCode(invitationCodeGenerator.generateRandomCode());
+                group.updateInvitationCode(invitationCodeGenerator.generateRandomCode(CODE_LENGTH));
                 return groupSpringDataRepository.save(group);
             } catch (DataIntegrityViolationException e) {
                 log.warn("Duplicated invitation code. Retry to generate invitation code.");
