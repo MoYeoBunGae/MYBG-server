@@ -52,6 +52,12 @@ dependencies {
     implementation 'io.jsonwebtoken:jjwt-impl:0.11.5'
     implementation 'io.jsonwebtoken:jjwt-jackson:0.11.5'
 
+    // queryDSL
+    implementation 'com.querydsl:querydsl-jpa:5.0.0:jakarta'
+    annotationProcessor "com.querydsl:querydsl-apt:5.0.0:jakarta"
+    annotationProcessor "jakarta.annotation:jakarta.annotation-api"
+    annotationProcessor "jakarta.persistence:jakarta.persistence-api"
+
     // h2 database
     implementation 'com.h2database:h2'
 
@@ -73,7 +79,7 @@ dependencies {
 
 tasks.named('test') {
     doFirst {
-        systemProperty 'spring.profiles.active', 'test'
+        systemProperty 'spring.profiles.active', 'localtest'
     }
     useJUnitPlatform()
 }
