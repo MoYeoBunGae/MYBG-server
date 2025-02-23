@@ -89,10 +89,10 @@ public class SecurityConfig {
         return source;
     }
 
-    @Bean
-    ObservationRegistryCustomizer<ObservationRegistry> addTextHandler() {
-        return registry -> registry.observationConfig().observationHandler(new ObservationTextPublisher());
-    }
+//    @Bean
+//    ObservationRegistryCustomizer<ObservationRegistry> addTextHandler() {
+//        return registry -> registry.observationConfig().observationHandler(new ObservationTextPublisher());
+//    }
 
 
 }
