@@ -67,4 +67,8 @@ public class Group {
         this.invitationCode = invitationCode;
     }
 
+    public boolean isOwner(Member member) {
+        return this.owner.getId().equals(member.getId());
+    }
+
 }

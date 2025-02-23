@@ -17,6 +17,13 @@ public enum ApplicationExceptionType {
     GROUP_NOT_FOUND_BY_INVITATION_CODE(HttpStatus.BAD_REQUEST, "ERR_GROUP_002", "해당 초대 코드의 그룹을 찾을 수 없습니다. : {0}"),
     INVALID_INVITATION_CODE(HttpStatus.BAD_REQUEST, "ERR_GROUP_003", "유효하지 않은 초대 코드입니다. : {0}"),
 
+    // group member
+    /**
+     * - {0} : memberId
+     * - {1} : groupId
+     */
+    ALREADY_JOINED_GROUP(HttpStatus.BAD_REQUEST, "ERR_GROUP_MEMBER_001", "회원 {0}은 이미 그룹 {1}에 가입되어 있습니다."),
+
     // authentication
     TOKEN_AUTHENTICATION_EXCEPTION(HttpStatus.FORBIDDEN, "ERR_AUTH_001", "토큰 인증에 실패했습니다. : {0}"),
     NOT_BEARER_TOKEN(HttpStatus.FORBIDDEN, "ERR_AUTH_002", "Bearer Token이 아닙니다."),

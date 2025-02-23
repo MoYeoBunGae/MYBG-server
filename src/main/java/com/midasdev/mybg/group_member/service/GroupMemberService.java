@@ -1,0 +1,48 @@
+package com.midasdev.mybg.group_member.service;
+
+import com.midasdev.mybg.global.exception.ApplicationException;
+import com.midasdev.mybg.global.exception.ApplicationExceptionType;
+import com.midasdev.mybg.group.domain.Group;
+import com.midasdev.mybg.group.repository.GroupRepository;
+import com.midasdev.mybg.group_member.controller.dto.request.GroupJoinRequest;
+import com.midasdev.mybg.group_member.domain.GroupMember;
+import com.midasdev.mybg.group_member.repository.GroupMemberSpringDataRepository;
+import com.midasdev.mybg.member.domain.Member;
+import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+@Service
+@RequiredArgsConstructor
+public class GroupMemberService {
+
+    private final GroupRepository groupRepository;
+    private final GroupMemberSpringDataRepository groupMemberSpringDataRepository;
+
+    @Transactional
+    public GroupMember joinGroup(Member member, GroupJoinRequest groupJoinRequest) {
+        // group 검증
+        Group group = groupRepository.findById(groupJoinRequest.groupId())
+                                     .orElseThrow(() -> new ApplicationException(ApplicationExceptionType.GROUP_NOT_FOUND_BY_ID,
+                                                                                 groupJoinRequest.groupId()));
+        // owner 인지 검증
+        if (isAlreadyGroupMember(member, group)) {
+            throw new ApplicationException(ApplicationExceptionType.ALREADY_JOINED_GROUP, member.getId(), group.getId());
+        }
+
+        // nickname 이 null이면 member의 name을 사용
+        String nickname = groupJoinRequest.nickname() == null ? member.getName() : groupJoinRequest.nickname();
+
+        GroupMember groupMember = GroupMember.builder()
+                                             .nickname(nickname)
+                                             .member(member)
+                                             .group(group)
+                                             .build();
+        return groupMemberSpringDataRepository.save(groupMember);
+    }
+
+    private boolean isAlreadyGroupMember(Member member, Group group) {
+        return group.isOwner(member) || groupMemberSpringDataRepository.findByMemberAndGroup(member, group).isPresent();
+    }
+
+}
