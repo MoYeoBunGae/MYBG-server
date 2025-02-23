@@ -5,6 +5,8 @@ import com.midasdev.mybg.group_member.controller.dto.response.ActiveGroupMemberR
 import com.midasdev.mybg.group_member.domain.GroupMember;
 import com.midasdev.mybg.group_member.service.GroupMemberService;
 import com.midasdev.mybg.member.domain.Member;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -25,6 +27,7 @@ public class GroupMemberController {
 
     private final GroupMemberService groupMemberService;
 
+    @Operation(summary = "그룹 참여 API", security = @SecurityRequirement(name = "BearerAuth"))
     @PostMapping
     public ResponseEntity<ActiveGroupMemberResponse> joinGroup(@AuthenticationPrincipal Member member,
                                                                @Valid @RequestBody GroupJoinRequest groupJoinRequest) {
