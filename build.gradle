@@ -79,7 +79,7 @@ dependencies {
 
 tasks.named('test') {
     doFirst {
-        systemProperty 'spring.profiles.active', 'localtest'
+        systemProperty 'spring.profiles.active', 'test'
     }
     useJUnitPlatform()
 }
