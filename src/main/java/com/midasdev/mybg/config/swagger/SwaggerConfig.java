@@ -1,5 +1,7 @@
 package com.midasdev.mybg.config.swagger;
 
+import static com.midasdev.mybg.config.swagger.SwaggerConfig.SECURITY_SCHEME_NAME;
+
 import io.swagger.v3.oas.annotations.OpenAPIDefinition;
 import io.swagger.v3.oas.annotations.enums.SecuritySchemeType;
 import io.swagger.v3.oas.annotations.info.Info;
@@ -15,13 +17,14 @@ import org.springframework.context.annotation.Configuration;
         info = @Info(title = "MYBG API", version = "1.0")
 )
 @SecurityScheme(
-        name = "BearerAuth",
+        name = SECURITY_SCHEME_NAME,
         type = SecuritySchemeType.HTTP,
         scheme = "bearer",
         bearerFormat = "JWT",
         description = "Token Authentication"
 )
 public class SwaggerConfig {
+    public static final String SECURITY_SCHEME_NAME = "BearerAuth";
 
     @Value("${server.url}")
     private String serverUrl;

@@ -1,5 +1,7 @@
 package com.midasdev.mybg.sample.controller;
 
+import static com.midasdev.mybg.config.swagger.SwaggerConfig.SECURITY_SCHEME_NAME;
+
 import com.midasdev.mybg.member.domain.Member;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
@@ -21,7 +23,7 @@ public class SampleAuthController {
 
     private final SampleSpringDataRepository sampleSpringDataRepository;
 
-    @Operation(summary = "Sample API", description = "Sample API", security = @SecurityRequirement(name = "BearerAuth"))
+    @Operation(summary = "Sample API", description = "Sample API", security = @SecurityRequirement(name = SECURITY_SCHEME_NAME))
     @GetMapping
     public ResponseEntity<List<SampleEntity>> findSample(@AuthenticationPrincipal Member member) {
         log.info("member: {}", member.getId());

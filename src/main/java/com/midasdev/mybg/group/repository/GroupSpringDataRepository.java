@@ -5,7 +5,7 @@ import java.util.Optional;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 public interface GroupSpringDataRepository extends JpaRepository<Group, Long> {
-
+    Optional<Group> findByIdAndDeletedIsFalse(Long id);
     Optional<Group> findByInvitationCode(String invitationCode);
 
 }
