@@ -56,7 +56,7 @@ class GroupControllerTest {
 
         // when
         // then
-        mockMvc.perform(post("/api/v1/group")
+        mockMvc.perform(post("/api/v1/groups")
                                 .contentType(MediaType.APPLICATION_JSON)
                                 .with(SecurityMockMvcRequestPostProcessors.csrf())
                                 .with(SecurityMockMvcRequestPostProcessors.oidcLogin())
