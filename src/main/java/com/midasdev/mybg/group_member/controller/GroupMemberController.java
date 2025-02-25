@@ -1,5 +1,7 @@
 package com.midasdev.mybg.group_member.controller;
 
+import static com.midasdev.mybg.config.swagger.SwaggerConfig.SECURITY_SCHEME_NAME;
+
 import com.midasdev.mybg.group_member.controller.dto.request.GroupJoinRequest;
 import com.midasdev.mybg.group_member.controller.dto.response.ActiveGroupMemberResponse;
 import com.midasdev.mybg.group_member.domain.GroupMember;
@@ -27,7 +29,7 @@ public class GroupMemberController {
 
     private final GroupMemberService groupMemberService;
 
-    @Operation(summary = "그룹 참여 API", security = @SecurityRequirement(name = "BearerAuth"))
+    @Operation(summary = "그룹 참여 API", security = @SecurityRequirement(name = SECURITY_SCHEME_NAME))
     @PostMapping
     public ResponseEntity<ActiveGroupMemberResponse> joinGroup(@AuthenticationPrincipal Member member,
                                                                @Valid @RequestBody GroupJoinRequest groupJoinRequest) {
