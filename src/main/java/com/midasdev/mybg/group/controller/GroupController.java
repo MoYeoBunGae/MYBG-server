@@ -49,7 +49,7 @@ public class GroupController {
     @Operation(summary = "참여 중인 그룹 조회 API", description = "사용자가 참여 중인 그룹을 조회합니다.", security = @SecurityRequirement(name = "BearerAuth"))
     @GetMapping("/participating")
     public ResponseEntity<GroupListResponse> findGroupsByMemberId(@AuthenticationPrincipal Member member) {
-        List<Group> groups = groupService.findGroupsByMemberId(member);
+        List<Group> groups = groupService.findGroupsByMember(member);
         return ResponseEntity.ok(GroupListResponse.from(groups));
     }
 
