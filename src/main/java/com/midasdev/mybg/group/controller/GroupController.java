@@ -1,6 +1,7 @@
 package com.midasdev.mybg.group.controller;
 
 import com.midasdev.mybg.group.controller.dto.request.GroupCreateRequest;
+import com.midasdev.mybg.group.controller.dto.response.GroupListResponse;
 import com.midasdev.mybg.group.controller.dto.response.GroupResponse;
 import com.midasdev.mybg.group.domain.Group;
 import com.midasdev.mybg.group.service.GroupService;
@@ -9,6 +10,7 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -42,6 +44,13 @@ public class GroupController {
     public ResponseEntity<GroupResponse> findGroupByInvitationCode(@RequestParam String invitationCode) {
         Group group = groupService.findGroupByInvitationCode(invitationCode);
         return ResponseEntity.ok(GroupResponse.from(group));
+    }
+
+    @Operation(summary = "참여 중인 그룹 조회 API", description = "사용자가 참여 중인 그룹을 조회합니다.", security = @SecurityRequirement(name = "BearerAuth"))
+    @GetMapping("/participating")
+    public ResponseEntity<GroupListResponse> findGroupsByMemberId(@AuthenticationPrincipal Member member) {
+        List<Group> groups = groupService.findGroupsByMemberId(member);
+        return ResponseEntity.ok(GroupListResponse.from(groups));
     }
 
 }
