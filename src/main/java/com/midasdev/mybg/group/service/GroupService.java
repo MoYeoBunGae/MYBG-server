@@ -10,6 +10,7 @@ import com.midasdev.mybg.group.domain.Group;
 import com.midasdev.mybg.group.repository.GroupRepository;
 import com.midasdev.mybg.group.repository.GroupSpringDataRepository;
 import com.midasdev.mybg.group.service.component.InvitationCodeGenerator;
+import com.midasdev.mybg.group_member.repository.GroupMemberSpringDataRepository;
 import com.midasdev.mybg.member.domain.Member;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
@@ -30,6 +31,12 @@ public class GroupService {
     private final GroupSpringDataRepository groupSpringDataRepository;
     private final GroupRepository groupRepository;
     private final InvitationCodeGenerator invitationCodeGenerator;
+    private final GroupMemberSpringDataRepository groupMemberSpringDataRepository;
+
+    private Group findGroupById(Long groupId) {
+        return groupSpringDataRepository.findByIdAndDeletedIsFalse(groupId)
+                                        .orElseThrow(() -> new ApplicationException(ApplicationExceptionType.GROUP_NOT_FOUND_BY_ID, groupId));
+    }
 
     @Transactional
     public Group createGroup(Member member, GroupCreateRequest groupCreateRequest) {
@@ -69,6 +76,13 @@ public class GroupService {
 
     public List<Group> findGroupsByMember(Member member) {
         return groupRepository.findGroupsByMemberId(member.getId());
+    }
+
+    public int countGroupMembers(Long groupId) {
+        Group group = findGroupById(groupId);
+
+        // TODO: 그룹 통계 테이블 활용하도록 수정
+        return groupMemberSpringDataRepository.countByGroup(group);
     }
 
 }
