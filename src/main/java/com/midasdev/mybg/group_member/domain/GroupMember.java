@@ -44,7 +44,7 @@ public class GroupMember {
     @Column(name = "nickname", nullable = false)
     private String nickname;
 
-    @Column(name = "left_at", nullable = true)
+    @Column(name = "left_at")
     private LocalDateTime leftAt;
 
     @Embedded
@@ -52,11 +52,11 @@ public class GroupMember {
     private Audit audit = new Audit();
 
     @ManyToOne
-    @JoinColumn(name = "member_id")
+    @JoinColumn(name = "member_id", nullable = false)
     private Member member;
 
     @ManyToOne
-    @JoinColumn(name = "group_id")
+    @JoinColumn(name = "group_id", nullable = false)
     private Group group;
 
 }

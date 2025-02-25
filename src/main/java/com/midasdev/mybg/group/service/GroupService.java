@@ -7,9 +7,11 @@ import com.midasdev.mybg.global.exception.ApplicationExceptionType;
 import com.midasdev.mybg.global.util.assertion.Assertion;
 import com.midasdev.mybg.group.controller.dto.request.GroupCreateRequest;
 import com.midasdev.mybg.group.domain.Group;
+import com.midasdev.mybg.group.repository.GroupRepository;
 import com.midasdev.mybg.group.repository.GroupSpringDataRepository;
 import com.midasdev.mybg.group.service.component.InvitationCodeGenerator;
 import com.midasdev.mybg.member.domain.Member;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.dao.DataIntegrityViolationException;
@@ -26,6 +28,7 @@ public class GroupService {
 
     private final DefaultProfileImageService defaultProfileImageService;
     private final GroupSpringDataRepository groupSpringDataRepository;
+    private final GroupRepository groupRepository;
     private final InvitationCodeGenerator invitationCodeGenerator;
 
     @Transactional
@@ -62,6 +65,10 @@ public class GroupService {
         Assertion.with(invitationCode)
                  .setValidation(code -> code.length() == CODE_LENGTH)
                  .validateOrThrow(() -> new ApplicationException(ApplicationExceptionType.INVALID_INVITATION_CODE, invitationCode));
+    }
+
+    public List<Group> findGroupsByMember(Member member) {
+        return groupRepository.findGroupsByMemberId(member.getId());
     }
 
 }

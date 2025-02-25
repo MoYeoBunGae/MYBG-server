@@ -52,7 +52,7 @@ public class Group {
     private String invitationCode;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "member_id")
+    @JoinColumn(name = "owner_member_id")
     private Member owner;
 
     @Column(nullable = false)
