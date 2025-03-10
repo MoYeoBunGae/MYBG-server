@@ -49,4 +49,8 @@ public class GroupStatistics {
     @ColumnDefault("false")
     private Boolean deleted;
 
+    public void increaseTotalMemberCount() {
+        this.totalMemberCount++;
+    }
+
 }

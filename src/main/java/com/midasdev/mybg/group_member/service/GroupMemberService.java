@@ -3,7 +3,9 @@ package com.midasdev.mybg.group_member.service;
 import com.midasdev.mybg.global.exception.ApplicationException;
 import com.midasdev.mybg.global.exception.ApplicationExceptionType;
 import com.midasdev.mybg.group.domain.Group;
+import com.midasdev.mybg.group.domain.GroupStatistics;
 import com.midasdev.mybg.group.repository.GroupRepository;
+import com.midasdev.mybg.group.repository.GroupStatisticsRepository;
 import com.midasdev.mybg.group_member.controller.dto.request.GroupJoinRequest;
 import com.midasdev.mybg.group_member.domain.GroupMember;
 import com.midasdev.mybg.group_member.repository.GroupMemberSpringDataRepository;
@@ -18,6 +20,7 @@ public class GroupMemberService {
 
     private final GroupRepository groupRepository;
     private final GroupMemberSpringDataRepository groupMemberSpringDataRepository;
+    private final GroupStatisticsRepository groupStatisticsRepository;
 
     @Transactional
     public GroupMember joinGroup(Member member, GroupJoinRequest groupJoinRequest) {
@@ -38,8 +41,18 @@ public class GroupMemberService {
                                              .member(member)
                                              .group(group)
                                              .build();
-        return groupMemberSpringDataRepository.save(groupMember);
+        return saveGroupMember(groupMember, group);
     }
+
+    private GroupMember saveGroupMember(GroupMember groupMember, Group group) {
+        GroupMember savedGroupMember = groupMemberSpringDataRepository.save(groupMember);
+        GroupStatistics groupStatistics = groupStatisticsRepository.findById(group.getId()).orElseThrow(
+                () -> new ApplicationException(ApplicationExceptionType.GROUP_STATISTICS_NOT_FOUND_BY_ID, group.getId()));
+
+        groupStatistics.increaseTotalMemberCount();
+        return savedGroupMember;
+    }
+
 
     private boolean isAlreadyGroupMember(Member member, Group group) {
         return group.isOwner(member) || groupMemberSpringDataRepository.findByMemberAndGroup(member, group).isPresent();
