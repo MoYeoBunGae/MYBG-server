@@ -7,15 +7,17 @@ import com.midasdev.mybg.global.exception.ApplicationExceptionType;
 import com.midasdev.mybg.global.util.assertion.Assertion;
 import com.midasdev.mybg.group.controller.dto.request.GroupCreateRequest;
 import com.midasdev.mybg.group.domain.Group;
+import com.midasdev.mybg.group.domain.GroupStatistics;
 import com.midasdev.mybg.group.repository.GroupRepository;
 import com.midasdev.mybg.group.repository.GroupSpringDataRepository;
+import com.midasdev.mybg.group.repository.GroupStatisticsRepository;
 import com.midasdev.mybg.group.service.component.InvitationCodeGenerator;
+import com.midasdev.mybg.group_member.domain.GroupMember;
 import com.midasdev.mybg.group_member.repository.GroupMemberSpringDataRepository;
 import com.midasdev.mybg.member.domain.Member;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
@@ -32,6 +34,7 @@ public class GroupService {
     private final GroupRepository groupRepository;
     private final InvitationCodeGenerator invitationCodeGenerator;
     private final GroupMemberSpringDataRepository groupMemberSpringDataRepository;
+    private final GroupStatisticsRepository groupStatisticsRepository;
 
     private Group findGroupById(Long groupId) {
         return groupSpringDataRepository.findByIdAndDeletedIsFalse(groupId)
@@ -51,21 +54,51 @@ public class GroupService {
                            .deleted(false)
                            .build();
 
-        while(true) {
-            try {
-                group.updateInvitationCode(invitationCodeGenerator.generateRandomCode(CODE_LENGTH));
-                return groupSpringDataRepository.save(group);
-            } catch (DataIntegrityViolationException e) {
-                log.warn("Duplicated invitation code. Retry to generate invitation code.");
-            }
-        }
+        String invitationCode = generateUniqueRandomInvitationCode();
+
+        group.updateInvitationCode(invitationCode);
+        Group savedGroup = groupSpringDataRepository.save(group);
+
+        // 그룹 생성자를 그룹 멤버로 추가
+        addOwnerToGroupMember(member, savedGroup);
+
+        // 통계 테이블 row 생성
+        createGroupStatistics(savedGroup);
+
+        return savedGroup;
+    }
+
+    private void addOwnerToGroupMember(Member member, Group savedGroup) {
+        GroupMember owner = GroupMember.builder()
+                                       .nickname(member.getName())
+                                       .group(savedGroup)
+                                       .member(member)
+                                       .build();
+        groupMemberSpringDataRepository.save(owner);
+    }
+
+    private String generateUniqueRandomInvitationCode() {
+        String code;
+        do {
+            code = invitationCodeGenerator.generateRandomCode(CODE_LENGTH);
+        } while (groupSpringDataRepository.existsByInvitationCode(code));
+        return code;
+    }
+
+    private void createGroupStatistics(Group group) {
+        groupStatisticsRepository.save(GroupStatistics.builder()
+                                                      .group(group)
+                                                      .totalMemberCount(1)
+                                                      .totalBungaeCount(0)
+                                                      .build());
     }
 
     @Transactional(readOnly = true)
     public Group findGroupByInvitationCode(String invitationCode) {
         validateInvitationCode(invitationCode);
         return groupSpringDataRepository.findByInvitationCode(invitationCode)
-                                        .orElseThrow(() -> new ApplicationException(ApplicationExceptionType.GROUP_NOT_FOUND_BY_INVITATION_CODE, invitationCode));
+                                        .orElseThrow(() -> new ApplicationException(ApplicationExceptionType.GROUP_NOT_FOUND_BY_INVITATION_CODE,
+                                                                                    invitationCode));
     }
 
     private void validateInvitationCode(String invitationCode) {
@@ -80,9 +113,10 @@ public class GroupService {
 
     public int countGroupMembers(Long groupId) {
         Group group = findGroupById(groupId);
-
-        // TODO: 그룹 통계 테이블 활용하도록 수정
-        return groupMemberSpringDataRepository.countByGroup(group);
+        GroupStatistics groupStatistics = groupStatisticsRepository.findById(group.getId())
+                                                                   .orElseThrow(() -> new ApplicationException(
+                                                                           ApplicationExceptionType.GROUP_STATISTICS_NOT_FOUND_BY_ID, group.getId()));
+        return groupStatistics.getTotalMemberCount();
     }
 
 }

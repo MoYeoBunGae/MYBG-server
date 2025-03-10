@@ -17,6 +17,13 @@ public enum ApplicationExceptionType {
     GROUP_NOT_FOUND_BY_INVITATION_CODE(HttpStatus.BAD_REQUEST, "ERR_GROUP_002", "해당 초대 코드의 그룹을 찾을 수 없습니다. : {0}"),
     INVALID_INVITATION_CODE(HttpStatus.BAD_REQUEST, "ERR_GROUP_003", "유효하지 않은 초대 코드입니다. : {0}"),
 
+    // group statistics
+    GROUP_STATISTICS_NOT_FOUND_BY_ID(
+            HttpStatus.BAD_REQUEST,
+            "ERR_GROUP_STATISTICS_001",
+            "해당 그룹 ID의 그룹 통계를 찾을 수 없습니다. : {0}"
+    ),
+
     // group member
     /**
      * - {0} : memberId
