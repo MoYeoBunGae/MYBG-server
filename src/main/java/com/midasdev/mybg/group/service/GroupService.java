@@ -75,6 +75,8 @@ public class GroupService {
     private void createGroupStatistics(Group group) {
         groupStatisticsRepository.save(GroupStatistics.builder()
                                                       .group(group)
+                                                      .totalMemberCount(1)
+                                                      .totalBungaeCount(0)
                                                       .build());
     }
 
