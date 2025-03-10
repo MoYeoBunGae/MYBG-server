@@ -113,9 +113,10 @@ public class GroupService {
 
     public int countGroupMembers(Long groupId) {
         Group group = findGroupById(groupId);
-
-        // TODO: 그룹 통계 테이블 활용하도록 수정
-        return groupMemberSpringDataRepository.countByGroup(group);
+        GroupStatistics groupStatistics = groupStatisticsRepository.findById(group.getId())
+                                                                   .orElseThrow(() -> new ApplicationException(
+                                                                           ApplicationExceptionType.GROUP_STATISTICS_NOT_FOUND_BY_ID, group.getId()));
+        return groupStatistics.getTotalMemberCount();
     }
 
 }
