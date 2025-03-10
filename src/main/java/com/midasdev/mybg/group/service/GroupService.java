@@ -12,6 +12,7 @@ import com.midasdev.mybg.group.repository.GroupRepository;
 import com.midasdev.mybg.group.repository.GroupSpringDataRepository;
 import com.midasdev.mybg.group.repository.GroupStatisticsRepository;
 import com.midasdev.mybg.group.service.component.InvitationCodeGenerator;
+import com.midasdev.mybg.group_member.domain.GroupMember;
 import com.midasdev.mybg.group_member.repository.GroupMemberSpringDataRepository;
 import com.midasdev.mybg.member.domain.Member;
 import java.util.List;
@@ -58,10 +59,22 @@ public class GroupService {
         group.updateInvitationCode(invitationCode);
         Group savedGroup = groupSpringDataRepository.save(group);
 
+        // 그룹 생성자를 그룹 멤버로 추가
+        addOwnerToGroupMember(member, savedGroup);
+
         // 통계 테이블 row 생성
         createGroupStatistics(savedGroup);
 
         return savedGroup;
+    }
+
+    private void addOwnerToGroupMember(Member member, Group savedGroup) {
+        GroupMember owner = GroupMember.builder()
+                                       .nickname(member.getName())
+                                       .group(savedGroup)
+                                       .member(member)
+                                       .build();
+        groupMemberSpringDataRepository.save(owner);
     }
 
     private String generateUniqueRandomInvitationCode() {
