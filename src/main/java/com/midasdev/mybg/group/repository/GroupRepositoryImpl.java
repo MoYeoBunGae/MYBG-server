@@ -2,6 +2,7 @@ package com.midasdev.mybg.group.repository;
 
 import com.midasdev.mybg.group.domain.Group;
 import com.midasdev.mybg.group.domain.QGroup;
+import com.midasdev.mybg.group.domain.QGroupStatistics;
 import com.midasdev.mybg.group_member.domain.QGroupMember;
 import com.midasdev.mybg.member.domain.QMember;
 import com.querydsl.jpa.impl.JPAQueryFactory;
@@ -31,8 +32,9 @@ public class GroupRepositoryImpl implements GroupRepository {
     }
 
     @Override
-    public List<Group> findGroupsByMemberId(Long memberId) {
+    public List<Group> findGroupsWithStatisticsByMemberId(Long memberId) {
         QGroup group = QGroup.group;
+        QGroupStatistics groupStatistics = QGroupStatistics.groupStatistics;
         QGroupMember groupMember = QGroupMember.groupMember;
         QMember member = QMember.member;
 
@@ -40,6 +42,8 @@ public class GroupRepositoryImpl implements GroupRepository {
                 .join(groupMember).on(group.eq(groupMember.group))
                 .fetchJoin()
                 .join(group.owner, member)
+                .fetchJoin()
+                .leftJoin(group.groupStatistics, groupStatistics)
                 .fetchJoin()
                 .where(groupMember.member.id.eq(memberId))
                 .fetch()

@@ -12,6 +12,7 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
 import jakarta.persistence.UniqueConstraint;
 import lombok.AccessLevel;
@@ -34,7 +35,7 @@ import org.springframework.data.jpa.domain.support.AuditingEntityListener;
                 @UniqueConstraint(
                         name = "uq_invitation_code",
                         columnNames = { "invitation_code" })
-})
+        })
 public class Group {
 
     @Id
@@ -63,12 +64,19 @@ public class Group {
     @Default
     private Audit audit = new Audit();
 
+    @OneToOne(mappedBy = "group")
+    GroupStatistics groupStatistics;
+
     public void updateInvitationCode(String invitationCode) {
         this.invitationCode = invitationCode;
     }
 
     public boolean isOwner(Member member) {
         return this.owner.getId().equals(member.getId());
+    }
+
+    public int getTotalMemberCount() {
+        return this.groupStatistics.getTotalMemberCount();
     }
 
 }

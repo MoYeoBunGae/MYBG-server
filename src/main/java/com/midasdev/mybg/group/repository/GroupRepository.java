@@ -7,5 +7,5 @@ import java.util.Optional;
 public interface GroupRepository {
     Optional<Group> findById(Long groupId);
 
-    List<Group> findGroupsByMemberId(Long memberId);
+    List<Group> findGroupsWithStatisticsByMemberId(Long memberId);
 }
