@@ -16,6 +16,11 @@ public enum ApplicationExceptionType {
     GROUP_NOT_FOUND_BY_ID(HttpStatus.BAD_REQUEST, "ERR_GROUP_001", "해당 ID의 그룹을 찾을 수 없습니다. : {0}"),
     GROUP_NOT_FOUND_BY_INVITATION_CODE(HttpStatus.BAD_REQUEST, "ERR_GROUP_002", "해당 초대 코드의 그룹을 찾을 수 없습니다. : {0}"),
     INVALID_INVITATION_CODE(HttpStatus.BAD_REQUEST, "ERR_GROUP_003", "유효하지 않은 초대 코드입니다. : {0}"),
+    GROUP_MEMBER_CAPACITY_REACHED(
+            HttpStatus.BAD_REQUEST,
+            "ERR_GROUP_004",
+            "그룹 최대 인원 수를 초과할 수 없습니다. (그룹 ID : {0})"
+    ),
 
     // group statistics
     GROUP_STATISTICS_NOT_FOUND_BY_ID(

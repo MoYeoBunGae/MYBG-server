@@ -25,9 +25,15 @@ public class GroupMemberService {
     @Transactional
     public GroupMember joinGroup(Member member, GroupJoinRequest groupJoinRequest) {
         // group 검증
-        Group group = groupRepository.findById(groupJoinRequest.groupId())
+        Long requestedGroupId = groupJoinRequest.groupId();
+        Group group = groupRepository.findWithStatisticsById(requestedGroupId)
                                      .orElseThrow(() -> new ApplicationException(ApplicationExceptionType.GROUP_NOT_FOUND_BY_ID,
-                                                                                 groupJoinRequest.groupId()));
+                                                                                 requestedGroupId));
+        // group에 가입 가능한지 검증
+        if (group.isFull()) {
+            throw new ApplicationException(ApplicationExceptionType.GROUP_MEMBER_CAPACITY_REACHED, group.getId());
+        }
+
         // owner 인지 검증
         if (isAlreadyGroupMember(member, group)) {
             throw new ApplicationException(ApplicationExceptionType.ALREADY_JOINED_GROUP, member.getId(), group.getId());

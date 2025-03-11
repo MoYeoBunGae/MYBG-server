@@ -82,4 +82,8 @@ public class Group {
         return this.groupStatistics.getTotalMemberCount();
     }
 
+    public boolean isFull() {
+        return this.getTotalMemberCount() >= this.maxMemberCount;
+    }
+
 }

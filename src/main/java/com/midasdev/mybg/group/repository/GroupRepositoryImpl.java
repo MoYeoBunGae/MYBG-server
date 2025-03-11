@@ -32,6 +32,23 @@ public class GroupRepositoryImpl implements GroupRepository {
     }
 
     @Override
+    public Optional<Group> findWithStatisticsById(Long groupId) {
+        QGroup group = QGroup.group;
+        QGroupStatistics groupStatistics = QGroupStatistics.groupStatistics;
+        QMember member = QMember.member;
+
+        Group result = jpaQueryFactory.selectFrom(group)
+                                      .join(group.owner, member)
+                                      .fetchJoin()
+                                      .leftJoin(group.groupStatistics, groupStatistics)
+                                      .fetchJoin()
+                                      .where(group.id.eq(groupId))
+                                      .fetchOne();
+
+        return Optional.ofNullable(result);
+    }
+
+    @Override
     public List<Group> findGroupsWithStatisticsByMemberId(Long memberId) {
         QGroup group = QGroup.group;
         QGroupStatistics groupStatistics = QGroupStatistics.groupStatistics;
@@ -39,14 +56,15 @@ public class GroupRepositoryImpl implements GroupRepository {
         QMember member = QMember.member;
 
         return jpaQueryFactory.selectFrom(group)
-                .join(groupMember).on(group.eq(groupMember.group))
-                .fetchJoin()
-                .join(group.owner, member)
-                .fetchJoin()
-                .leftJoin(group.groupStatistics, groupStatistics)
-                .fetchJoin()
-                .where(groupMember.member.id.eq(memberId))
-                .fetch()
-                .stream().toList();
+                              .join(groupMember).on(group.eq(groupMember.group))
+                              .fetchJoin()
+                              .join(group.owner, member)
+                              .fetchJoin()
+                              .leftJoin(group.groupStatistics, groupStatistics)
+                              .fetchJoin()
+                              .where(groupMember.member.id.eq(memberId))
+                              .fetch()
+                              .stream().toList();
     }
+
 }
