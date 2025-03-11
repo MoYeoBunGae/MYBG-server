@@ -40,6 +40,9 @@ dependencies {
         }
     }
 
+    // aws
+    implementation 'org.springframework.cloud:spring-cloud-starter-aws:2.2.6.RELEASE'
+
     // ehcache
     implementation 'org.ehcache:ehcache:3.10.8'
 
