@@ -51,6 +51,7 @@ public class GroupService {
                            .owner(member)
                            .name(groupCreateRequest.name())
                            .profileImageUrl(profileImageUrl)
+                           .maxMemberCount(groupCreateRequest.maxMemberCount())
                            .deleted(false)
                            .build();
 

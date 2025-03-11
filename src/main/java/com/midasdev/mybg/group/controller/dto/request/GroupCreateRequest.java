@@ -10,6 +10,9 @@ public record GroupCreateRequest(
         @NotBlank String name,
 
         @Schema(description = "그룹 프로필 이미지 URL", example = "https://example.com/image.jpg")
-        String profileImageUrl) {
+        String profileImageUrl,
 
+        @Schema(title = "그룹 최대 인원", example = "100", requiredMode = RequiredMode.REQUIRED)
+        int maxMemberCount
+) {
 }

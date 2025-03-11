@@ -5,7 +5,14 @@ import com.midasdev.mybg.group.domain.Group;
 import lombok.Builder;
 
 @Builder
-public record GroupResponse(long groupId, String name, String profileImageUrl, String invitationCode, int totalMemberCount) {
+public record GroupResponse(
+        long groupId,
+        String name,
+        String profileImageUrl,
+        String invitationCode,
+        int totalMemberCount,
+        int maxMemberCount
+) {
 
     public static GroupResponse from(Group group) {
         return GroupResponse.builder()
@@ -14,6 +21,8 @@ public record GroupResponse(long groupId, String name, String profileImageUrl, S
                             .profileImageUrl(group.getProfileImageUrl())
                             .invitationCode(group.getInvitationCode())
                             .totalMemberCount(group.getTotalMemberCount())
+                            .maxMemberCount(group.getMaxMemberCount())
                             .build();
     }
+
 }
