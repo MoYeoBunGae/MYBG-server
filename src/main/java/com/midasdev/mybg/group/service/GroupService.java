@@ -41,6 +41,11 @@ public class GroupService {
                                         .orElseThrow(() -> new ApplicationException(ApplicationExceptionType.GROUP_NOT_FOUND_BY_ID, groupId));
     }
 
+    public Group findGroupWithStatisticsById(Long groupId) {
+        return groupRepository.findWithStatisticsById(groupId)
+                              .orElseThrow(() -> new ApplicationException(ApplicationExceptionType.GROUP_NOT_FOUND_BY_ID, groupId));
+    }
+
     @Transactional
     public Group createGroup(Member member, GroupCreateRequest groupCreateRequest) {
         String profileImageUrl = StringUtils.hasText(groupCreateRequest.profileImageUrl())
@@ -51,6 +56,7 @@ public class GroupService {
                            .owner(member)
                            .name(groupCreateRequest.name())
                            .profileImageUrl(profileImageUrl)
+                           .maxMemberCount(groupCreateRequest.maxMemberCount())
                            .deleted(false)
                            .build();
 
@@ -96,9 +102,9 @@ public class GroupService {
     @Transactional(readOnly = true)
     public Group findGroupByInvitationCode(String invitationCode) {
         validateInvitationCode(invitationCode);
-        return groupSpringDataRepository.findByInvitationCode(invitationCode)
-                                        .orElseThrow(() -> new ApplicationException(ApplicationExceptionType.GROUP_NOT_FOUND_BY_INVITATION_CODE,
-                                                                                    invitationCode));
+        return groupRepository.findByInvitationCode(invitationCode)
+                              .orElseThrow(() -> new ApplicationException(ApplicationExceptionType.GROUP_NOT_FOUND_BY_INVITATION_CODE,
+                                                                          invitationCode));
     }
 
     private void validateInvitationCode(String invitationCode) {

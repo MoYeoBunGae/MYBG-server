@@ -52,6 +52,9 @@ public class Group {
     @Column(nullable = false)
     private String invitationCode;
 
+    @Column(nullable = false)
+    private int maxMemberCount;
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "owner_member_id")
     private Member owner;
@@ -77,6 +80,10 @@ public class Group {
 
     public int getTotalMemberCount() {
         return this.groupStatistics.getTotalMemberCount();
+    }
+
+    public boolean isFull() {
+        return this.getTotalMemberCount() >= this.maxMemberCount;
     }
 
 }
