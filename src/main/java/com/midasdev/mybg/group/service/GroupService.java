@@ -108,7 +108,7 @@ public class GroupService {
     }
 
     public List<Group> findGroupsByMember(Member member) {
-        return groupRepository.findGroupsByMemberId(member.getId());
+        return groupRepository.findGroupsWithStatisticsByMemberId(member.getId());
     }
 
     public int countGroupMembers(Long groupId) {

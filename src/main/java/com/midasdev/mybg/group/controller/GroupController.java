@@ -58,8 +58,8 @@ public class GroupController {
         List<Group> groups = groupService.findGroupsByMember(member);
         return ResponseEntity.ok(GroupListResponse.from(groups));
     }
-    // TODO: BearerAuth 상수화
-    @Operation(summary = "그룹 인원 수 조회 API", description = "사용자가 참여 중인 그룹을 조회합니다.", security = @SecurityRequirement(name = SECURITY_SCHEME_NAME))
+
+    @Operation(summary = "그룹 인원 수 조회 API", description = "그룹의 인원 수를 조회합니다.", security = @SecurityRequirement(name = SECURITY_SCHEME_NAME))
     @GetMapping("/{groupId}/participants/count")
     public ResponseEntity<GroupMemberCountResponse> countGroupMembers(
             @Parameter(description = "그룹 ID", required = true)
