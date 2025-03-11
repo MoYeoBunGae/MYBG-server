@@ -41,6 +41,11 @@ public class GroupService {
                                         .orElseThrow(() -> new ApplicationException(ApplicationExceptionType.GROUP_NOT_FOUND_BY_ID, groupId));
     }
 
+    public Group findGroupWithStatisticsById(Long groupId) {
+        return groupRepository.findWithStatisticsById(groupId)
+                                        .orElseThrow(() -> new ApplicationException(ApplicationExceptionType.GROUP_NOT_FOUND_BY_ID, groupId));
+    }
+
     @Transactional
     public Group createGroup(Member member, GroupCreateRequest groupCreateRequest) {
         String profileImageUrl = StringUtils.hasText(groupCreateRequest.profileImageUrl())

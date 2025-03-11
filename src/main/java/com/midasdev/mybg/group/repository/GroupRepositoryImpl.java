@@ -42,7 +42,8 @@ public class GroupRepositoryImpl implements GroupRepository {
                                       .fetchJoin()
                                       .leftJoin(group.groupStatistics, groupStatistics)
                                       .fetchJoin()
-                                      .where(group.id.eq(groupId))
+                                      .where(group.id.eq(groupId)
+                                                     .and(group.deleted.isFalse()))
                                       .fetchOne();
 
         return Optional.ofNullable(result);
