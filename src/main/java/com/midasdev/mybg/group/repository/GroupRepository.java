@@ -5,9 +5,13 @@ import java.util.List;
 import java.util.Optional;
 
 public interface GroupRepository {
+
     Optional<Group> findById(Long groupId);
 
     Optional<Group> findWithStatisticsById(Long groupId);
 
     List<Group> findGroupsWithStatisticsByMemberId(Long memberId);
+
+    Optional<Group> findByInvitationCode(String invitationCode);
+
 }

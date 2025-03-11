@@ -43,7 +43,7 @@ public class GroupService {
 
     public Group findGroupWithStatisticsById(Long groupId) {
         return groupRepository.findWithStatisticsById(groupId)
-                                        .orElseThrow(() -> new ApplicationException(ApplicationExceptionType.GROUP_NOT_FOUND_BY_ID, groupId));
+                              .orElseThrow(() -> new ApplicationException(ApplicationExceptionType.GROUP_NOT_FOUND_BY_ID, groupId));
     }
 
     @Transactional
@@ -102,9 +102,9 @@ public class GroupService {
     @Transactional(readOnly = true)
     public Group findGroupByInvitationCode(String invitationCode) {
         validateInvitationCode(invitationCode);
-        return groupSpringDataRepository.findByInvitationCode(invitationCode)
-                                        .orElseThrow(() -> new ApplicationException(ApplicationExceptionType.GROUP_NOT_FOUND_BY_INVITATION_CODE,
-                                                                                    invitationCode));
+        return groupRepository.findByInvitationCode(invitationCode)
+                              .orElseThrow(() -> new ApplicationException(ApplicationExceptionType.GROUP_NOT_FOUND_BY_INVITATION_CODE,
+                                                                          invitationCode));
     }
 
     private void validateInvitationCode(String invitationCode) {
