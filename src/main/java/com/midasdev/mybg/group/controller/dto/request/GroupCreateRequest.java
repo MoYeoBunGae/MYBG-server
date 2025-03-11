@@ -2,6 +2,8 @@ package com.midasdev.mybg.group.controller.dto.request;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.media.Schema.RequiredMode;
+import jakarta.validation.constraints.Max;
+import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
 
 @Schema(description = "그룹 생성 요청")
@@ -13,6 +15,7 @@ public record GroupCreateRequest(
         String profileImageUrl,
 
         @Schema(title = "그룹 최대 인원", example = "100", requiredMode = RequiredMode.REQUIRED)
+        @Min(1) @Max(500)
         int maxMemberCount
 ) {
 }
