@@ -75,6 +75,16 @@ public enum ApplicationExceptionType {
     OIDC_PUBLIC_KEY_PARSING_EXCEPTION(HttpStatus.INTERNAL_SERVER_ERROR, "ERR_OIDC_001", "Provider {0}의 인증 public keys 에서 에러가 발생했습니다."),
     OIDC_PUBLIC_KEY_CONVERTING_EXCEPTION(HttpStatus.INTERNAL_SERVER_ERROR, "ERR_OIDC_002", "Public Key 연산 중 에러가 발생했습니다. - Converting"),
 
+
+    // S3
+    S3_FILE_UPLOAD_EXCEPTION(HttpStatus.INTERNAL_SERVER_ERROR, "ERR_S3_001", "S3 File Upload 중 에러가 발생했습니다."),
+    /**
+     * - {0} : 파일 포맷
+     */
+    S3_FILE_FORMAT_EXCEPTION(HttpStatus.BAD_REQUEST, "ERR_S3_002", "파일 포맷에 문제가 있습니다. : {0}"),
+    S3_FILE_MAX_SIZE_EXCEPTION(HttpStatus.BAD_REQUEST, "ERR_S3_003", "파일 크기가 5MB를 초과할 수 없습니다."),
+
+
     // global
     FILTER_OR_API_EXCEPTION(HttpStatus.INTERNAL_SERVER_ERROR, "ERR_GLOBAL_001", "Filter 에러 또는 API 로직 중 처리되지 못한 에러 발생 : {0}"),
     /**

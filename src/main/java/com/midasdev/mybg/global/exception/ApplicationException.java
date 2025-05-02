@@ -14,6 +14,12 @@ public class ApplicationException extends RuntimeException {
         this.messageArguments = args;
     }
 
+    public ApplicationException(ApplicationExceptionType exceptionType, Throwable cause, Object... args) {
+        super(exceptionType.getErrorMessage(args), cause);
+        this.exceptionType = exceptionType;
+        this.messageArguments = args;
+    }
+
     public String getMessage() {
         return exceptionType.getErrorMessage(messageArguments);
     }
