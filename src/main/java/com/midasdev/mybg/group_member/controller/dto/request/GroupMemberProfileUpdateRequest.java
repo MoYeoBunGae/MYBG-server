@@ -12,7 +12,7 @@ public record GroupMemberProfileUpdateRequest(
         @Size(max = 10, message = "닉네임은 10자 이내여야 합니다.")
         String nickname,
 
-        @Schema(description = "프로필 이미지 파일 (jpg, png, gif), 변경하지 않을 시 null", format = "binary", requiredMode = RequiredMode.NOT_REQUIRED)
+        @Schema(description = "프로필 이미지 파일 (jpg, jpeg, png, gif), 변경하지 않을 시 null", format = "binary", requiredMode = RequiredMode.NOT_REQUIRED)
         MultipartFile image
 
 ) {}
