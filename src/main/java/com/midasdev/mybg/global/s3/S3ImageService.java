@@ -2,6 +2,7 @@ package com.midasdev.mybg.global.s3;
 
 import com.midasdev.mybg.global.exception.ApplicationException;
 import com.midasdev.mybg.global.exception.ApplicationExceptionType;
+import com.midasdev.mybg.global.url.ResourceUrlGenerator;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -23,6 +24,7 @@ public class S3ImageService {
     private static final long MAX_FILE_SIZE = 5 * 1024 * 1024; // 5MB
 
     private final S3Client s3Client;
+    private final ResourceUrlGenerator resourceUrlGenerator;
 
     @Value("${aws.s3.bucket-name}")
     private String bucketName;
@@ -30,12 +32,13 @@ public class S3ImageService {
     public String upload(MultipartFile multipartFile, String dirName) {
         validateImageFile(multipartFile);
 
-        String fileName = dirName + "/" + createFileName(multipartFile.getOriginalFilename());
+        String fileName = createFileName(multipartFile.getOriginalFilename());
+        String filePath = dirName + "/" + fileName;
 
         try (InputStream inputStream = multipartFile.getInputStream()) {
             PutObjectRequest putObjectRequest = PutObjectRequest.builder()
                                                                 .bucket(bucketName)
-                                                                .key(fileName)
+                                                                .key(filePath)
                                                                 .contentType(multipartFile.getContentType())
                                                                 .build();
 
@@ -44,9 +47,7 @@ public class S3ImageService {
             throw new ApplicationException(ApplicationExceptionType.S3_FILE_UPLOAD_EXCEPTION, e);
         }
 
-        return s3Client.utilities()
-                       .getUrl(builder -> builder.bucket(bucketName).key(fileName))
-                       .toExternalForm();
+        return resourceUrlGenerator.generateS3Url(dirName, fileName);
     }
 
     private void validateImageFile(MultipartFile multipartFile) {
