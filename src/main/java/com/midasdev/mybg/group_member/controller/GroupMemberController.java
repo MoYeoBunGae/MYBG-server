@@ -5,6 +5,7 @@ import static com.midasdev.mybg.config.swagger.SwaggerConfig.SECURITY_SCHEME_NAM
 import com.midasdev.mybg.group_member.controller.dto.request.GroupJoinRequest;
 import com.midasdev.mybg.group_member.controller.dto.request.GroupMemberProfileUpdateRequest;
 import com.midasdev.mybg.group_member.controller.dto.response.ActiveGroupMemberResponse;
+import com.midasdev.mybg.group_member.controller.dto.response.TOBE_ActiveGroupMemberResponse;
 import com.midasdev.mybg.group_member.domain.GroupMember;
 import com.midasdev.mybg.group_member.service.GroupMemberService;
 import com.midasdev.mybg.member.domain.Member;
@@ -48,13 +49,13 @@ public class GroupMemberController {
             security = @SecurityRequirement(name = SECURITY_SCHEME_NAME)
     )
     @PatchMapping(value = "/{groupMemberId}/profile", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    public ResponseEntity<ActiveGroupMemberResponse> updateGroupMemberProfile(
+    public ResponseEntity<TOBE_ActiveGroupMemberResponse> updateGroupMemberProfile(
             @PathVariable Long groupMemberId,
             @AuthenticationPrincipal Member member,
             @Valid @ModelAttribute GroupMemberProfileUpdateRequest request
     ) {
         GroupMember updatedMember = groupMemberService.updateProfile(groupMemberId, member, request);
-        return ResponseEntity.ok(ActiveGroupMemberResponse.from(updatedMember));
+        return ResponseEntity.ok(TOBE_ActiveGroupMemberResponse.from(updatedMember));
     }
 
 }
