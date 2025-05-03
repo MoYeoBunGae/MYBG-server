@@ -24,7 +24,7 @@ public class S3ImageService {
 
     private final S3Client s3Client;
 
-    @Value("${cloud.aws.s3.bucketName}")
+    @Value("${aws.s3.bucket-name}")
     private String bucketName;
 
     public String upload(MultipartFile multipartFile, String dirName) {
