@@ -58,6 +58,7 @@ public class GroupController {
     @GetMapping("/participating")
     public ResponseEntity<GroupListResponse> findGroupsByMemberId(@AuthenticationPrincipal Member member) {
         List<Group> groups = groupService.findGroupsByMember(member);
+        // TODO: 그룹 참여 id도 반환
         return ResponseEntity.ok(GroupListResponse.from(groups));
     }
 

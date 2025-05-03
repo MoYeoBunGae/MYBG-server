@@ -11,7 +11,6 @@ import com.midasdev.mybg.group_member.controller.dto.request.GroupJoinRequest;
 import com.midasdev.mybg.group_member.controller.dto.request.GroupMemberProfileUpdateRequest;
 import com.midasdev.mybg.group_member.domain.GroupMember;
 import com.midasdev.mybg.group_member.repository.GroupMemberRepository;
-import com.midasdev.mybg.group_member.repository.GroupMemberSpringDataRepository;
 import com.midasdev.mybg.member.domain.Member;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -47,6 +46,7 @@ public class GroupMemberService {
         // nickname 이 null이면 member의 name을 사용
         String nickname = groupJoinRequest.nickname() == null ? member.getName() : groupJoinRequest.nickname();
 
+        // TODO: 프로필 이미지 필드 추가
         GroupMember groupMember = GroupMember.builder()
                                              .nickname(nickname)
                                              .member(member)
