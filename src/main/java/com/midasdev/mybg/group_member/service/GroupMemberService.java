@@ -10,6 +10,7 @@ import com.midasdev.mybg.group.repository.GroupStatisticsRepository;
 import com.midasdev.mybg.group_member.controller.dto.request.GroupJoinRequest;
 import com.midasdev.mybg.group_member.controller.dto.request.GroupMemberProfileUpdateRequest;
 import com.midasdev.mybg.group_member.domain.GroupMember;
+import com.midasdev.mybg.group_member.repository.GroupMemberRepository;
 import com.midasdev.mybg.group_member.repository.GroupMemberSpringDataRepository;
 import com.midasdev.mybg.member.domain.Member;
 import lombok.RequiredArgsConstructor;
@@ -23,7 +24,7 @@ public class GroupMemberService {
 
     private final S3ImageService s3ImageService;
     private final GroupRepository groupRepository;
-    private final GroupMemberSpringDataRepository groupMemberSpringDataRepository;
+    private final GroupMemberRepository groupMemberRepository;
     private final GroupStatisticsRepository groupStatisticsRepository;
 
     @Transactional
@@ -55,7 +56,7 @@ public class GroupMemberService {
     }
 
     private GroupMember saveGroupMember(GroupMember groupMember, Group group) {
-        GroupMember savedGroupMember = groupMemberSpringDataRepository.save(groupMember);
+        GroupMember savedGroupMember = groupMemberRepository.save(groupMember);
         GroupStatistics groupStatistics = groupStatisticsRepository.findById(group.getId()).orElseThrow(
                 () -> new ApplicationException(ApplicationExceptionType.GROUP_STATISTICS_NOT_FOUND_BY_ID, group.getId()));
 
@@ -65,7 +66,7 @@ public class GroupMemberService {
 
 
     private boolean isAlreadyGroupMember(Member member, Group group) {
-        return group.isOwner(member) || groupMemberSpringDataRepository.findByMemberAndGroup(member, group).isPresent();
+        return group.isOwner(member) || groupMemberRepository.findByMemberAndGroup(member, group).isPresent();
     }
 
     @Transactional
