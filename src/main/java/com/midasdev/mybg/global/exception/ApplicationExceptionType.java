@@ -97,7 +97,7 @@ public enum ApplicationExceptionType {
      * - {0} : 파일 포맷
      */
     S3_FILE_FORMAT_EXCEPTION(HttpStatus.BAD_REQUEST, "ERR_S3_002", "파일 포맷에 문제가 있습니다. : {0}"),
-    S3_FILE_MAX_SIZE_EXCEPTION(HttpStatus.BAD_REQUEST, "ERR_S3_003", "파일 크기가 5MB를 초과할 수 없습니다."),
+    S3_FILE_MAX_SIZE_EXCEPTION(HttpStatus.BAD_REQUEST, "ERR_S3_003", "파일 크기가 3MB를 초과할 수 없습니다."),
 
 
     // global
