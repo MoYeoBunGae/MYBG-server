@@ -4,6 +4,7 @@ import static com.midasdev.mybg.config.swagger.SwaggerConfig.SECURITY_SCHEME_NAM
 
 import com.midasdev.mybg.global.util.validator.IsPositiveNumber;
 import com.midasdev.mybg.group.controller.dto.request.GroupCreateRequest;
+import com.midasdev.mybg.group.controller.dto.request.GroupUpdateRequest;
 import com.midasdev.mybg.group.controller.dto.response.GroupListResponse;
 import com.midasdev.mybg.group.controller.dto.response.GroupMemberCountResponse;
 import com.midasdev.mybg.group.controller.dto.response.GroupResponse;
@@ -17,10 +18,13 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -69,6 +73,21 @@ public class GroupController {
             @PathVariable @IsPositiveNumber Long groupId) {
         int groupMemberCount = groupService.countGroupMembers(groupId);
         return ResponseEntity.ok(new GroupMemberCountResponse(groupId, groupMemberCount));
+    }
+
+    @Operation(
+            summary = "그룹 정보 수정 API",
+            description = "그룹의 이름, 프로필 이미지, 최대 인원 수를 수정합니다. (오너만 가능)",
+            security = @SecurityRequirement(name = SECURITY_SCHEME_NAME)
+    )
+    @PatchMapping(value = "/{groupId}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public ResponseEntity<Void> updateGroup(
+            @PathVariable Long groupId,
+            @AuthenticationPrincipal Member member,
+            @Valid @ModelAttribute GroupUpdateRequest request
+    ) {
+        groupService.updateGroup(groupId, member, request);
+        return ResponseEntity.ok().build();
     }
 
 
