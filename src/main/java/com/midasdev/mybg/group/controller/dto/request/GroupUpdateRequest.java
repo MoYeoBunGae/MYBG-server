@@ -1,5 +1,6 @@
 package com.midasdev.mybg.group.controller.dto.request;
 
+import com.midasdev.mybg.global.util.validator.FileMaxSize;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.media.Schema.RequiredMode;
 import jakarta.validation.constraints.Max;
@@ -22,6 +23,7 @@ public record GroupUpdateRequest(
                 format = "binary",
                 requiredMode = RequiredMode.NOT_REQUIRED
         )
+        @FileMaxSize(value = 3 * 1024 * 1024, message = "파일 크기가 3MB를 초과할 수 없습니다.")
         MultipartFile profileImage,
 
         @Schema(
