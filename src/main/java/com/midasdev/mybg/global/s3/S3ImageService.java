@@ -21,7 +21,7 @@ import java.util.UUID;
 public class S3ImageService {
 
     private static final Set<String> ALLOWED_EXTENSIONS = Set.of(".jpg", ".jpeg", ".png", ".gif");
-    private static final long MAX_FILE_SIZE = 5 * 1024 * 1024; // 5MB
+    private static final long MAX_FILE_SIZE = 3 * 1024 * 1024; // 3MB
 
     private final S3Client s3Client;
     private final ResourceUrlGenerator resourceUrlGenerator;
