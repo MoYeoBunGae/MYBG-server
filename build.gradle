@@ -40,6 +40,9 @@ dependencies {
         }
     }
 
+    // aws
+    implementation 'software.amazon.awssdk:s3:2.31.13'
+
     // ehcache
     implementation 'org.ehcache:ehcache:3.10.8'
 

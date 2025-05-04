@@ -1,6 +1,8 @@
 package com.midasdev.mybg.group_member.domain;
 
 import com.midasdev.mybg.global.audit.Audit;
+import com.midasdev.mybg.global.exception.ApplicationException;
+import com.midasdev.mybg.global.exception.ApplicationExceptionType;
 import com.midasdev.mybg.group.domain.Group;
 import com.midasdev.mybg.member.domain.Member;
 import jakarta.persistence.Column;
@@ -47,6 +49,9 @@ public class GroupMember {
     @Column(name = "left_at")
     private LocalDateTime leftAt;
 
+    @Column(name = "member_profile_image_url", nullable = false)
+    private String memberProfileImageUrl;
+
     @Embedded
     @Default
     private Audit audit = new Audit();
@@ -58,5 +63,30 @@ public class GroupMember {
     @ManyToOne
     @JoinColumn(name = "group_id", nullable = false)
     private Group group;
+
+    public boolean isOwnedBy(Long memberId) {
+        if (this.member == null) {
+            throw new ApplicationException(ApplicationExceptionType.GLOBAL_INTERNAL_SERVER_ERROR,
+                                           "GroupMember is not initialized. memberId: " + memberId);
+        }
+        return this.member.getId().equals(memberId);
+    }
+
+    public void updateNickname(String nickname) {
+        if (nickname.isBlank()) {
+            throw new ApplicationException(ApplicationExceptionType.GROUP_MEMBER_NICKNAME_NOT_BLANK);
+        }
+
+        this.nickname = nickname;
+    }
+
+    public void updateProfileImageUrl(String imageUrl) {
+        if (imageUrl == null || imageUrl.isBlank()) {
+            throw new ApplicationException(ApplicationExceptionType.GLOBAL_INTERNAL_SERVER_ERROR,
+                                           "GroupMember image URL is not valid. imageUrl: " + imageUrl);
+        }
+
+        this.memberProfileImageUrl = imageUrl;
+    }
 
 }
