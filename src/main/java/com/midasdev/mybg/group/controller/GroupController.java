@@ -82,15 +82,14 @@ public class GroupController {
             security = @SecurityRequirement(name = SECURITY_SCHEME_NAME)
     )
     @PatchMapping(value = "/{groupId}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    public ResponseEntity<Void> updateGroup(
+    public ResponseEntity<GroupResponse> updateGroup(
             @PathVariable Long groupId,
             @AuthenticationPrincipal Member member,
             @Valid @ModelAttribute GroupUpdateRequest request
     ) {
-        groupService.updateGroup(groupId, member, request);
-        return ResponseEntity.ok().build();
+        Group updatedGroup = groupService.updateGroup(groupId, member, request);
+        return ResponseEntity.ok(GroupResponse.from(updatedGroup));
     }
-
 
 
 }
