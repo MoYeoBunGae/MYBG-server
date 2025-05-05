@@ -76,6 +76,23 @@ public enum ApplicationExceptionType {
             "ERR_GROUP_MEMBER_004",
             "해당 GroupMember({0})는 이미 그룹을 탈퇴한 상태입니다."
     ),
+    /**
+     * - {0} : GroupMemberId
+     * - {1} : MemberId
+     */
+    GROUP_MEMBER_DOES_NOT_BELONG_TO_MEMBER(
+            HttpStatus.FORBIDDEN,
+            "ERR_GROUP_MEMBER_005",
+            "요청한 Member({1})가 참여한 GroupMember({0})가 아닙니다."
+    ),
+    /**
+     * - {0} : groupId
+     */
+    GROUP_OWNER_CANNOT_LEAVE(
+            HttpStatus.BAD_REQUEST,
+            "ERR_GROUP_MEMBER_006",
+            "그룹({0})의 소유자는 나갈 수 없습니다."
+    ),
 
     // authentication
     TOKEN_AUTHENTICATION_EXCEPTION(HttpStatus.FORBIDDEN, "ERR_AUTH_001", "토큰 인증에 실패했습니다. : {0}"),

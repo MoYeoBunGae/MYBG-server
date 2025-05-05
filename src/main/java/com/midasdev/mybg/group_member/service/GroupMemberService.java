@@ -27,6 +27,22 @@ public class GroupMemberService {
     private final GroupMemberRepository groupMemberRepository;
     private final GroupStatisticsRepository groupStatisticsRepository;
 
+    /**
+     * groupMemberId 기반으로 조회 후 로그인 사용자 본인 소유인지 검증
+     */
+    private GroupMember findGroupMemberByIdAndMember(Long groupMemberId, Member loginMember) {
+        GroupMember groupMember = groupMemberRepository.findById(groupMemberId)
+                                                       .orElseThrow(() -> new ApplicationException(
+                                                               ApplicationExceptionType.GROUP_MEMBER_NOT_FOUND, groupMemberId));
+
+        if (!groupMember.belongsTo(loginMember.getId())) {
+            throw new ApplicationException(ApplicationExceptionType.GROUP_MEMBER_DOES_NOT_BELONG_TO_MEMBER,
+                                           groupMemberId, loginMember.getId());
+        }
+
+        return groupMember;
+    }
+
     @Transactional
     public GroupMember joinGroup(Member member, GroupJoinRequest groupJoinRequest) {
         // group 검증
@@ -39,7 +55,8 @@ public class GroupMemberService {
             throw new ApplicationException(ApplicationExceptionType.GROUP_MEMBER_CAPACITY_REACHED, group.getId());
         }
 
-        // owner 인지 검증
+        // 이미 가입된 그룹인지 검증
+        // TODO: soft delete 반영하도록 수정
         if (isAlreadyGroupMember(member, group)) {
             throw new ApplicationException(ApplicationExceptionType.ALREADY_JOINED_GROUP, member.getId(), group.getId());
         }
@@ -68,7 +85,7 @@ public class GroupMemberService {
 
 
     private boolean isAlreadyGroupMember(Member member, Group group) {
-        return group.isOwner(member) || groupMemberRepository.findByMemberAndGroup(member, group).isPresent();
+        return group.isOwnedBy(member) || groupMemberRepository.findByMemberAndGroup(member, group).isPresent();
     }
 
     @Transactional
@@ -81,7 +98,7 @@ public class GroupMemberService {
                                                        ));
 
         // 2. 요청 유저의 소유 여부 검증
-        if (!groupMember.isOwnedBy(member.getId())) {
+        if (!groupMember.belongsTo(member.getId())) {
             throw new ApplicationException(
                     ApplicationExceptionType.GROUP_MEMBER_NOT_FOUND,
                     member.getId(), groupMemberId
@@ -102,5 +119,26 @@ public class GroupMemberService {
         }
 
         return groupMember;
+    }
+
+    /**
+     * 그룹 나가기
+     * - 그룹의 소유자는 나갈 수 없음
+     */
+    @Transactional
+    public void leaveGroup(Long groupMemberId, Member loginMember) {
+        GroupMember groupMember = findGroupMemberByIdAndMember(groupMemberId, loginMember);
+
+        Group group = groupMember.getGroup();
+
+        // 소유자는 나갈 수 없음
+        if (group.isOwnedBy(loginMember)) {
+            throw new ApplicationException(ApplicationExceptionType.GROUP_OWNER_CANNOT_LEAVE, group.getId());
+        }
+
+        groupMember.leave();
+
+        // 그룹 통계 인원 수 감소
+        group.getGroupStatistics().decreaseTotalMemberCount();
     }
 }

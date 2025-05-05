@@ -71,7 +71,7 @@ public class GroupMember {
     @ColumnDefault("false")
     private boolean deleted;
 
-    public boolean isOwnedBy(Long memberId) {
+    public boolean belongsTo(Long memberId) {
         if (this.member == null) {
             throw new ApplicationException(ApplicationExceptionType.GLOBAL_INTERNAL_SERVER_ERROR,
                                            "GroupMember is not initialized. memberId: " + memberId);
