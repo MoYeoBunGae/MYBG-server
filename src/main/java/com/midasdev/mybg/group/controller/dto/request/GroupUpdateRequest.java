@@ -1,6 +1,7 @@
 package com.midasdev.mybg.group.controller.dto.request;
 
 import com.midasdev.mybg.global.util.validator.FileMaxSize;
+import com.midasdev.mybg.global.util.validator.NotBlankIfPresent;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.media.Schema.RequiredMode;
 import jakarta.validation.constraints.Max;
@@ -15,6 +16,7 @@ public record GroupUpdateRequest(
                 example = "우리 가족방",
                 requiredMode = RequiredMode.NOT_REQUIRED
         )
+        @NotBlankIfPresent
         @Size(max = 25, message = "그룹 이름은 최대 25자까지 가능합니다.")
         String name,
 
