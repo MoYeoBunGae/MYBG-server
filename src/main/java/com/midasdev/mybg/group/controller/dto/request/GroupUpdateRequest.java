@@ -1,5 +1,7 @@
 package com.midasdev.mybg.group.controller.dto.request;
 
+import com.midasdev.mybg.global.exception.ApplicationException;
+import com.midasdev.mybg.global.exception.ApplicationExceptionType;
 import com.midasdev.mybg.global.util.validator.FileMaxSize;
 import com.midasdev.mybg.global.util.validator.NotBlankIfPresent;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -10,11 +12,11 @@ import org.springframework.web.multipart.MultipartFile;
 
 @Schema(
         description = """
-        그룹 정보 수정 Request
-        - 프로필 이미지는 jpg, jpeg, png, gif 형식만 허용되며, 최대 3MB까지 업로드할 수 있습니다.
-        - 각 필드는 선택 사항이며, null인 경우 해당 항목은 변경되지 않습니다.
-                - 수정하지 않을 시 반드시 null 입력        
-        """
+                그룹 정보 수정 Request
+                - 프로필 이미지는 jpg, jpeg, png, gif 형식만 허용되며, 최대 3MB까지 업로드할 수 있습니다.
+                - 각 필드는 선택 사항이며, null인 경우 해당 항목은 변경되지 않습니다.
+                        - 수정하지 않을 시 반드시 null 입력
+                """
 )
 public record GroupUpdateRequest(
 
@@ -43,4 +45,17 @@ public record GroupUpdateRequest(
         @Max(value = 1000, message = "최대 인원 수는 1000명을 초과할 수 없습니다.")
         Integer maxMemberCount
 
-) {}
+) {
+
+    /**
+     * 최소 1개 필드가 null이 아닌지 검증합니다.
+     *
+     * @throws ApplicationException 최소 1개 필드가 null이 아닐 경우
+     */
+    public void validateAtLeastOneFieldPresent() {
+        if (name == null && profileImage == null && maxMemberCount == null) {
+            throw new ApplicationException(ApplicationExceptionType.GLOBAL_NO_UPDATE_FIELD_PROVIDED);
+        }
+    }
+
+}

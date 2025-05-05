@@ -70,20 +70,21 @@ public class GroupController {
     @GetMapping("/{groupId}/participants/count")
     public ResponseEntity<GroupMemberCountResponse> countGroupMembers(
             @Parameter(description = "그룹 ID", required = true)
-            @PathVariable @IsPositiveNumber Long groupId) {
+            @PathVariable @IsPositiveNumber Long groupId
+    ) {
         int groupMemberCount = groupService.countGroupMembers(groupId);
         return ResponseEntity.ok(new GroupMemberCountResponse(groupId, groupMemberCount));
     }
 
     @Operation(
-        summary = "그룹 정보 수정 API",
-        description = """
-            그룹의 이름, 프로필 이미지, 최대 인원 수를 수정합니다.
-            - Request DTO : GroupUpdateRequest
-            - 세부사항:
-                1. 그룹 소유자만 수정할 수 있습니다.
-            """,
-        security = @SecurityRequirement(name = SECURITY_SCHEME_NAME)
+            summary = "그룹 정보 수정 API",
+            description = """
+                    그룹의 이름, 프로필 이미지, 최대 인원 수를 수정합니다.
+                    - Request DTO : GroupUpdateRequest
+                    - 세부사항:
+                        1. 그룹 소유자만 수정할 수 있습니다.
+                    """,
+            security = @SecurityRequirement(name = SECURITY_SCHEME_NAME)
     )
     @PatchMapping(value = "/{groupId}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<GroupResponse> updateGroup(
@@ -91,6 +92,7 @@ public class GroupController {
             @AuthenticationPrincipal Member member,
             @Valid @ModelAttribute GroupUpdateRequest request
     ) {
+        request.validateAtLeastOneFieldPresent();
         Group updatedGroup = groupService.updateGroup(groupId, member, request);
         return ResponseEntity.ok(GroupResponse.from(updatedGroup));
     }
