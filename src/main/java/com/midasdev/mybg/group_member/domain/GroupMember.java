@@ -23,11 +23,14 @@ import lombok.Builder;
 import lombok.Builder.Default;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.ColumnDefault;
+import org.hibernate.annotations.DynamicInsert;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 @Entity
 @Builder
 @Getter
+@DynamicInsert
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
 @EntityListeners(AuditingEntityListener.class)
@@ -64,6 +67,10 @@ public class GroupMember {
     @JoinColumn(name = "group_id", nullable = false)
     private Group group;
 
+    @Column(nullable = false)
+    @ColumnDefault("false")
+    private boolean deleted;
+
     public boolean isOwnedBy(Long memberId) {
         if (this.member == null) {
             throw new ApplicationException(ApplicationExceptionType.GLOBAL_INTERNAL_SERVER_ERROR,
@@ -87,6 +94,14 @@ public class GroupMember {
         }
 
         this.memberProfileImageUrl = imageUrl;
+    }
+
+    public void leave() {
+        if (this.deleted) {
+            throw new ApplicationException(ApplicationExceptionType.GROUP_MEMBER_ALREADY_LEFT);
+        }
+        this.deleted = true;
+        this.leftAt = LocalDateTime.now();
     }
 
 }

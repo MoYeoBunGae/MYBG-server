@@ -68,8 +68,14 @@ public enum ApplicationExceptionType {
             "ERR_GROUP_MEMBER_003",
             "그룹 참여자의 닉네임은 비어있을 수 없습니다."
     ),
-
-
+    /**
+     * - {0} : groupMemberId
+     */
+    GROUP_MEMBER_ALREADY_LEFT(
+            HttpStatus.BAD_REQUEST,
+            "ERR_GROUP_MEMBER_004",
+            "해당 GroupMember({0})는 이미 그룹을 탈퇴한 상태입니다."
+    ),
 
     // authentication
     TOKEN_AUTHENTICATION_EXCEPTION(HttpStatus.FORBIDDEN, "ERR_AUTH_001", "토큰 인증에 실패했습니다. : {0}"),
