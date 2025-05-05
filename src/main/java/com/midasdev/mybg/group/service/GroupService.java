@@ -155,12 +155,12 @@ public class GroupService {
             );
         }
 
-        // 3. 그룹 이름 변경 (blank 검증은 DTO 어노테이션으로 처리됨)
+        // 3. 그룹 이름 변경
         if (request.name() != null) {
             group.updateName(request.name());
         }
 
-        // 4. 최대 인원 수 변경 (현재 인원보다 작을 수 없음 → 도메인에서 검증)
+        // 4. 최대 인원 수 변경
         if (request.maxMemberCount() != null) {
             group.updateMaxMemberCount(request.maxMemberCount());
         }
