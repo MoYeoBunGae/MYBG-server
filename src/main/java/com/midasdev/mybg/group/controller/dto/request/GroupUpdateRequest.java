@@ -8,7 +8,14 @@ import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Size;
 import org.springframework.web.multipart.MultipartFile;
 
-@Schema(description = "그룹 정보 수정 Request")
+@Schema(
+        description = """
+        그룹 정보 수정 Request
+        - 프로필 이미지는 jpg, jpeg, png, gif 형식만 허용되며, 최대 3MB까지 업로드할 수 있습니다.
+        - 각 필드는 선택 사항이며, null인 경우 해당 항목은 변경되지 않습니다.
+                - 수정하지 않을 시 반드시 null 입력        
+        """
+)
 public record GroupUpdateRequest(
 
         @Schema(

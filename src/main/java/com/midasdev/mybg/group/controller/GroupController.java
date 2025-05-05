@@ -76,10 +76,14 @@ public class GroupController {
     }
 
     @Operation(
-            summary = "그룹 정보 수정 API",
-            description = "그룹의 이름, 프로필 이미지, 최대 인원 수를 수정합니다.\n" +
-                    "그룹 소유자만 수정할 수 있습니다.",
-            security = @SecurityRequirement(name = SECURITY_SCHEME_NAME)
+        summary = "그룹 정보 수정 API",
+        description = """
+            그룹의 이름, 프로필 이미지, 최대 인원 수를 수정합니다.
+            - Request DTO : GroupUpdateRequest
+            - 세부사항:
+                1. 그룹 소유자만 수정할 수 있습니다.
+            """,
+        security = @SecurityRequirement(name = SECURITY_SCHEME_NAME)
     )
     @PatchMapping(value = "/{groupId}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<GroupResponse> updateGroup(
