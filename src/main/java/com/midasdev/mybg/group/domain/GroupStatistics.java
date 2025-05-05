@@ -1,6 +1,8 @@
 package com.midasdev.mybg.group.domain;
 
 import com.midasdev.mybg.global.audit.Audit;
+import com.midasdev.mybg.global.exception.ApplicationException;
+import com.midasdev.mybg.global.exception.ApplicationExceptionType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Embedded;
 import jakarta.persistence.Entity;
@@ -51,6 +53,14 @@ public class GroupStatistics {
 
     public void increaseTotalMemberCount() {
         this.totalMemberCount++;
+    }
+
+    public void decreaseTotalMemberCount() {
+        if (this.totalMemberCount <= 1) {
+            throw new ApplicationException(ApplicationExceptionType.GLOBAL_INTERNAL_SERVER_ERROR,
+                                           "그룹 인원 수가 0이하로 감소할 수 없습니다.");
+        }
+        this.totalMemberCount--;
     }
 
 }
