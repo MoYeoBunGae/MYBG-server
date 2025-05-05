@@ -18,7 +18,6 @@ import com.midasdev.mybg.group.service.component.InvitationCodeGenerator;
 import com.midasdev.mybg.group_member.domain.GroupMember;
 import com.midasdev.mybg.group_member.repository.GroupMemberSpringDataRepository;
 import com.midasdev.mybg.member.domain.Member;
-import jakarta.validation.Valid;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -148,7 +147,7 @@ public class GroupService {
                                      ));
 
         // 2. 그룹 소유자인지 검증
-        if (!group.isOwner(member)) {
+        if (!group.isOwnedBy(member)) {
             throw new ApplicationException(
                     ApplicationExceptionType.GROUP_UPDATE_FORBIDDEN,
                     member.getId(), groupId
