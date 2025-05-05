@@ -78,6 +78,8 @@ public class GroupService {
         GroupMember owner = GroupMember.builder()
                                        .nickname(member.getName())
                                        .group(savedGroup)
+                                       // TODO: 그룹 생성 시 그룹 내의 방장 프로필 이미지 설정 여부 검토
+                                       .memberProfileImageUrl(member.getProfileImageUrl())
                                        .member(member)
                                        .build();
         groupMemberSpringDataRepository.save(owner);
