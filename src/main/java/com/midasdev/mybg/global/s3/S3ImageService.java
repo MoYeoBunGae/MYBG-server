@@ -29,11 +29,11 @@ public class S3ImageService {
     @Value("${aws.s3.bucket-name}")
     private String bucketName;
 
-    public String upload(MultipartFile multipartFile, String dirName) {
+    public String upload(MultipartFile multipartFile, S3Directory directory) {
         validateImageFile(multipartFile);
 
         String fileName = createFileName(multipartFile.getOriginalFilename());
-        String filePath = dirName + "/" + fileName;
+        String filePath = directory.getDirectory() + "/" + fileName;
 
         try (InputStream inputStream = multipartFile.getInputStream()) {
             PutObjectRequest putObjectRequest = PutObjectRequest.builder()
@@ -47,7 +47,7 @@ public class S3ImageService {
             throw new ApplicationException(ApplicationExceptionType.S3_FILE_UPLOAD_EXCEPTION, e);
         }
 
-        return resourceUrlGenerator.generateS3Url(dirName, fileName);
+        return resourceUrlGenerator.generateS3Url(directory.getDirectory(), fileName);
     }
 
     private void validateImageFile(MultipartFile multipartFile) {
