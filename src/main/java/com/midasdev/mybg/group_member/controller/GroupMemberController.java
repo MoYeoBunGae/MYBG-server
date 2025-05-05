@@ -2,6 +2,7 @@ package com.midasdev.mybg.group_member.controller;
 
 import static com.midasdev.mybg.config.swagger.SwaggerConfig.SECURITY_SCHEME_NAME;
 
+import com.midasdev.mybg.global.response.MessageResponse;
 import com.midasdev.mybg.group_member.controller.dto.request.GroupJoinRequest;
 import com.midasdev.mybg.group_member.controller.dto.request.GroupMemberProfileUpdateRequest;
 import com.midasdev.mybg.group_member.controller.dto.response.ActiveGroupMemberResponse;
@@ -18,6 +19,7 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.validation.annotation.Validated;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -56,6 +58,25 @@ public class GroupMemberController {
     ) {
         GroupMember updatedMember = groupMemberService.updateProfile(groupMemberId, member, request);
         return ResponseEntity.ok(TOBE_ActiveGroupMemberResponse.from(updatedMember));
+    }
+
+    @Operation(
+            summary = "그룹 나가기 API",
+            description = """
+                사용자가 참여한 그룹에서 나갑니다.
+                - 세부사항:
+                    1. 그룹의 소유자는 나갈 수 없습니다.
+                """,
+            security = @SecurityRequirement(name = SECURITY_SCHEME_NAME)
+    )
+    @DeleteMapping("/{groupMemberId}")
+    public ResponseEntity<MessageResponse> leaveGroup(
+            @PathVariable Long groupMemberId,
+            @AuthenticationPrincipal Member loginMember
+    ) {
+        groupMemberService.leaveGroup(groupMemberId, loginMember);
+        return ResponseEntity.ok(new MessageResponse("Leave group succeeded"));
+
     }
 
 }
