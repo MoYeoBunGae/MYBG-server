@@ -2,6 +2,7 @@ package com.midasdev.mybg.group_member.service;
 
 import com.midasdev.mybg.global.exception.ApplicationException;
 import com.midasdev.mybg.global.exception.ApplicationExceptionType;
+import com.midasdev.mybg.global.s3.S3Directory;
 import com.midasdev.mybg.global.s3.S3ImageService;
 import com.midasdev.mybg.group.domain.Group;
 import com.midasdev.mybg.group.domain.GroupStatistics;
@@ -46,10 +47,11 @@ public class GroupMemberService {
         // nickname 이 null이면 member의 name을 사용
         String nickname = groupJoinRequest.nickname() == null ? member.getName() : groupJoinRequest.nickname();
 
-        // TODO: 프로필 이미지 필드 추가
         GroupMember groupMember = GroupMember.builder()
                                              .nickname(nickname)
                                              .member(member)
+                                             // TODO: 기본 프로필 이미지 URL로 변경
+                                             .memberProfileImageUrl(member.getProfileImageUrl())
                                              .group(group)
                                              .build();
         return saveGroupMember(groupMember, group);
@@ -94,7 +96,7 @@ public class GroupMemberService {
         // 4. 이미지 업데이트
         MultipartFile image = request.image();
         if (image != null && !image.isEmpty()) {
-            String imageUrl = s3ImageService.upload(image, "group-member-profile-image");
+            String imageUrl = s3ImageService.upload(image, S3Directory.GROUP_MEMBER_PROFILE_IMAGES);
             // TODO: 트랜젝션 롤백시 S3 이미지 삭제 배치 작업 필요
             groupMember.updateProfileImageUrl(imageUrl);
         }

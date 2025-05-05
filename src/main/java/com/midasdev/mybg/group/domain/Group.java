@@ -1,6 +1,8 @@
 package com.midasdev.mybg.group.domain;
 
 import com.midasdev.mybg.global.audit.Audit;
+import com.midasdev.mybg.global.exception.ApplicationException;
+import com.midasdev.mybg.global.exception.ApplicationExceptionType;
 import com.midasdev.mybg.member.domain.Member;
 import jakarta.persistence.Column;
 import jakarta.persistence.Embedded;
@@ -84,6 +86,25 @@ public class Group {
 
     public boolean isFull() {
         return this.getTotalMemberCount() >= this.maxMemberCount;
+    }
+
+    public void updateName(String name) {
+        this.name = name;
+    }
+
+    public void updateMaxMemberCount(int newMaxCount) {
+        int currentTotal = this.getTotalMemberCount();
+        if (newMaxCount < currentTotal) {
+            throw new ApplicationException(
+                    ApplicationExceptionType.GROUP_MAX_COUNT_BELOW_CURRENT,
+                    newMaxCount, currentTotal
+            );
+        }
+        this.maxMemberCount = newMaxCount;
+    }
+
+    public void updateProfileImageUrl(String imageUrl) {
+        this.profileImageUrl = imageUrl;
     }
 
 }

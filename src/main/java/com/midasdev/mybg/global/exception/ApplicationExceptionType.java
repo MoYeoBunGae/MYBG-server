@@ -22,6 +22,26 @@ public enum ApplicationExceptionType {
             "그룹 최대 인원 수를 초과할 수 없습니다. (그룹 ID : {0})"
     ),
 
+    /**
+     * - {0} : maxMemberCount (요청한 최대 인원 수)
+     * - {1} : totalMemberCount (현재 그룹 인원 수)
+     */
+    GROUP_MAX_COUNT_BELOW_CURRENT(
+            HttpStatus.BAD_REQUEST,
+            "ERR_GROUP_005",
+            "현재 인원 수({1})보다 작은 최대 인원 수({0})로 변경할 수 없습니다."
+    ),
+
+    /**
+     * - {0} : memberId (요청한 사용자 ID)
+     * - {1} : groupId (그룹 ID)
+     */
+    GROUP_UPDATE_FORBIDDEN(
+            HttpStatus.FORBIDDEN,
+            "ERR_GROUP_006",
+            "그룹 정보를 수정할 권한이 없습니다. 요청자(memberId: {0})는 그룹(groupId: {1})의 소유자가 아닙니다."
+    ),
+
     // group statistics
     GROUP_STATISTICS_NOT_FOUND_BY_ID(
             HttpStatus.BAD_REQUEST,
@@ -110,6 +130,11 @@ public enum ApplicationExceptionType {
      * - {0} : Exception Message
      */
     GLOBAL_INTERNAL_SERVER_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, "ERR_GLOBAL_003", "서버 내부 에러입니다. : {0}"),
+    GLOBAL_NO_UPDATE_FIELD_PROVIDED(
+            HttpStatus.BAD_REQUEST,
+            "ERR_GLOBAL_004",
+            "수정할 항목이 없습니다."
+    ),
     UNDEFINED_EXCEPTION(HttpStatus.INTERNAL_SERVER_ERROR, "ERR_GLOBAL_999", "정의되지 않은 에러입니다. : {0}");
 
     public static ApplicationExceptionType resolveExceptionType(Exception exception) {
