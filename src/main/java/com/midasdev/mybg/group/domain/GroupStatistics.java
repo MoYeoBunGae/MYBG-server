@@ -58,7 +58,7 @@ public class GroupStatistics {
     public void decreaseTotalMemberCount() {
         if (this.totalMemberCount <= 1) {
             throw new ApplicationException(ApplicationExceptionType.GLOBAL_INTERNAL_SERVER_ERROR,
-                                           "그룹 통계의 totalMemberCount가 1보다 작아질 수 없습니다.");
+                                           "그룹 인원 수가 0이하로 감소할 수 없습니다.");
         }
         this.totalMemberCount--;
     }
