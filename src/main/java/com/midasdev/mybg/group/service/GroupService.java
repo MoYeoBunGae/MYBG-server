@@ -174,7 +174,7 @@ public class GroupService {
     }
 
     @Transactional(readOnly = true)
-    public Pair<Group, List<GroupMember>> getGroupMembersInfo(Long groupId, Member loginMember) {
+    public Pair<Group, List<GroupMember>> getAllGroupMembers(Long groupId, Member loginMember) {
         Group group = findGroupById(groupId);
 
         // 요청자 검증 - 소속 여부 확인
