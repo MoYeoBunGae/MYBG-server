@@ -3,7 +3,7 @@ package com.midasdev.mybg.group.controller.dto.response;
 import com.midasdev.mybg.global.exception.ApplicationException;
 import com.midasdev.mybg.global.exception.ApplicationExceptionType;
 import com.midasdev.mybg.group.domain.Group;
-import com.midasdev.mybg.group_member.controller.dto.request.GroupMemberSimpleResponse;
+import com.midasdev.mybg.group_member.controller.dto.response.GroupMemberSimpleResponse;
 import com.midasdev.mybg.group_member.domain.GroupMember;
 import java.util.List;
 import lombok.Builder;

@@ -1,4 +1,4 @@
-package com.midasdev.mybg.group_member.controller.dto.request;
+package com.midasdev.mybg.group_member.controller.dto.response;
 
 import com.midasdev.mybg.group_member.domain.GroupMember;
 import java.time.LocalDateTime;
