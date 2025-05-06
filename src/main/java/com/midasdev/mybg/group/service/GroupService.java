@@ -15,11 +15,12 @@ import com.midasdev.mybg.group.repository.GroupRepository;
 import com.midasdev.mybg.group.repository.GroupStatisticsRepository;
 import com.midasdev.mybg.group.service.component.InvitationCodeGenerator;
 import com.midasdev.mybg.group_member.domain.GroupMember;
-import com.midasdev.mybg.group_member.repository.GroupMemberSpringDataRepository;
+import com.midasdev.mybg.group_member.repository.GroupMemberRepository;
 import com.midasdev.mybg.member.domain.Member;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.util.Pair;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
@@ -36,7 +37,7 @@ public class GroupService {
     private final S3ImageService s3ImageService;
     private final GroupRepository groupRepository;
     private final InvitationCodeGenerator invitationCodeGenerator;
-    private final GroupMemberSpringDataRepository groupMemberSpringDataRepository;
+    private final GroupMemberRepository groupMemberRepository;
     private final GroupStatisticsRepository groupStatisticsRepository;
 
     private Group findGroupById(Long groupId) {
@@ -170,6 +171,25 @@ public class GroupService {
         }
 
         return group;
+    }
+
+    @Transactional(readOnly = true)
+    public Pair<Group, List<GroupMember>> getGroupMembersInfo(Long groupId, Member loginMember) {
+        Group group = findGroupById(groupId);
+
+        // 요청자 검증 - 소속 여부 확인
+        boolean isMember = groupMemberRepository.existsByGroupIdAndMemberIdAndDeletedFalse(groupId, loginMember.getId());
+        if (!isMember) {
+            throw new ApplicationException(
+                    ApplicationExceptionType.GROUP_MEMBER_DOES_NOT_BELONG_TO_MEMBER,
+                    groupId, loginMember.getId()
+            );
+        }
+
+        // GroupMember 목록 조회
+        List<GroupMember> groupMembers = groupMemberRepository.findAllActiveGroupMembersExceptOwner(groupId);
+
+        return Pair.of(group, groupMembers);
     }
 
 
