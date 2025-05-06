@@ -14,23 +14,23 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 @RequiredArgsConstructor
-public class GroupRepositoryImpl implements GroupRepository {
+public class GroupRepositoryCustomImpl implements GroupRepositoryCustom {
 
     private final JPAQueryFactory jpaQueryFactory;
 
-    @Override
-    public Optional<Group> findById(Long groupId) {
-        QGroup group = QGroup.group;
-        QMember member = QMember.member;
-
-        Group result = jpaQueryFactory.selectFrom(group)
-                                      .join(group.owner, member)
-                                      .fetchJoin()
-                                      .where(group.id.eq(groupId))
-                                      .fetchOne();
-
-        return Optional.ofNullable(result);
-    }
+//    @Override
+//    public Optional<Group> findById(Long groupId) {
+//        QGroup group = QGroup.group;
+//        QMember member = QMember.member;
+//
+//        Group result = jpaQueryFactory.selectFrom(group)
+//                                      .join(group.owner, member)
+//                                      .fetchJoin()
+//                                      .where(group.id.eq(groupId))
+//                                      .fetchOne();
+//
+//        return Optional.ofNullable(result);
+//    }
 
     @Override
     public Optional<Group> findWithStatisticsById(Long groupId) {

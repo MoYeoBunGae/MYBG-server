@@ -2,25 +2,16 @@ package com.midasdev.mybg.group.service;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.argThat;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.doThrow;
-import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
 
-import com.midasdev.mybg.group.controller.dto.request.GroupCreateRequest;
-import com.midasdev.mybg.group.domain.Group;
-import com.midasdev.mybg.group.repository.GroupSpringDataRepository;
+import com.midasdev.mybg.group.repository.GroupRepository;
 import com.midasdev.mybg.group.service.component.InvitationCodeGenerator;
-import com.midasdev.mybg.member.domain.Member;
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.dao.DataIntegrityViolationException;
 
 @ExtendWith(MockitoExtension.class)
 class GroupServiceTest {
@@ -28,7 +19,7 @@ class GroupServiceTest {
     private static final int CODE_LENGTH = 8;
 
     @Mock
-    private GroupSpringDataRepository groupSpringDataRepository;
+    private GroupRepository groupRepository;
     @Mock
     private InvitationCodeGenerator invitationCodeGenerator;
 
