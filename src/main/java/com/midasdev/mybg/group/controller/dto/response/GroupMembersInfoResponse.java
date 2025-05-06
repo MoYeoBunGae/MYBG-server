@@ -1,4 +1,4 @@
-package com.midasdev.mybg.group.controller.dto.request;
+package com.midasdev.mybg.group.controller.dto.response;
 
 import com.midasdev.mybg.global.exception.ApplicationException;
 import com.midasdev.mybg.global.exception.ApplicationExceptionType;

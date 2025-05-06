@@ -4,7 +4,7 @@ import static com.midasdev.mybg.config.swagger.SwaggerConfig.SECURITY_SCHEME_NAM
 
 import com.midasdev.mybg.global.util.validator.IsPositiveNumber;
 import com.midasdev.mybg.group.controller.dto.request.GroupCreateRequest;
-import com.midasdev.mybg.group.controller.dto.request.GroupMembersInfoResponse;
+import com.midasdev.mybg.group.controller.dto.response.GroupMembersInfoResponse;
 import com.midasdev.mybg.group.controller.dto.request.GroupUpdateRequest;
 import com.midasdev.mybg.group.controller.dto.response.GroupListResponse;
 import com.midasdev.mybg.group.controller.dto.response.GroupMemberCountResponse;
