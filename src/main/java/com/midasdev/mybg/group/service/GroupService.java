@@ -12,15 +12,15 @@ import com.midasdev.mybg.group.controller.dto.request.GroupUpdateRequest;
 import com.midasdev.mybg.group.domain.Group;
 import com.midasdev.mybg.group.domain.GroupStatistics;
 import com.midasdev.mybg.group.repository.GroupRepository;
-import com.midasdev.mybg.group.repository.GroupSpringDataRepository;
 import com.midasdev.mybg.group.repository.GroupStatisticsRepository;
 import com.midasdev.mybg.group.service.component.InvitationCodeGenerator;
 import com.midasdev.mybg.group_member.domain.GroupMember;
-import com.midasdev.mybg.group_member.repository.GroupMemberSpringDataRepository;
+import com.midasdev.mybg.group_member.repository.GroupMemberRepository;
 import com.midasdev.mybg.member.domain.Member;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.util.Pair;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
@@ -35,14 +35,13 @@ public class GroupService {
 
     private final DefaultProfileImageService defaultProfileImageService;
     private final S3ImageService s3ImageService;
-    private final GroupSpringDataRepository groupSpringDataRepository;
     private final GroupRepository groupRepository;
     private final InvitationCodeGenerator invitationCodeGenerator;
-    private final GroupMemberSpringDataRepository groupMemberSpringDataRepository;
+    private final GroupMemberRepository groupMemberRepository;
     private final GroupStatisticsRepository groupStatisticsRepository;
 
     private Group findGroupById(Long groupId) {
-        return groupSpringDataRepository.findByIdAndDeletedIsFalse(groupId)
+        return groupRepository.findByIdAndDeletedIsFalse(groupId)
                                         .orElseThrow(() -> new ApplicationException(ApplicationExceptionType.GROUP_NOT_FOUND_BY_ID, groupId));
     }
 
@@ -68,7 +67,7 @@ public class GroupService {
         String invitationCode = generateUniqueRandomInvitationCode();
 
         group.updateInvitationCode(invitationCode);
-        Group savedGroup = groupSpringDataRepository.save(group);
+        Group savedGroup = groupRepository.save(group);
 
         // 그룹 생성자를 그룹 멤버로 추가
         addOwnerToGroupMember(member, savedGroup);
@@ -87,14 +86,14 @@ public class GroupService {
                                        .memberProfileImageUrl(member.getProfileImageUrl())
                                        .member(member)
                                        .build();
-        groupMemberSpringDataRepository.save(owner);
+        groupMemberRepository.save(owner);
     }
 
     private String generateUniqueRandomInvitationCode() {
         String code;
         do {
             code = invitationCodeGenerator.generateRandomCode(CODE_LENGTH);
-        } while (groupSpringDataRepository.existsByInvitationCode(code));
+        } while (groupRepository.existsByInvitationCode(code));
         return code;
     }
 
@@ -172,6 +171,25 @@ public class GroupService {
         }
 
         return group;
+    }
+
+    @Transactional(readOnly = true)
+    public Pair<Group, List<GroupMember>> getAllGroupMembers(Long groupId, Member loginMember) {
+        Group group = findGroupById(groupId);
+
+        // 요청자 검증 - 소속 여부 확인
+        boolean isMember = groupMemberRepository.existsByGroupIdAndMemberIdAndDeletedFalse(groupId, loginMember.getId());
+        if (!isMember) {
+            throw new ApplicationException(
+                    ApplicationExceptionType.GROUP_MEMBER_DOES_NOT_BELONG_TO_MEMBER,
+                    groupId, loginMember.getId()
+            );
+        }
+
+        // GroupMember 목록 조회
+        List<GroupMember> groupMembers = groupMemberRepository.findAllActiveGroupMembersExceptOwner(groupId);
+
+        return Pair.of(group, groupMembers);
     }
 
 

@@ -4,12 +4,14 @@ import static com.midasdev.mybg.config.swagger.SwaggerConfig.SECURITY_SCHEME_NAM
 
 import com.midasdev.mybg.global.util.validator.IsPositiveNumber;
 import com.midasdev.mybg.group.controller.dto.request.GroupCreateRequest;
+import com.midasdev.mybg.group.controller.dto.response.GroupMembersInfoResponse;
 import com.midasdev.mybg.group.controller.dto.request.GroupUpdateRequest;
 import com.midasdev.mybg.group.controller.dto.response.GroupListResponse;
 import com.midasdev.mybg.group.controller.dto.response.GroupMemberCountResponse;
 import com.midasdev.mybg.group.controller.dto.response.GroupResponse;
 import com.midasdev.mybg.group.domain.Group;
 import com.midasdev.mybg.group.service.GroupService;
+import com.midasdev.mybg.group_member.domain.GroupMember;
 import com.midasdev.mybg.member.domain.Member;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -18,6 +20,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.util.Pair;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -97,5 +100,24 @@ public class GroupController {
         return ResponseEntity.ok(GroupResponse.from(updatedGroup));
     }
 
+    @Operation(
+            summary = "그룹 전체 멤버 조회 API",
+            description = """
+                        특정 그룹의 전체 멤버 정보를 조회합니다.
+                        - Request DTO : 없음
+                        - Response DTO : GroupMembersInfoResponse
+                        - 세부사항:
+                            1. 요청자는 해당 그룹에 소속된 사용자여야 합니다.
+                    """,
+            security = @SecurityRequirement(name = SECURITY_SCHEME_NAME)
+    )
+    @GetMapping("/{groupId}/members")
+    public ResponseEntity<GroupMembersInfoResponse> getAllGroupMembers(
+            @PathVariable Long groupId,
+            @AuthenticationPrincipal Member member
+    ) {
+        Pair<Group, List<GroupMember>> result = groupService.getAllGroupMembers(groupId, member);
+        return ResponseEntity.ok(GroupMembersInfoResponse.from(result.getFirst(), result.getSecond()));
+    }
 
 }
