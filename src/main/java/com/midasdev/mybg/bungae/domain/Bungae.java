@@ -16,6 +16,7 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import java.time.LocalDateTime;
+import java.time.LocalTime;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -80,5 +81,9 @@ public class Bungae {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "group_member_id", nullable = false)
-    private GroupMember groupMember;
+    private GroupMember host;
+
+    public LocalTime getBungaeTime() {
+        return bungaeTime != null ? bungaeTime.getDateTime().toLocalTime() : null;
+    }
 }
