@@ -2,6 +2,8 @@ package com.midasdev.mybg.bungae.service;
 
 import com.midasdev.mybg.bungae.controller.dto.request.BungaeCreateRequest;
 import com.midasdev.mybg.bungae.domain.Bungae;
+import com.midasdev.mybg.bungae.domain.BungaeDateTime;
+import com.midasdev.mybg.bungae.domain.BungaeStatus;
 import com.midasdev.mybg.group_member.domain.GroupMember;
 import com.midasdev.mybg.group_member.repository.GroupMemberRepository;
 import com.midasdev.mybg.global.exception.ApplicationException;
@@ -23,7 +25,37 @@ public class BungaeService {
                         request.hostGroupMemberId(), request.groupId()
                 ));
 
-        // 2. Bungae 엔티티 생성 - 날짜 후보에 따라 Status 설정
+        // 2. Bungae 엔티티 생성 - 날짜 후보에 따라 Status 및 bungaeDateTime 설정
+        BungaeStatus status = request.dateCandidates().size() == 1
+                ? BungaeStatus.RECRUITING
+                : BungaeStatus.DATE_VOTING;
+
+        BungaeDateTime bungaeDateTime;
+        if (request.hasSingleDateCandidate()) {
+            // 날짜 후보가 1개면 날짜+시간 모두 포함
+            bungaeDateTime = new BungaeDateTime(
+                request.dateCandidates().get(0),
+                request.bungaeTime()
+            );
+        } else {
+            // 여러개면 시간만 포함
+            bungaeDateTime = new BungaeDateTime(request.bungaeTime());
+        }
+
+        Bungae bungae = Bungae.builder()
+                .name(request.name())
+                .description(request.description())
+                .minAttendees(request.minAttendees())
+                .maxAttendees(request.maxAttendees())
+                .isOnline(request.isOnline())
+                .location(request.location())
+                .bungaeDateTime(bungaeDateTime)
+                .dateVoteClosedAt(request.dateVoteClosedAt())
+                .status(status)
+                .deleted(false)
+                .group(hostGroupMember.getGroup())
+                .host(hostGroupMember)
+                .build();
 
         // 3. Bungae 엔티티 저장
 

@@ -58,7 +58,7 @@ public class Bungae {
     private String location;
 
     @Column
-    private BungaeTime bungaeTime;
+    private BungaeDateTime bungaeDateTime;
 
     @Column(nullable = false)
     private LocalDateTime dateVoteClosedAt;
@@ -83,7 +83,4 @@ public class Bungae {
     @JoinColumn(name = "group_member_id", nullable = false)
     private GroupMember host;
 
-    public LocalTime getBungaeTime() {
-        return bungaeTime != null ? bungaeTime.getDateTime().toLocalTime() : null;
-    }
 }

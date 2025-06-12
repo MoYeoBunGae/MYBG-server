@@ -2,6 +2,7 @@ package com.midasdev.mybg.bungae.controller.dto.response;
 
 import com.midasdev.mybg.bungae.domain.Bungae;
 import com.midasdev.mybg.bungae.domain.BungaeStatus;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import lombok.Builder;
@@ -17,6 +18,7 @@ public record BungaeResponse(
         Integer maxAttendees,
         Boolean isOnline,
         String location,
+        LocalDate bungaeDate,
         LocalTime bungaeTime,
         LocalDateTime dateVoteClosedAt,
         BungaeStatus status,
@@ -33,7 +35,8 @@ public record BungaeResponse(
                              .maxAttendees(bungae.getMaxAttendees())
                              .isOnline(bungae.getIsOnline())
                              .location(bungae.getLocation())
-                             .bungaeTime(bungae.getBungaeTime())
+                             .bungaeDate(bungae.getBungaeDateTime().getDate())
+                             .bungaeTime(bungae.getBungaeDateTime().getTime())
                              .dateVoteClosedAt(bungae.getDateVoteClosedAt())
                              .status(bungae.getStatus())
                              .groupId(bungae.getGroup().getId())

@@ -106,7 +106,11 @@ public record BungaeCreateRequest(
         @NotNull
         Long hostGroupMemberId
 
-) {}
+) {
+    public boolean hasSingleDateCandidate() {
+        return dateCandidates.size() == 1;
+    }
+}
 
 
 
