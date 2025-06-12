@@ -100,7 +100,11 @@ public record BungaeCreateRequest(
         )
         @IsPositiveNumber
         @NotNull
-        Long groupId
+        Long groupId,
+
+        @IsPositiveNumber
+        @NotNull
+        Long hostGroupMemberId
 
 ) {}
 

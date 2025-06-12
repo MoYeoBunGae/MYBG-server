@@ -5,14 +5,13 @@ import static com.midasdev.mybg.config.swagger.SwaggerConfig.SECURITY_SCHEME_NAM
 import com.midasdev.mybg.bungae.controller.dto.request.BungaeCreateRequest;
 import com.midasdev.mybg.bungae.controller.dto.response.BungaeResponse;
 import com.midasdev.mybg.bungae.domain.Bungae;
-import com.midasdev.mybg.member.domain.Member;
+import com.midasdev.mybg.bungae.service.BungaeService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -42,10 +41,9 @@ public class BungaeController {
     )
     @PostMapping
     public ResponseEntity<BungaeResponse> createBungae(
-            @AuthenticationPrincipal Member loginMember,
             @Valid @RequestBody BungaeCreateRequest request
     ) {
-        Bungae bungae = bungaeService.createBungae(loginMember, request);
+        Bungae bungae = bungaeService.createBungae(request);
         return ResponseEntity.ok(BungaeResponse.from(bungae));
     }
 
