@@ -2,9 +2,11 @@ package com.midasdev.mybg.bungae.service;
 
 import com.midasdev.mybg.bungae.controller.dto.request.BungaeCreateRequest;
 import com.midasdev.mybg.bungae.domain.Bungae;
+import com.midasdev.mybg.bungae.domain.BungaeAttendee;
 import com.midasdev.mybg.bungae.domain.BungaeDateTime;
 import com.midasdev.mybg.bungae.domain.BungaeRecruitDateOption;
 import com.midasdev.mybg.bungae.domain.BungaeStatus;
+import com.midasdev.mybg.bungae.repository.BungaeAttendeeRepository;
 import com.midasdev.mybg.bungae.repository.BungaeRecruitDateOptionRepository;
 import com.midasdev.mybg.bungae.repository.BungaeRepository;
 import com.midasdev.mybg.group_member.domain.GroupMember;
@@ -22,6 +24,7 @@ public class BungaeService {
     private final GroupMemberRepository groupMemberRepository;
     private final BungaeRepository bungaeRepository;
     private final BungaeRecruitDateOptionRepository bungaeRecruitDateOptionRepository;
+    private final BungaeAttendeeRepository bungaeAttendeeRepository;
 
     @Transactional
     public Bungae createBungae(BungaeCreateRequest request) {
@@ -80,6 +83,12 @@ public class BungaeService {
         }
 
         // 5. Bungae 참여자에 host GroupMember 추가
+        BungaeAttendee attendee = BungaeAttendee.builder()
+                .bungae(savedBungae)
+                .groupMember(hostGroupMember)
+                .deleted(false)
+                .build();
+        bungaeAttendeeRepository.save(attendee);
 
         // 6. 투표 생성 이벤트 발행
 
