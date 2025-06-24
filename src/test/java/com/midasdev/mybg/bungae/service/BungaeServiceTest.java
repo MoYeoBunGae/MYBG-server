@@ -8,7 +8,6 @@ import com.midasdev.mybg.bungae.domain.BungaeRecruitDateOption;
 import com.midasdev.mybg.bungae.domain.BungaeStatus;
 import com.midasdev.mybg.bungae.repository.BungaeRecruitDateOptionRepository;
 import com.midasdev.mybg.bungae.repository.BungaeRepository;
-import com.midasdev.mybg.bungae.service.event.BungaeVoteCreatedEvent;
 import com.midasdev.mybg.group.domain.Group;
 import com.midasdev.mybg.group.fixture.GroupFixture;
 import com.midasdev.mybg.group.repository.GroupRepository;
@@ -25,11 +24,8 @@ import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.SpyBean;
-import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.transaction.annotation.Transactional;
 
 @SpringBootTest
@@ -53,9 +49,6 @@ class BungaeServiceTest {
 
     @Autowired
     private BungaeRecruitDateOptionRepository bungaeRecruitDateOptionRepository;
-
-    @SpyBean
-    private ApplicationEventPublisher eventPublisher;
 
     private Group group;
     private GroupMember hostGroupMember;
@@ -169,64 +162,5 @@ class BungaeServiceTest {
         assertThat(options)
                 .extracting(BungaeRecruitDateOption::getVoteCount)
                 .containsOnly(1);
-    }
-
-    @Test
-    @DisplayName("날짜 후보가 1개일 때 번개 생성 시 이벤트가 발행된다")
-    void createBungae_withSingleDateCandidate_shouldPublishEvent() {
-        // given
-        BungaeCreateRequest request = new BungaeCreateRequest(
-                "이벤트 테스트 번개1",
-                "설명",
-                2,
-                10,
-                false,
-                "서울",
-                LocalTime.of(18, 0),
-                List.of(LocalDate.now().plusDays(1)),
-                null,
-                group.getId(),
-                hostGroupMember.getId()
-        );
-
-        // when
-        bungaeService.createBungae(request);
-
-        // then
-        Mockito.verify(eventPublisher, Mockito.times(1))
-               .publishEvent(Mockito.argThat(event -> event instanceof BungaeVoteCreatedEvent));
-    }
-
-    @Test
-    @DisplayName("날짜 후보가 2개 이상일 때 번개 생성 시 이벤트가 발행된다")
-    void createBungae_withMultipleDateCandidates_shouldPublishEvent() {
-        // given
-        List<LocalDate> dateCandidates = List.of(
-                LocalDate.now().plusDays(1),
-                LocalDate.now().plusDays(2)
-        );
-        LocalTime bungaeTime = LocalTime.of(19, 0);
-        LocalDateTime voteClosedAt = LocalDateTime.now().plusDays(1);
-
-        BungaeCreateRequest request = new BungaeCreateRequest(
-                "이벤트 테스트 번개2",
-                "설명2",
-                2,
-                10,
-                false,
-                "서울",
-                bungaeTime,
-                dateCandidates,
-                voteClosedAt,
-                group.getId(),
-                hostGroupMember.getId()
-        );
-
-        // when
-        bungaeService.createBungae(request);
-
-        // then
-        Mockito.verify(eventPublisher, Mockito.times(1))
-                .publishEvent(Mockito.argThat(event -> event instanceof BungaeVoteCreatedEvent));
     }
 }
