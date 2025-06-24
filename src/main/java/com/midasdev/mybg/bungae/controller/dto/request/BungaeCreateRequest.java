@@ -87,10 +87,10 @@ public record BungaeCreateRequest(
 
         @Schema(
                 title = "투표 마감 시각",
-                description = "현재 시각 이후여야 합니다.",
-                requiredMode = RequiredMode.REQUIRED
+                description = "날짜 후보가 2개 이상일 경우 필수입니다.",
+                requiredMode = RequiredMode.NOT_REQUIRED
         )
-        @NotNull
+        // TODO: 날짜 후보가 2개 이상일 경우 해당 필드가 있는지 검증
         @Future
         LocalDateTime dateVoteClosedAt,
 

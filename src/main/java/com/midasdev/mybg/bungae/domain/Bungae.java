@@ -60,7 +60,7 @@ public class Bungae {
     @Column
     private BungaeDateTime bungaeDateTime;
 
-    @Column(nullable = false)
+    @Column
     private LocalDateTime dateVoteClosedAt;
 
     @Enumerated(EnumType.STRING)
