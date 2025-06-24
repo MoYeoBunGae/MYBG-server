@@ -9,11 +9,13 @@ import com.midasdev.mybg.bungae.domain.BungaeStatus;
 import com.midasdev.mybg.bungae.repository.BungaeAttendeeRepository;
 import com.midasdev.mybg.bungae.repository.BungaeRecruitDateOptionRepository;
 import com.midasdev.mybg.bungae.repository.BungaeRepository;
+import com.midasdev.mybg.bungae.service.event.BungaeVoteCreatedEvent;
 import com.midasdev.mybg.group_member.domain.GroupMember;
 import com.midasdev.mybg.group_member.repository.GroupMemberRepository;
 import com.midasdev.mybg.global.exception.ApplicationException;
 import com.midasdev.mybg.global.exception.ApplicationExceptionType;
 import lombok.RequiredArgsConstructor;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -25,6 +27,7 @@ public class BungaeService {
     private final BungaeRepository bungaeRepository;
     private final BungaeRecruitDateOptionRepository bungaeRecruitDateOptionRepository;
     private final BungaeAttendeeRepository bungaeAttendeeRepository;
+    private final ApplicationEventPublisher eventPublisher;
 
     @Transactional
     public Bungae createBungae(BungaeCreateRequest request) {
@@ -36,7 +39,7 @@ public class BungaeService {
                 ));
 
         // 2. Bungae 엔티티 생성 - 날짜 후보에 따라 Status 및 bungaeDateTime 설정
-        BungaeStatus status = request.dateCandidates().size() == 1
+        BungaeStatus status = request.hasSingleDateCandidate()
                 ? BungaeStatus.RECRUITING
                 : BungaeStatus.DATE_VOTING;
 
@@ -75,7 +78,7 @@ public class BungaeService {
             request.dateCandidates().forEach(date -> {
                 BungaeRecruitDateOption option = BungaeRecruitDateOption.builder()
                         .dateOption(date)
-                        .voteCount(0)
+                        .voteCount(1) // 주최자가 1표를 가진 것으로 초기화
                         .bungae(savedBungae)
                         .build();
                 bungaeRecruitDateOptionRepository.save(option);
@@ -91,7 +94,10 @@ public class BungaeService {
         bungaeAttendeeRepository.save(attendee);
 
         // 6. 투표 생성 이벤트 발행
+        eventPublisher.publishEvent(new BungaeVoteCreatedEvent(savedBungae.getId()));
 
+        // 필요하다면 반환
+        return savedBungae;
     }
 
 }
