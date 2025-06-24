@@ -21,6 +21,7 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.List;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -58,6 +59,15 @@ class BungaeServiceTest {
         Member member = memberRepository.save(MemberFixture.create());
         group = groupRepository.save(GroupFixture.create(member));
         hostGroupMember = groupMemberRepository.save(GroupMemberFixture.create(group, member));
+    }
+
+    @AfterEach
+    void clear() {
+        bungaeRecruitDateOptionRepository.deleteAll();
+        bungaeRepository.deleteAll();
+        groupMemberRepository.deleteAll();
+        groupRepository.deleteAll();
+        memberRepository.deleteAll();
     }
 
     @Test
