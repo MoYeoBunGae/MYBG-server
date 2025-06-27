@@ -14,7 +14,7 @@ import java.lang.annotation.Target;
 @Documented
 public @interface WithinWeeks {
 
-    String message() default "날짜는 오늘로부터 {maxWeeks}주 이내여야 합니다.";
+    String message() default "날짜는 오늘로부터 {value}주 이내여야 합니다.";
 
     Class<?>[] groups() default {};
 
