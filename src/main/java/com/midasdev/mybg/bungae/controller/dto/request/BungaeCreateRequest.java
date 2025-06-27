@@ -1,6 +1,7 @@
 package com.midasdev.mybg.bungae.controller.dto.request;
 
 
+import com.midasdev.mybg.bungae.controller.dto.request.validation.VoteRequiredIfHasMultipleDateCandidates;
 import com.midasdev.mybg.global.util.validator.IsPositiveNumber;
 import com.midasdev.mybg.global.util.validator.WithinWeeks;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -19,6 +20,7 @@ import java.time.LocalTime;
 import java.util.List;
 
 @Schema(description = "번개 생성 요청")
+@VoteRequiredIfHasMultipleDateCandidates
 public record BungaeCreateRequest(
 
         @Schema(
@@ -64,7 +66,7 @@ public record BungaeCreateRequest(
         Boolean isOnline,
 
         @Schema(
-                title = "오프라인 장소",
+                title = "모임 장소",
                 description = "최대 100자까지 입력 가능합니다.",
                 requiredMode = RequiredMode.NOT_REQUIRED
         )
@@ -73,6 +75,7 @@ public record BungaeCreateRequest(
 
         @Schema(
                 title = "번개 시간",
+                example = "19:00",
                 requiredMode = RequiredMode.NOT_REQUIRED
         )
         LocalTime bungaeTime,
@@ -90,7 +93,6 @@ public record BungaeCreateRequest(
                 description = "날짜 후보가 2개 이상일 경우 필수입니다.",
                 requiredMode = RequiredMode.NOT_REQUIRED
         )
-        // TODO: 날짜 후보가 2개 이상일 경우 해당 필드가 있는지 검증
         @Future
         LocalDateTime dateVoteClosedAt,
 
@@ -107,12 +109,9 @@ public record BungaeCreateRequest(
         Long hostGroupMemberId
 
 ) {
+
     public boolean hasSingleDateCandidate() {
         return dateCandidates.size() == 1;
     }
+
 }
-
-
-
-
-
