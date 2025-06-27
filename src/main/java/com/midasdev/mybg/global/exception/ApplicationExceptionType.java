@@ -93,6 +93,24 @@ public enum ApplicationExceptionType {
             "ERR_GROUP_MEMBER_006",
             "그룹({0})의 소유자는 나갈 수 없습니다."
     ),
+    /**
+     * - {0} : groupMemberId
+     * - {1} : groupId
+     */
+    GROUP_MEMBER_NOT_BELONG_TO_GROUP(
+        HttpStatus.FORBIDDEN,
+        "ERR_GROUP_MEMBER_007",
+        "GroupMember({0})는 그룹({1})에 속해있지 않습니다."
+    ),
+    /**
+     * - {0} : groupMemberId
+     * - {1} : groupId
+     */
+    GROUP_MEMBER_NOT_FOUND_BY_GROUP_ID(
+        HttpStatus.BAD_REQUEST,
+        "ERR_GROUP_MEMBER_008",
+        "해당 그룹({1})에 속하는 그룹멤버({0})를 찾을 수 없습니다."
+    ),
 
     // authentication
     TOKEN_AUTHENTICATION_EXCEPTION(HttpStatus.FORBIDDEN, "ERR_AUTH_001", "토큰 인증에 실패했습니다. : {0}"),
