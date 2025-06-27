@@ -65,7 +65,7 @@ class BungaeServiceEventTest {
     }
 
     @Test
-    @DisplayName("날짜 후보가 1개일 때 번개 생성 시 BungaeCreateRequest가 발행된다")
+    @DisplayName("날짜 후보가 1개일 때 번개 생성 시 BungaeVoteCreatedEvent가 발행된다")
     void createBungae_withSingleDateCandidate_shouldPublishEvent() {
         // given
         BungaeCreateRequest request = new BungaeCreateRequest(
@@ -91,7 +91,7 @@ class BungaeServiceEventTest {
     }
 
     @Test
-    @DisplayName("날짜 후보가 2개 이상일 때 번개 생성 시 BungaeCreateRequest가 발행된다")
+    @DisplayName("날짜 후보가 2개 이상일 때 번개 생성 시 BungaeVoteCreatedEvent가 발행된다")
     void createBungae_withMultipleDateCandidates_shouldPublishEvent() {
         // given
         List<LocalDate> dateCandidates = List.of(
