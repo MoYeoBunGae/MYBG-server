@@ -6,6 +6,15 @@ import com.midasdev.mybg.bungae.domain.BungaeAttendee;
 import com.midasdev.mybg.bungae.domain.BungaeDateTime;
 import com.midasdev.mybg.bungae.domain.BungaeRecruitDateOption;
 import com.midasdev.mybg.bungae.domain.BungaeStatus;
+import com.midasdev.mybg.member.domain.Member;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.context.ApplicationEventPublisher;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import java.util.List;
+
 import com.midasdev.mybg.bungae.repository.BungaeAttendeeRepository;
 import com.midasdev.mybg.bungae.repository.BungaeRecruitDateOptionRepository;
 import com.midasdev.mybg.bungae.repository.BungaeRepository;
@@ -15,9 +24,6 @@ import com.midasdev.mybg.group_member.repository.GroupMemberRepository;
 import com.midasdev.mybg.global.exception.ApplicationException;
 import com.midasdev.mybg.global.exception.ApplicationExceptionType;
 import lombok.RequiredArgsConstructor;
-import org.springframework.context.ApplicationEventPublisher;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
@@ -98,6 +104,14 @@ public class BungaeService {
 
         // 필요하다면 반환
         return savedBungae;
+    }
+
+    public Page<Bungae> findBungaesByMemberIdAndStatuses(
+            Member member,
+            List<BungaeStatus> statuses,
+            Pageable pageable
+    ) {
+        return bungaeRepository.findAllByAttendeeMemberIdAndStatusIn(member.getId(), statuses, pageable);
     }
 
 }
