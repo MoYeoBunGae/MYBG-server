@@ -12,8 +12,9 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
-import java.util.List;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.validation.annotation.Validated;
@@ -57,21 +58,20 @@ public class BungaeController {
             description = """
                     로그인한 사용자가 참여한 번개모임 목록을 조회합니다.
                     - Request DTO : GetMyBungaesRequest
-                    - Response DTO : List<BungaeResponse>
+                    - Response DTO : Page<BungaeResponse>
                     """,
             security = @SecurityRequirement(name = SECURITY_SCHEME_NAME)
     )
     @GetMapping("/me")
-    public ResponseEntity<List<BungaeResponse>> getMyBungaes(
+    public ResponseEntity<Page<BungaeResponse>> getMyBungaes(
             @AuthenticationPrincipal Member member,
-            @Valid @RequestBody GetMyBungaesRequest request
+            @Valid @RequestBody GetMyBungaesRequest request,
+            Pageable pageable
     ) {
-        List<Bungae> bungaes = bungaeService.findBungaesByMemberIdAndStatuses(
-                member, request.statuses()
+        Page<Bungae> bungaes = bungaeService.findBungaesByMemberIdAndStatuses(
+                member, request.statuses(), pageable
         );
-        List<BungaeResponse> responses = bungaes.stream()
-                                                .map(BungaeResponse::from)
-                                                .toList();
+        Page<BungaeResponse> responses = bungaes.map(BungaeResponse::from);
         return ResponseEntity.ok(responses);
     }
 
