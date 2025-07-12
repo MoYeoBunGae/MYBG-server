@@ -7,6 +7,7 @@ import com.midasdev.mybg.bungae.controller.dto.request.GetMyBungaesRequest;
 import com.midasdev.mybg.bungae.controller.dto.response.BungaeResponse;
 import com.midasdev.mybg.bungae.domain.Bungae;
 import com.midasdev.mybg.bungae.service.BungaeService;
+import com.midasdev.mybg.global.util.default_value_mapper.DefaultedRequestBody;
 import com.midasdev.mybg.member.domain.Member;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
@@ -14,7 +15,6 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.validation.annotation.Validated;
@@ -65,11 +65,10 @@ public class BungaeController {
     @GetMapping("/me")
     public ResponseEntity<Page<BungaeResponse>> getMyBungaes(
             @AuthenticationPrincipal Member member,
-            @Valid @RequestBody GetMyBungaesRequest request,
-            Pageable pageable
+            @Valid @DefaultedRequestBody GetMyBungaesRequest request
     ) {
         Page<Bungae> bungaes = bungaeService.findBungaesByMemberIdAndStatuses(
-                member, request.statuses(), pageable
+                member, request.getStatuses(), request.toPageable()
         );
         Page<BungaeResponse> responses = bungaes.map(BungaeResponse::from);
         return ResponseEntity.ok(responses);

@@ -1,4 +1,4 @@
-package com.midasdev.mybg.global.util;
+package com.midasdev.mybg.global.util.cursor_page;
 
 import java.util.List;
 import lombok.Getter;
