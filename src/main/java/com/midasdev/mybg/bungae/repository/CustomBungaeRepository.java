@@ -2,10 +2,15 @@ package com.midasdev.mybg.bungae.repository;
 
 import com.midasdev.mybg.bungae.domain.Bungae;
 import com.midasdev.mybg.bungae.domain.BungaeStatus;
+import com.midasdev.mybg.global.util.cursor_page.CursorPage;
+import com.midasdev.mybg.global.util.cursor_page.CursorPageable;
 import java.util.List;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
 
 public interface CustomBungaeRepository {
-    Page<Bungae> findAllByAttendeeMemberIdAndStatusIn(Long memberId, List<BungaeStatus> statuses, Pageable pageable);
+
+    CursorPage<Bungae> findAllByAttendeeMemberIdAndStatusIn(
+        Long memberId,
+        List<BungaeStatus> statuses,
+        CursorPageable cursorPageable
+    );
 }
