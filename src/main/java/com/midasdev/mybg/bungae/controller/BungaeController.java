@@ -7,6 +7,7 @@ import com.midasdev.mybg.bungae.controller.dto.request.GetMyBungaesRequest;
 import com.midasdev.mybg.bungae.controller.dto.response.BungaeResponse;
 import com.midasdev.mybg.bungae.domain.Bungae;
 import com.midasdev.mybg.bungae.service.BungaeService;
+import com.midasdev.mybg.global.util.cursor_page.CursorPage;
 import com.midasdev.mybg.global.util.default_value_mapper.DefaultedRequestBody;
 import com.midasdev.mybg.member.domain.Member;
 import io.swagger.v3.oas.annotations.Operation;
@@ -14,7 +15,6 @@ import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.validation.annotation.Validated;
@@ -57,20 +57,21 @@ public class BungaeController {
             summary = "내 번개모임 목록 조회 API",
             description = """
                     로그인한 사용자가 참여한 번개모임 목록을 조회합니다.
+                    커서 페이지네이션을 지원합니다.
                     - Request DTO : GetMyBungaesRequest
-                    - Response DTO : Page<BungaeResponse>
+                    - Response DTO : CursorPage<BungaeResponse>
                     """,
             security = @SecurityRequirement(name = SECURITY_SCHEME_NAME)
     )
     @GetMapping("/me")
-    public ResponseEntity<Page<BungaeResponse>> getMyBungaes(
+    public ResponseEntity<CursorPage<BungaeResponse>> getMyBungaes(
             @AuthenticationPrincipal Member member,
             @Valid @DefaultedRequestBody GetMyBungaesRequest request
     ) {
-        Page<Bungae> bungaes = bungaeService.findBungaesByMemberIdAndStatuses(
+        CursorPage<Bungae> bungaes = bungaeService.findBungaesByMemberIdAndStatuses(
                 member, request.getStatuses(), request.toPageable()
         );
-        Page<BungaeResponse> responses = bungaes.map(BungaeResponse::from);
+        CursorPage<BungaeResponse> responses = bungaes.map(BungaeResponse::from);
         return ResponseEntity.ok(responses);
     }
 

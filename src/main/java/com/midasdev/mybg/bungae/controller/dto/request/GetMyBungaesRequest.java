@@ -7,10 +7,12 @@ import io.swagger.v3.oas.annotations.media.Schema.RequiredMode;
 import java.util.List;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 @Schema(description = "내 번개모임 목록 조회 요청 DTO")
 @Getter
 @AllArgsConstructor
+@NoArgsConstructor
 public class GetMyBungaesRequest extends CursorPageRequest {
 
     @Schema(
