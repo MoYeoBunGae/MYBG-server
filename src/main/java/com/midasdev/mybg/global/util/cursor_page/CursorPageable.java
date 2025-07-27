@@ -15,4 +15,8 @@ public record CursorPageable(
         Long lastCursorId,
         Integer pageSize,
         SortOrder sortOrder
-) {}
+) {
+    public CursorPageable(Long lastCursorId, Integer pageSize) {
+        this(lastCursorId, pageSize, SortOrder.ASC);
+    }
+}

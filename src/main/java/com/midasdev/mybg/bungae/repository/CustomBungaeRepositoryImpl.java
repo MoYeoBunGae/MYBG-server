@@ -37,7 +37,7 @@ public class CustomBungaeRepositoryImpl implements CustomBungaeRepository {
                 .join(bungae.group).fetchJoin()
                 .join(bungae.host).fetchJoin()
                 .where(condition)
-                .orderBy(bungae.audit.createdAt.desc()) // 생성일 기준 내림차순 정렬
+                .orderBy(bungae.id.desc()) // id 기준 내림차순 정렬 (최신순)
                 .limit(pageSize + 1)
                 .fetch();
 

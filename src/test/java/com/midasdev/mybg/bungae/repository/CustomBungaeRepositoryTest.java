@@ -1,0 +1,124 @@
+package com.midasdev.mybg.bungae.repository;
+
+import com.midasdev.mybg.bungae.domain.Bungae;
+import com.midasdev.mybg.bungae.domain.BungaeAttendee;
+import com.midasdev.mybg.bungae.fixture.BungaeFixture;
+import com.midasdev.mybg.config.QueryDslConfig;
+import com.midasdev.mybg.group.domain.Group;
+import com.midasdev.mybg.group.fixture.GroupFixture;
+import com.midasdev.mybg.group.repository.GroupRepository;
+import com.midasdev.mybg.group_member.domain.GroupMember;
+import com.midasdev.mybg.group_member.fixture.GroupMemberFixture;
+import com.midasdev.mybg.group_member.repository.GroupMemberRepository;
+import com.midasdev.mybg.member.domain.Member;
+import com.midasdev.mybg.member.fixture.MemberFixture;
+import com.midasdev.mybg.member.repository.MemberRepository;
+import com.midasdev.mybg.global.util.cursor_page.CursorPage;
+import com.midasdev.mybg.global.util.cursor_page.CursorPageable;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
+
+import java.util.ArrayList;
+import java.util.List;
+import org.springframework.context.annotation.Import;
+
+import static org.assertj.core.api.Assertions.assertThat;
+
+@DataJpaTest
+@Import(QueryDslConfig.class)
+class CustomBungaeRepositoryTest {
+
+    @Autowired
+    private BungaeRepository bungaeRepository;
+
+    @Autowired
+    private BungaeAttendeeRepository bungaeAttendeeRepository;
+
+    @Autowired
+    private GroupRepository groupRepository;
+
+    @Autowired
+    private GroupMemberRepository groupMemberRepository;
+
+    @Autowired
+    private MemberRepository memberRepository;
+
+    private Member member;
+    private Group group;
+    private GroupMember groupMember;
+    private List<Bungae> savedBungaes;
+
+    @BeforeEach
+    void setUp() {
+        // 기본 엔티티 생성 및 저장
+        member = memberRepository.save(MemberFixture.create());
+        group = groupRepository.save(GroupFixture.create(member));
+        groupMember = groupMemberRepository.save(GroupMemberFixture.create(group, member));
+
+        // 각 BungaeStatus별로 Bungae 생성 및 저장
+        savedBungaes = new ArrayList<>();
+
+        // DATE_VOTING 번개 생성
+        Bungae dateVotingBungae = bungaeRepository.save(
+                BungaeFixture.createWithDateVoting(group, groupMember));
+        savedBungaes.add(dateVotingBungae);
+
+        // RECRUITING 번개 생성
+        Bungae recruitingBungae = bungaeRepository.save(
+                BungaeFixture.createWithRecruiting(group, groupMember));
+        savedBungaes.add(recruitingBungae);
+
+        // RECRUITING_CLOSED 번개 생성
+        Bungae recruitingClosedBungae = bungaeRepository.save(
+                BungaeFixture.createWithRecruitingClosed(group, groupMember));
+        savedBungaes.add(recruitingClosedBungae);
+
+        // CLOSED 번개 생성
+        Bungae closedBungae = bungaeRepository.save(
+                BungaeFixture.createWithClosed(group, groupMember));
+        savedBungaes.add(closedBungae);
+
+        // CANCELLED 번개 생성
+        Bungae cancelledBungae = bungaeRepository.save(
+                BungaeFixture.createWithCancelled(group, groupMember));
+        savedBungaes.add(cancelledBungae);
+
+        // 각 번개에 대해 BungaeAttendee 생성 (member가 참여자로 등록)
+        for (Bungae bungae : savedBungaes) {
+            BungaeAttendee attendee = BungaeAttendee.builder()
+                    .bungae(bungae)
+                    .groupMember(groupMember)
+                    .deleted(false)
+                    .build();
+            bungaeAttendeeRepository.save(attendee);
+        }
+    }
+
+    @Test
+    @DisplayName("lastCursorId, size 조건에 맞는 번개만 조회된다")
+    void findAllByAttendeeMemberIdAndStatusIn_withCursorAndSize_shouldReturnCorrectBungaes() {
+        // given
+        Long lastCursorId = savedBungaes.get(savedBungaes.size() - 1).getId() + 1; // 마지막에 저장된 번개의 ID보다 큰 값
+        int pageSize = 2;
+        CursorPageable cursorPageable = new CursorPageable(lastCursorId, pageSize);
+
+        // when
+        CursorPage<Bungae> result = bungaeRepository.findAllByAttendeeMemberIdAndStatusIn(
+                member.getId(),
+                null, // 모든 상태
+                cursorPageable
+        );
+
+        // then
+        assertThat(result.getContent()).hasSize(pageSize);
+        assertThat(result.getContent())
+                .extracting(Bungae::getId)
+                .allMatch(id -> id < lastCursorId); // cursor보다 작은 ID만 조회되어야 함
+        assertThat(result.isHasNext()).isTrue();
+        long expectedNextCursorId = savedBungaes.get(savedBungaes.size() - 1 - pageSize).getId();
+        assertThat(result.getNextCursorId()).isEqualTo(expectedNextCursorId);
+    }
+}

@@ -13,7 +13,7 @@ import java.time.LocalTime;
 public class BungaeFixture {
 
     // DATE_VOTING
-    public static Bungae createWithDateVoting(Group group, GroupMember host, LocalTime time) {
+    public static Bungae createWithDateVoting(Group group, GroupMember host) {
         return bungaeBaseBuilder(group, host)
                 .status(BungaeStatus.DATE_VOTING)
                 .dateVoteClosedAt(LocalDateTime.now().plusDays(1))
