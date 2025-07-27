@@ -1,38 +1,38 @@
 package com.midasdev.mybg.global.util.cursor_page;
 
-import com.midasdev.mybg.global.util.default_value_mapper.Default;
-import io.swagger.v3.oas.annotations.media.Schema;
-import io.swagger.v3.oas.annotations.media.Schema.RequiredMode;
+import io.swagger.v3.oas.annotations.Parameter;
+import jakarta.validation.constraints.Positive;
+import jakarta.validation.constraints.PositiveOrZero;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 /**
  * 커서 기반 페이징을 위한 요청 DTO의 추상 클래스입니다. <br>
  * 정렬은 아직 지원하지 않습니다.
  */
-@Schema(description = "커서 기반 페이징 요청 DTO")
+//@Schema(description = "커서 기반 페이징 요청 DTO")
 @Getter
+@Setter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
 public abstract class CursorPageRequest {
 
-    @Schema(
+    @Parameter(
             description = "커서(마지막으로 조회된 엔티티의 ID) (default: 0)",
-            example = "100",
-            requiredMode = RequiredMode.NOT_REQUIRED
+            example = "100"
     )
-    @Default("0")
-    private Long lastCursorId;
+    @PositiveOrZero
+    private Long lastCursorId = 0L;
 
-    @Schema(
+    @Parameter(
             description = "페이지 크기 (default: 10)",
-            example = "10",
-            requiredMode = RequiredMode.NOT_REQUIRED
+            example = "10"
     )
-    @Default("10")
-    private Integer pageSize;
+    @Positive
+    private Integer pageSize = 10;
 
     public CursorPageable toPageable() {
         return CursorPageable.builder()

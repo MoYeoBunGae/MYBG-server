@@ -8,13 +8,13 @@ import com.midasdev.mybg.bungae.controller.dto.response.BungaeResponse;
 import com.midasdev.mybg.bungae.domain.Bungae;
 import com.midasdev.mybg.bungae.service.BungaeService;
 import com.midasdev.mybg.global.util.cursor_page.CursorPage;
-import com.midasdev.mybg.global.util.default_value_mapper.DefaultedRequestBody;
 import com.midasdev.mybg.member.domain.Member;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.validation.annotation.Validated;
@@ -24,6 +24,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+@Slf4j
 @Tag(name = "Bungae APIs")
 @RestController
 @RequestMapping("/api/v1/bungaes")
@@ -45,7 +46,7 @@ public class BungaeController {
                     """,
             security = @SecurityRequirement(name = SECURITY_SCHEME_NAME)
     )
-    @PostMapping
+    @PostMapping()
     public ResponseEntity<BungaeResponse> createBungae(
             @Valid @RequestBody BungaeCreateRequest request
     ) {
@@ -63,10 +64,10 @@ public class BungaeController {
                     """,
             security = @SecurityRequirement(name = SECURITY_SCHEME_NAME)
     )
-    @GetMapping("/me")
+    @GetMapping(value = "/me")
     public ResponseEntity<CursorPage<BungaeResponse>> getMyBungaes(
             @AuthenticationPrincipal Member member,
-            @Valid @DefaultedRequestBody GetMyBungaesRequest request
+            @Valid GetMyBungaesRequest request
     ) {
         CursorPage<Bungae> bungaes = bungaeService.findBungaesByMemberIdAndStatuses(
                 member, request.getStatuses(), request.toPageable()
