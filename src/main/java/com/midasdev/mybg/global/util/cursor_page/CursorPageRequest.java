@@ -21,11 +21,13 @@ import lombok.Setter;
 public abstract class CursorPageRequest {
 
     @Parameter(
-            description = "커서(마지막으로 조회된 엔티티의 ID) (default: 0)",
-            example = "100"
+            description = """
+            마지막으로 조회된 엔티티의 ID (default: null)
+            - null인 경우, 가장 최근 엔티티부터 조회합니다.
+            """
     )
     @PositiveOrZero
-    private Long lastCursorId = 0L;
+    private Long lastCursorId;
 
     @Parameter(
             description = "페이지 크기 (default: 10)",

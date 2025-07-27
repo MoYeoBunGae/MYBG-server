@@ -61,6 +61,8 @@ public class BungaeController {
                     커서 페이지네이션을 지원합니다.
                     - Request DTO : GetMyBungaesRequest
                     - Response DTO : CursorPage<BungaeResponse>
+                    - 세부사항:
+                        1. 가장 마지막 번개가 포함되어 있을 경우, nextCursorId가 null이고 hasNext가 false로 반환됩니다.
                     """,
             security = @SecurityRequirement(name = SECURITY_SCHEME_NAME)
     )
