@@ -41,7 +41,6 @@ public class CustomBungaeRepositoryImpl implements CustomBungaeRepository {
                 .limit(pageSize + 1)
                 .fetch();
 
-        // TODO: 이해하기
         boolean hasNext = content.size() > pageSize;
         Long nextCursorId = null;
         if (hasNext) {
