@@ -44,8 +44,8 @@ public class CustomBungaeRepositoryImpl implements CustomBungaeRepository {
         boolean hasNext = content.size() > pageSize;
         Long nextCursorId = null;
         if (hasNext) {
-            Bungae last = content.remove(pageSize);
-            nextCursorId = last.getId();
+            content.remove(pageSize); // 페이지 크기보다 하나 더 가져왔으므로 마지막 요소 제거
+            nextCursorId = content.get(pageSize - 1).getId(); // 다음 페이지의 커서 ID는 현재 페이지의 마지막 요소
         }
 
         return new CursorPage<>(content, nextCursorId, hasNext);

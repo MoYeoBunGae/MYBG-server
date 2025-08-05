@@ -119,7 +119,8 @@ class CustomBungaeRepositoryTest {
                 .extracting(Bungae::getId)
                 .allMatch(id -> id < lastCursorId); // cursor보다 작은 ID만 조회되어야 함
         assertThat(result.isHasNext()).isTrue();
-        long expectedNextCursorId = savedBungaes.get(savedBungaes.size() - 1 - pageSize).getId();
+        // nextCursorId는 반환된 마지막 요소의 ID여야 함
+        Long expectedNextCursorId = result.getContent().get(pageSize - 1).getId();
         assertThat(result.getNextCursorId()).isEqualTo(expectedNextCursorId);
     }
 
@@ -200,5 +201,7 @@ class CustomBungaeRepositoryTest {
                 .toList();
 
         assertThat(resultIds).isEqualTo(sortedIds);
+        // nextCursorId는 반환된 마지막 요소의 ID여야 함
+        assertThat(result.getNextCursorId()).isEqualTo(result.getContent().get(2).getId());
     }
 }
