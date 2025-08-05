@@ -2,6 +2,7 @@ package com.midasdev.mybg.bungae.repository;
 
 import com.midasdev.mybg.bungae.domain.Bungae;
 import com.midasdev.mybg.bungae.domain.BungaeAttendee;
+import com.midasdev.mybg.bungae.domain.BungaeStatus;
 import com.midasdev.mybg.bungae.fixture.BungaeFixture;
 import com.midasdev.mybg.config.QueryDslConfig;
 import com.midasdev.mybg.group.domain.Group;
@@ -120,5 +121,84 @@ class CustomBungaeRepositoryTest {
         assertThat(result.isHasNext()).isTrue();
         long expectedNextCursorId = savedBungaes.get(savedBungaes.size() - 1 - pageSize).getId();
         assertThat(result.getNextCursorId()).isEqualTo(expectedNextCursorId);
+    }
+
+    @Test
+    @DisplayName("특정 status 조건에 맞는 번개만 조회된다")
+    void findAllByAttendeeMemberIdAndStatusIn_withStatus_shouldReturnFilteredBungaes() {
+        // given
+        List<BungaeStatus> targetStatuses = List.of(BungaeStatus.DATE_VOTING, BungaeStatus.RECRUITING);
+        CursorPageable cursorPageable = new CursorPageable(null, 10);
+
+        // when
+        CursorPage<Bungae> result = bungaeRepository.findAllByAttendeeMemberIdAndStatusIn(
+                member.getId(),
+                targetStatuses,
+                cursorPageable
+        );
+
+        // then
+        assertThat(result.getContent())
+                .extracting(Bungae::getStatus)
+                .containsExactlyInAnyOrder(BungaeStatus.DATE_VOTING, BungaeStatus.RECRUITING);
+        assertThat(result.getContent())
+                .extracting(Bungae::getStatus)
+                .doesNotContain(BungaeStatus.RECRUITING_CLOSED, BungaeStatus.CLOSED, BungaeStatus.CANCELLED);
+    }
+
+    @Test
+    @DisplayName("status가 null일 경우 모든 상태의 번개가 조회된다")
+    void findAllByAttendeeMemberIdAndStatusIn_withNullStatus_shouldReturnAllBungaes() {
+        // given
+        CursorPageable cursorPageable = new CursorPageable(null, 10);
+
+        // when
+        CursorPage<Bungae> result = bungaeRepository.findAllByAttendeeMemberIdAndStatusIn(
+                member.getId(),
+                null, // status가 null
+                cursorPageable
+        );
+
+        // then
+        assertThat(result.getContent()).hasSize(5); // 모든 상태의 번개 5개 조회
+        assertThat(result.getContent())
+                .extracting(Bungae::getStatus)
+                .containsExactlyInAnyOrder(
+                        BungaeStatus.DATE_VOTING,
+                        BungaeStatus.RECRUITING,
+                        BungaeStatus.RECRUITING_CLOSED,
+                        BungaeStatus.CLOSED,
+                        BungaeStatus.CANCELLED
+                );
+    }
+
+    @Test
+    @DisplayName("lastCursorId가 null일 경우 가장 최근 것부터 조회된다")
+    void findAllByAttendeeMemberIdAndStatusIn_withNullCursor_shouldReturnFromLatest() {
+        // given
+        CursorPageable cursorPageable = new CursorPageable(null, 3); // lastCursorId가 null
+
+        // when
+        CursorPage<Bungae> result = bungaeRepository.findAllByAttendeeMemberIdAndStatusIn(
+                member.getId(),
+                null,
+                cursorPageable
+        );
+
+        // then
+        assertThat(result.getContent()).hasSize(3);
+
+        // ID 기준 내림차순 정렬 확인 (최신순)
+        List<Long> resultIds = result.getContent().stream()
+                .map(Bungae::getId)
+                .toList();
+
+        List<Long> sortedIds = savedBungaes.stream()
+                .map(Bungae::getId)
+                .sorted((a, b) -> Long.compare(b, a)) // 내림차순 정렬
+                .limit(3)
+                .toList();
+
+        assertThat(resultIds).isEqualTo(sortedIds);
     }
 }
