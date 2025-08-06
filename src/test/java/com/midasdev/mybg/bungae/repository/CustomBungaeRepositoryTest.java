@@ -102,7 +102,7 @@ class CustomBungaeRepositoryTest {
     @DisplayName("lastCursorId, size 조건에 맞는 번개만 조회된다")
     void findAllByAttendeeMemberIdAndStatusIn_withCursorAndSize_shouldReturnCorrectBungaes() {
         // given
-        Long lastCursorId = savedBungaes.get(savedBungaes.size() - 1).getId() + 1; // 마지막에 저장된 번개의 ID보다 큰 값
+        Long lastCursorId = Long.MAX_VALUE; // 마지막에 저장된 번개의 ID보다 큰 값
         int pageSize = 2;
         CursorPageable cursorPageable = new CursorPageable(lastCursorId, pageSize);
 
