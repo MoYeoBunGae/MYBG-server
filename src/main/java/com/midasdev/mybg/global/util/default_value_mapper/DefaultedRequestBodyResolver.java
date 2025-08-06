@@ -31,8 +31,7 @@ public class DefaultedRequestBodyResolver implements HandlerMethodArgumentResolv
         HttpServletRequest servletRequest = webRequest.getNativeRequest(HttpServletRequest.class);
         String json = servletRequest.getReader().lines().collect(Collectors.joining());
 
-        // TODO: 발생한 예외가 어디서 잡히는 지 확인
-        // TODO: empty body 일 경우 어떻게 되는지 확인하고, 적절한 처리
+        // TODO: @Default를 사용할 때, empty body 일 경우 어떻게 되는지 확인하고, 적절한 처리
 
         Object dto = objectMapper.readValue(json, parameter.getParameterType());
         DefaultValueResolver.applyDefaults(dto);
