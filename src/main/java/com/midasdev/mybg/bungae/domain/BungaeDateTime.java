@@ -21,6 +21,10 @@ public class BungaeDateTime {
     @Column(name = "bungae_time")
     private LocalTime time;
 
+    public BungaeDateTime(LocalDate date) {
+        this.date = date;
+    }
+
     public BungaeDateTime(LocalTime time) {
         this.time = time;
     }

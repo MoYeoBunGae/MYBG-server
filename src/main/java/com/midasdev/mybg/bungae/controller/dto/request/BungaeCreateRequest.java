@@ -98,12 +98,19 @@ public record BungaeCreateRequest(
 
         @Schema(
                 title = "그룹 ID",
+                example = "1",
                 requiredMode = RequiredMode.REQUIRED
         )
         @IsPositiveNumber
         @NotNull
         Long groupId,
 
+        @Schema(
+                title = "호스트 그룹 멤버 ID",
+                description = "번개를 생성하는 호스트의 그룹 멤버 ID입니다.",
+                example = "1",
+                requiredMode = RequiredMode.REQUIRED
+        )
         @IsPositiveNumber
         @NotNull
         Long hostGroupMemberId
