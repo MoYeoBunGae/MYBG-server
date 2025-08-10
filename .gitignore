@@ -1,6 +1,12 @@
 HELP.md
 .gradle
 build/
+
+# Prompt files
+prompt/
+prompt-*.md
+
+
 !gradle/wrapper/gradle-wrapper.jar
 !**/src/main/**/build/
 !**/src/test/**/build/
