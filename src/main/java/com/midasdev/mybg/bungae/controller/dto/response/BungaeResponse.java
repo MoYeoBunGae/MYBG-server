@@ -14,6 +14,7 @@ public record BungaeResponse(
         String description,
         Integer minAttendees,
         Integer maxAttendees,
+        Integer attendeeCount,
         Boolean isOnline,
         String location,
         LocalDate bungaeDate,
@@ -21,7 +22,8 @@ public record BungaeResponse(
         LocalDateTime dateVoteClosedAt,
         BungaeStatus status,
         Long groupId,
-        Long hostGroupMemberId
+        Long hostGroupMemberId,
+        LocalDateTime createdAt // [copilot] 번개가 만들어진 시간 정보 추가
 ) {
 
     public static BungaeResponse from(Bungae bungae) {
@@ -39,8 +41,8 @@ public record BungaeResponse(
                              .status(bungae.getStatus())
                              .groupId(bungae.getGroup().getId())
                              .hostGroupMemberId(bungae.getHost().getId())
+                             .createdAt(bungae.getAudit().getCreatedAt()) // [copilot] 번개 생성 시간 추가
                              .build();
     }
 
 }
-

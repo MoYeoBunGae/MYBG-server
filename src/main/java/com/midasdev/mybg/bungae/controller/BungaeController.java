@@ -4,6 +4,7 @@ import static com.midasdev.mybg.config.swagger.SwaggerConfig.SECURITY_SCHEME_NAM
 
 import com.midasdev.mybg.bungae.controller.dto.request.BungaeCreateRequest;
 import com.midasdev.mybg.bungae.controller.dto.request.GetMyBungaesRequest;
+import com.midasdev.mybg.bungae.controller.dto.request.GetGroupBungaesRequest;
 import com.midasdev.mybg.bungae.controller.dto.response.BungaeResponse;
 import com.midasdev.mybg.bungae.domain.Bungae;
 import com.midasdev.mybg.bungae.service.BungaeService;
@@ -78,5 +79,30 @@ public class BungaeController {
         return ResponseEntity.ok(responses);
     }
 
+    @Operation(
+            summary = "그룹별 번개모임 목록 조회 API",
+            description = """
+                    특정 그룹의 번개모임 목록을 조회합니다.
+                    커서 페이지네이션을 지원합니다.
+                    - Request DTO : GetGroupBungaesRequest
+                    - Response DTO : CursorPage<BungaeResponse>
+                    - 세부사항:
+                        1. groupId는 필수 파라미터입니다.
+                        2. statuses가 null인 경우, 모든 상태의 번개를 조회합니다.
+                        3. 가장 마지막 번개가 포함되어 있을 경우, nextCursorId가 null이고 hasNext가 false로 반환됩니다.
+                    """,
+            security = @SecurityRequirement(name = SECURITY_SCHEME_NAME)
+    )
+    @GetMapping(value = "/group")
+    public ResponseEntity<CursorPage<BungaeResponse>> getGroupBungaes(
+            @AuthenticationPrincipal Member member,
+            @Valid GetGroupBungaesRequest request
+    ) {
+        CursorPage<BungaeDto> bungaes = bungaeService.findBungaesByGroupIdAndStatuses(
+                request.getGroupId(), request.getStatuses(), request.toPageable()
+        );
+        CursorPage<BungaeResponse> responses = bungaes.map(BungaeResponse::from);
+        return ResponseEntity.ok(responses);
+    }
 
 }
