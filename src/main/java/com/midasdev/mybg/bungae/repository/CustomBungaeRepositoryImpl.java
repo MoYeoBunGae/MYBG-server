@@ -4,9 +4,13 @@ import com.midasdev.mybg.bungae.domain.Bungae;
 import com.midasdev.mybg.bungae.domain.BungaeStatus;
 import com.midasdev.mybg.bungae.domain.QBungae;
 import com.midasdev.mybg.bungae.domain.QBungaeAttendee;
+import com.midasdev.mybg.bungae.repository.dto.BungaeDto;
+import com.midasdev.mybg.bungae.repository.dto.QBungaeDto;
 import com.midasdev.mybg.global.util.cursor_page.CursorPage;
 import com.midasdev.mybg.global.util.cursor_page.CursorPageable;
 import com.querydsl.core.types.dsl.BooleanExpression;
+import com.querydsl.jpa.JPAExpressions;
+import com.querydsl.jpa.JPQLQuery;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
@@ -54,6 +58,69 @@ public class CustomBungaeRepositoryImpl implements CustomBungaeRepository {
     private BooleanExpression createMemberAndBungaeStatusCondition(Long memberId, List<BungaeStatus> statuses) {
         BooleanExpression baseCondition = attendee.groupMember.member.id.eq(memberId)
                 .and(attendee.deleted.isFalse())
+                .and(bungae.deleted.isFalse());
+
+        BooleanExpression statusCondition = (statuses == null || statuses.isEmpty())
+                ? null
+                : bungae.status.in(statuses);
+
+        return (statusCondition == null)
+                ? baseCondition
+                : baseCondition.and(statusCondition);
+    }
+
+    @Override
+    public CursorPage<BungaeDto> findByGroupIdAndStatusIn(Long groupId, List<BungaeStatus> statuses, CursorPageable cursorPageable) {
+        Long cursorId = cursorPageable.lastCursorId();
+        int pageSize = cursorPageable.pageSize();
+
+        BooleanExpression condition = createGroupAndBungaeStatusCondition(groupId, statuses)
+            .and(cursorId != null ? bungae.id.lt(cursorId) : null);
+
+        JPQLQuery<Integer> attendeeCount = JPAExpressions
+                .select(attendee.count().intValue())
+                .from(attendee)
+                .where(attendee.bungae.eq(bungae)
+                                      .and(attendee.deleted.isFalse()));
+
+        List<BungaeDto> content = queryFactory
+                .select(new QBungaeDto(
+                        bungae.id,
+                        bungae.name,
+                        bungae.description,
+                        bungae.minAttendees,
+                        bungae.maxAttendees,
+                        bungae.isOnline,
+                        bungae.location,
+                        bungae.bungaeDateTime,
+                        bungae.dateVoteClosedAt,
+                        bungae.status,
+                        bungae.audit,
+                        bungae.deleted,
+                        bungae.group.id,
+                        bungae.host.id,
+                        attendeeCount
+                ))
+                .from(bungae)
+                .join(bungae.group)
+                .join(bungae.host)
+                .where(condition) // 그룹 ID, 상태 조건, last cursor ID 조건
+                .orderBy(bungae.id.desc())
+                .limit(pageSize + 1)
+                .fetch();
+
+        boolean hasNext = content.size() > pageSize;
+        Long nextCursorId = null;
+        if (hasNext) {
+            content.remove(pageSize);
+            nextCursorId = content.get(pageSize - 1).id();
+        }
+
+        return new CursorPage<>(content, nextCursorId, hasNext);
+    }
+
+    private BooleanExpression createGroupAndBungaeStatusCondition(Long groupId, List<BungaeStatus> statuses) {
+        BooleanExpression baseCondition = bungae.group.id.eq(groupId)
                 .and(bungae.deleted.isFalse());
 
         BooleanExpression statusCondition = (statuses == null || statuses.isEmpty())
