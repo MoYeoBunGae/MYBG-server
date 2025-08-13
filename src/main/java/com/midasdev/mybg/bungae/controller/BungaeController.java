@@ -7,6 +7,7 @@ import com.midasdev.mybg.bungae.controller.dto.request.GetMyBungaesRequest;
 import com.midasdev.mybg.bungae.controller.dto.request.GetGroupBungaesRequest;
 import com.midasdev.mybg.bungae.controller.dto.response.BungaeResponse;
 import com.midasdev.mybg.bungae.domain.Bungae;
+import com.midasdev.mybg.bungae.repository.dto.BungaeDto;
 import com.midasdev.mybg.bungae.service.BungaeService;
 import com.midasdev.mybg.global.util.cursor_page.CursorPage;
 import com.midasdev.mybg.member.domain.Member;
@@ -99,7 +100,7 @@ public class BungaeController {
             @Valid GetGroupBungaesRequest request
     ) {
         CursorPage<BungaeDto> bungaes = bungaeService.findBungaesByGroupIdAndStatuses(
-                request.getGroupId(), request.getStatuses(), request.toPageable()
+                member, request.getGroupId(), request.getStatuses(), request.toPageable()
         );
         CursorPage<BungaeResponse> responses = bungaes.map(BungaeResponse::from);
         return ResponseEntity.ok(responses);
