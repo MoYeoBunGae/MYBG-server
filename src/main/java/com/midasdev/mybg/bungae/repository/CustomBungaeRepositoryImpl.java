@@ -95,7 +95,7 @@ public class CustomBungaeRepositoryImpl implements CustomBungaeRepository {
                         bungae.bungaeDateTime,
                         bungae.dateVoteClosedAt,
                         bungae.status,
-                        bungae.audit,
+                        bungae.audit.createdAt,
                         bungae.deleted,
                         bungae.group.id,
                         bungae.host.id,

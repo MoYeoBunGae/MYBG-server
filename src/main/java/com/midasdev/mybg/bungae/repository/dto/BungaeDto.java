@@ -2,7 +2,6 @@ package com.midasdev.mybg.bungae.repository.dto;
 
 import com.midasdev.mybg.bungae.domain.BungaeDateTime;
 import com.midasdev.mybg.bungae.domain.BungaeStatus;
-import com.midasdev.mybg.global.audit.Audit;
 import com.querydsl.core.annotations.QueryProjection;
 import java.time.LocalDateTime;
 
@@ -17,7 +16,7 @@ public record BungaeDto(
         BungaeDateTime bungaeDateTime,
         LocalDateTime dateVoteClosedAt,
         BungaeStatus status,
-        Audit audit,
+        LocalDateTime createdAt,
         Boolean deleted,
         Long groupId,
         Long hostGroupMemberId,

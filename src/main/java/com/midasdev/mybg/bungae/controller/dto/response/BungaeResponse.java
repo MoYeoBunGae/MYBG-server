@@ -62,7 +62,7 @@ public record BungaeResponse(
                              .status(bungaeDto.status())
                              .groupId(bungaeDto.groupId())
                              .hostGroupMemberId(bungaeDto.hostGroupMemberId())
-                             .createdAt(bungaeDto.audit().getCreatedAt())
+                             .createdAt(bungaeDto.createdAt())
                              .build();
     }
 
