@@ -3,6 +3,7 @@ package com.midasdev.mybg.bungae.controller.dto.response;
 import com.midasdev.mybg.bungae.domain.Bungae;
 import com.midasdev.mybg.bungae.domain.BungaeStatus;
 import com.midasdev.mybg.bungae.repository.dto.BungaeDto;
+import com.midasdev.mybg.global.util.cursor_page.LongIdentifiable;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
@@ -25,7 +26,7 @@ public record BungaeResponse(
         Long groupId,
         Long hostGroupMemberId,
         LocalDateTime createdAt
-) {
+) implements LongIdentifiable {
 
     public static BungaeResponse from(Bungae bungae) {
         return BungaeResponse.builder()
@@ -64,6 +65,11 @@ public record BungaeResponse(
                              .hostGroupMemberId(bungaeDto.hostGroupMemberId())
                              .createdAt(bungaeDto.createdAt())
                              .build();
+    }
+
+    @Override
+    public Long getId() {
+        return id;
     }
 
 }

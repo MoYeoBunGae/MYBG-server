@@ -19,4 +19,11 @@ public record CursorPageable(
     public CursorPageable(Long lastCursorId, Integer pageSize) {
         this(lastCursorId, pageSize, SortOrder.ASC);
     }
+
+    /**
+     * 지정된 pageSize 다음 리소스가 있는지 확인하기 위해, pageSize + 1 만큼 데이터를 가져오도록 fetchSize를 설정합니다.
+     */
+    public int getFetchSize() {
+        return pageSize + 1;
+    }
 }
