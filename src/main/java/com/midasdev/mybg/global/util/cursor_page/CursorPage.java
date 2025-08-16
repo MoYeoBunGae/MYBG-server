@@ -1,6 +1,5 @@
 package com.midasdev.mybg.global.util.cursor_page;
 
-import java.util.Collections;
 import java.util.List;
 import java.util.function.Function;
 import java.util.stream.Collectors;
@@ -31,11 +30,11 @@ public class CursorPage<T extends LongIdentifiable> {
         this.hasNext = fetchedContent.size() > pageSize;
         if (hasNext) {
             this.nextCursorId = fetchedContent.get(pageSize - 1).getId();
-            fetchedContent.remove(pageSize);
+            this.content = List.copyOf(fetchedContent.subList(0, pageSize));
         } else {
             this.nextCursorId = null;
+            this.content = List.copyOf(fetchedContent);
         }
-        this.content = Collections.unmodifiableList(fetchedContent);
     }
 
     public <R extends LongIdentifiable> CursorPage<R> map(Function<? super T, ? extends R> mapper) {
