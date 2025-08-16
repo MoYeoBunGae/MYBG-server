@@ -13,4 +13,13 @@ public class MemberFixture {
                 .oauthAccount(new OauthAccount(OauthProvider.KAKAO, "test-oauth-sub"))
                 .build();
     }
+
+    public static Member createSecondMember() {
+        return Member.builder()
+                     .name("테스트멤버2")
+                     .profileImageUrl("http://test.com/profile.png")
+                     .deleted(false)
+                     .oauthAccount(new OauthAccount(OauthProvider.KAKAO, "test-oauth-sub2"))
+                     .build();
+    }
 }

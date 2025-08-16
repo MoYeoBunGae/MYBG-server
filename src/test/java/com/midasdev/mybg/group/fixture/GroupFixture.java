@@ -14,4 +14,15 @@ public class GroupFixture {
                 .deleted(false)
                 .build();
     }
+
+    public static Group create(Member owner, String name, String invitationCode) {
+        return Group.builder()
+                    .name(name)
+                    .profileImageUrl("http://test.com/group.png")
+                    .invitationCode(invitationCode)
+                    .maxMemberCount(100)
+                    .owner(owner)
+                    .deleted(false)
+                    .build();
+    }
 }
