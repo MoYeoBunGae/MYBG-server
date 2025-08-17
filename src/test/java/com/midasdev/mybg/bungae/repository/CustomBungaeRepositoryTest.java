@@ -246,7 +246,7 @@ class CustomBungaeRepositoryTest {
     }
 
     @Test
-    @DisplayName("B-3-R-1: 조건에 맞는 올바른 그룹 번개 조�� - lastCursorId, size")
+    @DisplayName("B-3-R-1: 조건에 맞는 올바른 그룹 번개 조회 - lastCursorId, size")
     void findByGroupIdAndStatusIn_withCursorAndSize_shouldReturnCorrectBungaes() {
         // given
         Long lastCursorId = Long.MAX_VALUE;
