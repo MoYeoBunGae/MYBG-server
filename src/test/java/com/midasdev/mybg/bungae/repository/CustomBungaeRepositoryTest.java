@@ -1,11 +1,15 @@
 package com.midasdev.mybg.bungae.repository;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
 import com.midasdev.mybg.bungae.domain.Bungae;
 import com.midasdev.mybg.bungae.domain.BungaeAttendee;
 import com.midasdev.mybg.bungae.domain.BungaeStatus;
 import com.midasdev.mybg.bungae.fixture.BungaeFixture;
 import com.midasdev.mybg.bungae.repository.dto.BungaeDto;
 import com.midasdev.mybg.config.QueryDslConfig;
+import com.midasdev.mybg.global.util.cursor_page.CursorPage;
+import com.midasdev.mybg.global.util.cursor_page.CursorPageable;
 import com.midasdev.mybg.group.domain.Group;
 import com.midasdev.mybg.group.fixture.GroupFixture;
 import com.midasdev.mybg.group.repository.GroupRepository;
@@ -15,30 +19,24 @@ import com.midasdev.mybg.group_member.repository.GroupMemberRepository;
 import com.midasdev.mybg.member.domain.Member;
 import com.midasdev.mybg.member.fixture.MemberFixture;
 import com.midasdev.mybg.member.repository.MemberRepository;
-import com.midasdev.mybg.global.util.cursor_page.CursorPage;
-import com.midasdev.mybg.global.util.cursor_page.CursorPageable;
+import java.util.ArrayList;
+import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
-
-import java.util.ArrayList;
-import java.util.List;
 import org.springframework.context.annotation.Import;
-
-import static org.assertj.core.api.Assertions.assertThat;
 
 /**
  * 공통 given
  * - Member: member, otherMember
  * - Group: group, otherGroup
  * - GroupMember:
- *     - group : groupMember (member가 group에 참여자로 등록된 상태)
- *     - otherGroup : otherGroupMember(otherMember), memberInOtherGroup(member)
- * - Bungae: savedBungaes (group에서 member가 참여자로 등록된, 각각의 상태를 가지는 번개들),
- *           otherMemberSavedBungaes (otherGroup에서 otherMember가 참여자로 등록된, 각각의 상태를 가지는 번개들)
- *           + member가 otherGroup의 RECRUITING, CLOSED 번개에도 참여
+ *     * group : groupMember (member가 group에 참여자로 등록된 상태)
+ *     * otherGroup : otherGroupMember(otherMember), memberInOtherGroup(member)
+ * - Bungae: savedBungaes (group에서 member가 참여자로 등록된, 각각의 상태를 가지는 번개들), otherMemberSavedBungaes (otherGroup에서 otherMember가 참여자로 등록된, 각각의 상태를 가지는 번개들)
+ * + member가 otherGroup의 RECRUITING, CLOSED 번개에도 참여
  */
 
 @DataJpaTest
@@ -238,21 +236,22 @@ class CustomBungaeRepositoryTest {
 
         // ID 기준 내림차순 정렬 확인 (최신순)
         List<Long> resultIds = result.getContent().stream()
-                .map(Bungae::getId)
-                .toList();
+                                     .map(Bungae::getId)
+                                     .toList();
 
         //  member가 참여한 모든 번개 중 최신 3개를 가져와서 검증
         List<Long> allMemberBungaeIds = new ArrayList<>();
         allMemberBungaeIds.addAll(groupSavedBungaes.stream().map(Bungae::getId).toList());
         //  otherGroup의 번개 중 member가 참여하고 있는 RECRUITING, CLOSED 번개 ID 추가
         allMemberBungaeIds.addAll(otherGroupSavedBungaes.stream()
-                                                        .filter(bungae -> bungae.getStatus() == BungaeStatus.RECRUITING || bungae.getStatus() == BungaeStatus.CLOSED)
+                                                        .filter(bungae -> bungae.getStatus() == BungaeStatus.RECRUITING
+                                                                || bungae.getStatus() == BungaeStatus.CLOSED)
                                                         .map(Bungae::getId).toList());
 
         List<Long> sortedIds = allMemberBungaeIds.stream()
-                .sorted((a, b) -> Long.compare(b, a))
-                .limit(3)
-                .toList();
+                                                 .sorted((a, b) -> Long.compare(b, a))
+                                                 .limit(3)
+                                                 .toList();
 
         assertThat(resultIds).isEqualTo(sortedIds);
         assertThat(result.getNextCursorId()).isEqualTo(result.getContent().get(2).getId());
@@ -332,7 +331,7 @@ class CustomBungaeRepositoryTest {
     @DisplayName("B-3-R-4: lastCursorId가 null일 경우 가장 최근 것부터 그룹 번개 조회")
     void findByGroupIdAndStatusIn_withNullCursor_shouldReturnFromLatest() {
         // given
-        CursorPageable cursorPageable = new CursorPageable(null, 3); // [copilot] lastCursorId가 null
+        CursorPageable cursorPageable = new CursorPageable(null, 3);
 
         // when
         CursorPage<BungaeDto> result = bungaeRepository.findByGroupIdAndStatusIn(
@@ -344,8 +343,8 @@ class CustomBungaeRepositoryTest {
         // then
         // ID 기준 내림차순 정렬 확인 (최신순)
         List<Long> resultIds = result.getContent().stream()
-                .map(BungaeDto::id)
-                .toList();
+                                     .map(BungaeDto::id)
+                                     .toList();
 
         List<Long> sortedIds = groupSavedBungaes.stream()
                                                 .map(Bungae::getId)
@@ -355,4 +354,5 @@ class CustomBungaeRepositoryTest {
 
         assertThat(resultIds).isEqualTo(sortedIds);
     }
+
 }
