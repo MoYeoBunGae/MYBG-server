@@ -60,7 +60,6 @@ public class Bungae implements LongIdentifiable {
     private String location;
 
     @Embedded
-    @Column
     private BungaeDateTime bungaeDateTime;
 
     @Column
