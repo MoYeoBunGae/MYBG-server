@@ -37,7 +37,7 @@ public class GetGroupBungaesRequest extends CursorPageRequest {
                     - null인 경우, 모든 상태의 번개를 조회합니다.
                     - 여러 상태를 지정할 수 있습니다.
                     """,
-            example = "[\"RECRUITING\", \"CONFIRMED\"]",
+            example = "[\"RECRUITING\", \"CLOSED\"]",
             array = @ArraySchema(
                     schema = @Schema(
                             implementation = BungaeStatus.class
