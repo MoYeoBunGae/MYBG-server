@@ -16,7 +16,9 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.LocalTime;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -57,6 +59,7 @@ public class Bungae implements LongIdentifiable {
     @Column
     private String location;
 
+    @Embedded
     @Column
     private BungaeDateTime bungaeDateTime;
 
@@ -82,5 +85,21 @@ public class Bungae implements LongIdentifiable {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "host_group_member_id", nullable = false)
     private GroupMember host;
+
+    public LocalDate getBungaeDate() {
+        return bungaeDateTime != null ? bungaeDateTime.getDate() : null;
+    }
+
+    public LocalTime getBungaeTime() {
+        return bungaeDateTime != null ? bungaeDateTime.getTime() : null;
+    }
+
+    public LocalDateTime getCreatedAt() {
+        return audit != null ? audit.getCreatedAt() : null;
+    }
+
+    public LocalDateTime getUpdatedAt() {
+        return audit != null ? audit.getModifiedAt() : null;
+    }
 
 }

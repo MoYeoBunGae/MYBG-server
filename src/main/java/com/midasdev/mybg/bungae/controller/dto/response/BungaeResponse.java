@@ -37,13 +37,13 @@ public record BungaeResponse(
                              .maxAttendees(bungae.getMaxAttendees())
                              .isOnline(bungae.getIsOnline())
                              .location(bungae.getLocation())
-                             .bungaeDate(bungae.getBungaeDateTime().getDate())
-                             .bungaeTime(bungae.getBungaeDateTime().getTime())
+                             .bungaeDate(bungae.getBungaeDate())
+                             .bungaeTime(bungae.getBungaeTime())
                              .dateVoteClosedAt(bungae.getDateVoteClosedAt())
                              .status(bungae.getStatus())
                              .groupId(bungae.getGroup().getId())
                              .hostGroupMemberId(bungae.getHost().getId())
-                             .createdAt(bungae.getAudit().getCreatedAt())
+                             .createdAt(bungae.getCreatedAt())
                              .build();
     }
 
@@ -57,8 +57,8 @@ public record BungaeResponse(
                              .attendeeCount(bungaeDto.attendeeCount())
                              .isOnline(bungaeDto.isOnline())
                              .location(bungaeDto.location())
-                             .bungaeDate(bungaeDto.bungaeDateTime().getDate())
-                             .bungaeTime(bungaeDto.bungaeDateTime().getTime())
+                             .bungaeDate(bungaeDto.bungaeDate())
+                             .bungaeTime(bungaeDto.bungaeTime())
                              .dateVoteClosedAt(bungaeDto.dateVoteClosedAt())
                              .status(bungaeDto.status())
                              .groupId(bungaeDto.groupId())

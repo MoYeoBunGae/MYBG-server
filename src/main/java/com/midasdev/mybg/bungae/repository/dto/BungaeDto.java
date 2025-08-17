@@ -1,10 +1,11 @@
 package com.midasdev.mybg.bungae.repository.dto;
 
-import com.midasdev.mybg.bungae.domain.BungaeDateTime;
 import com.midasdev.mybg.bungae.domain.BungaeStatus;
 import com.midasdev.mybg.global.util.cursor_page.LongIdentifiable;
 import com.querydsl.core.annotations.QueryProjection;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.LocalTime;
 
 public record BungaeDto(
         Long id,
@@ -14,7 +15,8 @@ public record BungaeDto(
         Integer maxAttendees,
         Boolean isOnline,
         String location,
-        BungaeDateTime bungaeDateTime,
+        LocalDate bungaeDate,
+        LocalTime bungaeTime,
         LocalDateTime dateVoteClosedAt,
         BungaeStatus status,
         LocalDateTime createdAt,
