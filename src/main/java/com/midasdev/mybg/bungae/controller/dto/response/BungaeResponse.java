@@ -2,6 +2,8 @@ package com.midasdev.mybg.bungae.controller.dto.response;
 
 import com.midasdev.mybg.bungae.domain.Bungae;
 import com.midasdev.mybg.bungae.domain.BungaeStatus;
+import com.midasdev.mybg.bungae.repository.dto.BungaeDto;
+import com.midasdev.mybg.global.util.cursor_page.LongIdentifiable;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
@@ -14,6 +16,7 @@ public record BungaeResponse(
         String description,
         Integer minAttendees,
         Integer maxAttendees,
+        Integer attendeeCount,
         Boolean isOnline,
         String location,
         LocalDate bungaeDate,
@@ -21,8 +24,9 @@ public record BungaeResponse(
         LocalDateTime dateVoteClosedAt,
         BungaeStatus status,
         Long groupId,
-        Long hostGroupMemberId
-) {
+        Long hostGroupMemberId,
+        LocalDateTime createdAt
+) implements LongIdentifiable {
 
     public static BungaeResponse from(Bungae bungae) {
         return BungaeResponse.builder()
@@ -39,8 +43,33 @@ public record BungaeResponse(
                              .status(bungae.getStatus())
                              .groupId(bungae.getGroup().getId())
                              .hostGroupMemberId(bungae.getHost().getId())
+                             .createdAt(bungae.getAudit().getCreatedAt())
                              .build();
     }
 
-}
+    public static BungaeResponse from(BungaeDto bungaeDto) {
+        return BungaeResponse.builder()
+                             .id(bungaeDto.id())
+                             .name(bungaeDto.name())
+                             .description(bungaeDto.description())
+                             .minAttendees(bungaeDto.minAttendees())
+                             .maxAttendees(bungaeDto.maxAttendees())
+                             .attendeeCount(bungaeDto.attendeeCount())
+                             .isOnline(bungaeDto.isOnline())
+                             .location(bungaeDto.location())
+                             .bungaeDate(bungaeDto.bungaeDateTime().getDate())
+                             .bungaeTime(bungaeDto.bungaeDateTime().getTime())
+                             .dateVoteClosedAt(bungaeDto.dateVoteClosedAt())
+                             .status(bungaeDto.status())
+                             .groupId(bungaeDto.groupId())
+                             .hostGroupMemberId(bungaeDto.hostGroupMemberId())
+                             .createdAt(bungaeDto.createdAt())
+                             .build();
+    }
 
+    @Override
+    public Long getId() {
+        return id;
+    }
+
+}

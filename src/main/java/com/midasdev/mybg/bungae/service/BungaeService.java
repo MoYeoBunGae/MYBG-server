@@ -6,6 +6,7 @@ import com.midasdev.mybg.bungae.domain.BungaeAttendee;
 import com.midasdev.mybg.bungae.domain.BungaeDateTime;
 import com.midasdev.mybg.bungae.domain.BungaeRecruitDateOption;
 import com.midasdev.mybg.bungae.domain.BungaeStatus;
+import com.midasdev.mybg.bungae.repository.dto.BungaeDto;
 import com.midasdev.mybg.bungae.repository.BungaeAttendeeRepository;
 import com.midasdev.mybg.bungae.repository.BungaeRecruitDateOptionRepository;
 import com.midasdev.mybg.bungae.repository.BungaeRepository;
@@ -14,6 +15,8 @@ import com.midasdev.mybg.global.exception.ApplicationException;
 import com.midasdev.mybg.global.exception.ApplicationExceptionType;
 import com.midasdev.mybg.global.util.cursor_page.CursorPage;
 import com.midasdev.mybg.global.util.cursor_page.CursorPageable;
+import com.midasdev.mybg.group.domain.Group;
+import com.midasdev.mybg.group.repository.GroupRepository;
 import com.midasdev.mybg.group_member.domain.GroupMember;
 import com.midasdev.mybg.group_member.repository.GroupMemberRepository;
 import com.midasdev.mybg.member.domain.Member;
@@ -32,10 +35,12 @@ public class BungaeService {
     private final BungaeRecruitDateOptionRepository bungaeRecruitDateOptionRepository;
     private final BungaeAttendeeRepository bungaeAttendeeRepository;
     private final ApplicationEventPublisher eventPublisher;
+    private final GroupRepository groupRepository;
 
     @Transactional
     public Bungae createBungae(BungaeCreateRequest request) {
         // 1. groupId와 groupMemberId로 삭제되지 않은 groupMember 조회 (그룹에 속하는 그룹멤버가 없다면 예외)
+        // TODO: hostGroupMember는 요청을 보낸 사람이므로, member 정보를 통해 그룹멤버를 조회하는 로직으로 변경 필요
         GroupMember hostGroupMember = groupMemberRepository.findByIdAndGroupIdAndDeletedFalse(request.hostGroupMemberId(), request.groupId())
                                                            .orElseThrow(() -> new ApplicationException(
                                                                    ApplicationExceptionType.GROUP_MEMBER_NOT_FOUND_BY_GROUP_ID,
@@ -110,6 +115,20 @@ public class BungaeService {
             CursorPageable cursorPageable
     ) {
         return bungaeRepository.findAllByAttendeeMemberIdAndStatusIn(member.getId(), statuses, cursorPageable);
+    }
+
+    public CursorPage<BungaeDto> findBungaesByGroupIdAndStatuses(Member member, Long groupId, List<BungaeStatus> statuses, CursorPageable pageable) {
+        // 1. 그룹 존재 여부 검증
+        Group group = groupRepository.findByIdAndDeletedIsFalse(groupId)
+                                    .orElseThrow(() -> new ApplicationException(ApplicationExceptionType.GROUP_NOT_FOUND_BY_ID, groupId));
+
+        // 2. 멤버가 그룹에 속하는지 검증
+        groupMemberRepository.findByMemberAndGroup(member, group)
+                             .orElseThrow(() -> new ApplicationException(ApplicationExceptionType.GROUP_MEMBER_NOT_FOUND_BY_GROUP_ID, member.getId(), groupId));
+
+        // 3. 해당 그룹에 속하고 statuses에 포함된 번개모임 조회
+        return bungaeRepository.findByGroupIdAndStatusIn(groupId, statuses, pageable);
+
     }
 
 }

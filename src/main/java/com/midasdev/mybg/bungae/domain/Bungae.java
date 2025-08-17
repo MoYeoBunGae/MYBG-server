@@ -1,6 +1,7 @@
 package com.midasdev.mybg.bungae.domain;
 
 import com.midasdev.mybg.global.audit.Audit;
+import com.midasdev.mybg.global.util.cursor_page.LongIdentifiable;
 import com.midasdev.mybg.group.domain.Group;
 import com.midasdev.mybg.group_member.domain.GroupMember;
 import jakarta.persistence.Column;
@@ -16,7 +17,6 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import java.time.LocalDateTime;
-import java.time.LocalTime;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -32,7 +32,7 @@ import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 @AllArgsConstructor
 @EntityListeners(AuditingEntityListener.class)
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class Bungae {
+public class Bungae implements LongIdentifiable {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -80,7 +80,7 @@ public class Bungae {
     private Group group;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "group_member_id", nullable = false)
+    @JoinColumn(name = "host_group_member_id", nullable = false)
     private GroupMember host;
 
 }
