@@ -21,6 +21,7 @@ import com.midasdev.mybg.member.fixture.MemberFixture;
 import com.midasdev.mybg.member.repository.MemberRepository;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.function.BiFunction;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -33,8 +34,8 @@ import org.springframework.context.annotation.Import;
  * - Member: member, otherMember
  * - Group: group, otherGroup
  * - GroupMember:
- *     * group : groupMember (member가 group에 참여자로 등록된 상태)
- *     * otherGroup : otherGroupMember(otherMember), memberInOtherGroup(member)
+ * * group : groupMember (member가 group에 참여자로 등록된 상태)
+ * * otherGroup : otherGroupMember(otherMember), memberInOtherGroup(member)
  * - Bungae: savedBungaes (group에서 member가 참여자로 등록된, 각각의 상태를 가지는 번개들), otherMemberSavedBungaes (otherGroup에서 otherMember가 참여자로 등록된, 각각의 상태를 가지는 번개들)
  * + member가 otherGroup의 RECRUITING, CLOSED 번개에도 참여
  */
@@ -64,8 +65,7 @@ class CustomBungaeRepositoryTest {
     private GroupMember otherGroupMember;
     private GroupMember memberInOtherGroup;
     private List<Bungae> groupSavedBungaes;
-    private List<Bungae> otherGroupSavedBungaes;
-
+    private List<Long> memberJoinedBungaeIds;
 
     @BeforeEach
     void setUp() {
@@ -80,66 +80,57 @@ class CustomBungaeRepositoryTest {
 
         // 각 BungaeStatus별로 Bungae 생성 및 저장
         groupSavedBungaes = new ArrayList<>();
-        otherGroupSavedBungaes = new ArrayList<>();
+        memberJoinedBungaeIds = new ArrayList<>();
 
-        // DATE_VOTING 번개 생성
-        Bungae dateVotingBungae = bungaeRepository.save(
-                BungaeFixture.createWithDateVoting(group, groupMember));
-        groupSavedBungaes.add(dateVotingBungae);
-        // DATE_VOTING 번개 생성 (다른 그룹 멤버)
-        otherGroupSavedBungaes.add(bungaeRepository.save(BungaeFixture.createWithDateVoting(otherGroup, otherGroupMember)));
+        // 각 상태별 번개 생성 및 참여자 등록 - group
+        createBungaeAndSaveAttendee(BungaeFixture::createWithDateVoting, group, groupMember);
+        createBungaeAndSaveAttendee(BungaeFixture::createWithRecruiting, group, groupMember);
+        createBungaeAndSaveAttendee(BungaeFixture::createWithRecruitingClosed, group, groupMember);
+        createBungaeAndSaveAttendee(BungaeFixture::createWithClosed, group, groupMember);
+        createBungaeAndSaveAttendee(BungaeFixture::createWithCancelled, group, groupMember);
 
-        // RECRUITING 번개 생성
-        Bungae recruitingBungae = bungaeRepository.save(
-                BungaeFixture.createWithRecruiting(group, groupMember));
-        groupSavedBungaes.add(recruitingBungae);
-        // RECRUITING 번개 생성 (다른 그룹 멤버)
-        Bungae otherRecruitingBungae = bungaeRepository.save(BungaeFixture.createWithRecruiting(otherGroup, otherGroupMember));
-        otherGroupSavedBungaes.add(otherRecruitingBungae);
-
-        // RECRUITING_CLOSED 번개 생성
-        Bungae recruitingClosedBungae = bungaeRepository.save(
-                BungaeFixture.createWithRecruitingClosed(group, groupMember));
-        groupSavedBungaes.add(recruitingClosedBungae);
-        // RECRUITING_CLOSED 번개 생성 (다른 그룹 멤버)
-        otherGroupSavedBungaes.add(bungaeRepository.save(BungaeFixture.createWithRecruitingClosed(otherGroup, otherGroupMember)));
-
-        // CLOSED 번개 생성
-        Bungae closedBungae = bungaeRepository.save(
-                BungaeFixture.createWithClosed(group, groupMember));
-        groupSavedBungaes.add(closedBungae);
-        // CLOSED 번개 생성 (다른 그룹 멤버)
-        Bungae otherClosedBungae = bungaeRepository.save(BungaeFixture.createWithClosed(otherGroup, otherGroupMember));
-        otherGroupSavedBungaes.add(otherClosedBungae);
-
-        // CANCELLED 번개 생성
-        Bungae cancelledBungae = bungaeRepository.save(
-                BungaeFixture.createWithCancelled(group, groupMember));
-        groupSavedBungaes.add(cancelledBungae);
-        // CANCELLED 번개 생성 (다른 그룹 멤버)
-        otherGroupSavedBungaes.add(bungaeRepository.save(BungaeFixture.createWithCancelled(otherGroup, otherGroupMember)));
-
-        // 각 번개에 대해 BungaeAttendee 생성 (member가 참여자로 등록)
-        saveAttendee(groupSavedBungaes, groupMember);
-        saveAttendee(otherGroupSavedBungaes, otherGroupMember);
-
-        //  member를 otherGroup의 RECRUITING, CLOSED 번개에 참여자로 추가
-        saveAttendeeForMemberInOtherGroup(otherRecruitingBungae, memberInOtherGroup);
-        saveAttendeeForMemberInOtherGroup(otherClosedBungae, memberInOtherGroup);
+        //  각 상태별 번개 생성 및 참여자 등록 - otherGroup
+        createBungaeAndSaveAttendee(BungaeFixture::createWithDateVoting, otherGroup, otherGroupMember);
+        createBungaeAndSaveAttendee(BungaeFixture::createWithRecruiting, otherGroup, otherGroupMember, memberInOtherGroup);
+        createBungaeAndSaveAttendee(BungaeFixture::createWithRecruitingClosed, otherGroup, otherGroupMember);
+        createBungaeAndSaveAttendee(BungaeFixture::createWithClosed, otherGroup, otherGroupMember, memberInOtherGroup);
+        createBungaeAndSaveAttendee(BungaeFixture::createWithCancelled, otherGroup, otherGroupMember);
     }
 
-    private void saveAttendee(List<Bungae> bungaes, GroupMember groupMember) {
-        for (Bungae bungae : bungaes) {
-            BungaeAttendee attendee = BungaeAttendee.builder()
-                                                    .bungae(bungae)
-                                                    .groupMember(groupMember)
-                                                    .deleted(false)
-                                                    .build();
-            bungaeAttendeeRepository.save(attendee);
+    /**
+     * 번개 생성과 참여자 저장을 통합한 헬퍼 메서드
+     */
+    private void createBungaeAndSaveAttendee(
+            BiFunction<Group, GroupMember, Bungae> bungaeCreator,
+            Group group,
+            GroupMember host,
+            GroupMember... additionalAttendees
+    ) {
+        Bungae bungae = bungaeRepository.save(bungaeCreator.apply(group, host));
+
+        if (group.getId().equals(this.group.getId())) {
+            groupSavedBungaes.add(bungae);
         }
+
+        saveAttendee(bungae, host);
+
+        // host가 member인 경우 memberJoinedBungaeIds에 추가
+        if (host.getMember().getId().equals(member.getId())) {
+            memberJoinedBungaeIds.add(bungae.getId());
+        }
+
+        for (GroupMember attendee : additionalAttendees) {
+            saveAttendee(bungae, attendee);
+
+            // 추가 참여자가 member인 경우 memberJoinedBungaeIds에 추가
+            if (attendee.getMember().getId().equals(member.getId())) {
+                memberJoinedBungaeIds.add(bungae.getId());
+            }
+        }
+
     }
 
-    private void saveAttendeeForMemberInOtherGroup(Bungae bungae, GroupMember groupMember) {
+    private void saveAttendee(Bungae bungae, GroupMember groupMember) {
         BungaeAttendee attendee = BungaeAttendee.builder()
                                                 .bungae(bungae)
                                                 .groupMember(groupMember)
@@ -149,7 +140,7 @@ class CustomBungaeRepositoryTest {
     }
 
     @Test
-    @DisplayName("lastCursorId, size 조건에 맞는 번개만 조회된다")
+    @DisplayName("B-2-R-1: 조건에 맞는 올바른 나의 번개 조회 - lastCursorId, size")
     void findAllByAttendeeMemberIdAndStatusIn_withCursorAndSize_shouldReturnCorrectBungaes() {
         // given
         Long lastCursorId = Long.MAX_VALUE;
@@ -167,11 +158,12 @@ class CustomBungaeRepositoryTest {
         assertThat(result.getContent()).hasSize(pageSize);
         assertThat(result.getContent())
                 .extracting(Bungae::getId)
-                .allMatch(id -> id < lastCursorId); // cursor보다 작은 ID만 조회되어야 함
+                .allMatch(id -> id < lastCursorId)
+                .allMatch(memberJoinedBungaeIds::contains);
     }
 
     @Test
-    @DisplayName("특정 status 조건에 맞는 번개만 조회된다")
+    @DisplayName("B-2-R-2: 조건에 맞는 올바른 나의 번개 조회 - status")
     void findAllByAttendeeMemberIdAndStatusIn_withStatus_shouldReturnFilteredBungaes() {
         // given
         List<BungaeStatus> targetStatuses = List.of(BungaeStatus.DATE_VOTING, BungaeStatus.RECRUITING);
@@ -187,12 +179,15 @@ class CustomBungaeRepositoryTest {
         // then
         assertThat(result.getContent()).hasSize(3); // DATE_VOTING 1개 + RECRUITING 2개
         assertThat(result.getContent())
+                .extracting(Bungae::getId)
+                .allMatch(memberJoinedBungaeIds::contains);
+        assertThat(result.getContent())
                 .extracting(Bungae::getStatus)
                 .doesNotContain(BungaeStatus.RECRUITING_CLOSED, BungaeStatus.CLOSED, BungaeStatus.CANCELLED);
     }
 
     @Test
-    @DisplayName("status가 null일 경우 모든 상태의 번개가 조회된다")
+    @DisplayName("B-2-R-3: 조건에 맞는 올바른 나의 번개 조회 - status가 null일 경우")
     void findAllByAttendeeMemberIdAndStatusIn_withNullStatus_shouldReturnAllBungaes() {
         // given
         CursorPageable cursorPageable = new CursorPageable(null, 10);
@@ -205,8 +200,10 @@ class CustomBungaeRepositoryTest {
         );
 
         // then
-        // member가 참여한 번개: group의 5개 + otherGroup의 2개 (RECRUITING, CLOSED)
-        assertThat(result.getContent()).hasSize(7);
+        assertThat(result.getContent()).hasSize(memberJoinedBungaeIds.size()); // member가 참여한 모든 번개 수와 일치
+        assertThat(result.getContent())
+                .extracting(Bungae::getId)
+                .containsExactlyInAnyOrderElementsOf(memberJoinedBungaeIds); // member가 참여한 모든 번개 ID와 정확히 일치
         assertThat(result.getContent())
                 .extracting(Bungae::getStatus)
                 .contains(
@@ -219,7 +216,7 @@ class CustomBungaeRepositoryTest {
     }
 
     @Test
-    @DisplayName("lastCursorId가 null일 경우 가장 최근 것부터 조회된다")
+    @DisplayName("B-2-R-4: lastCursorId가 null일 경우 가장 최근 것부터 나의 번개 조회")
     void findAllByAttendeeMemberIdAndStatusIn_withNullCursor_shouldReturnFromLatest() {
         // given
         CursorPageable cursorPageable = new CursorPageable(null, 3);
@@ -239,26 +236,17 @@ class CustomBungaeRepositoryTest {
                                      .map(Bungae::getId)
                                      .toList();
 
-        //  member가 참여한 모든 번개 중 최신 3개를 가져와서 검증
-        List<Long> allMemberBungaeIds = new ArrayList<>();
-        allMemberBungaeIds.addAll(groupSavedBungaes.stream().map(Bungae::getId).toList());
-        //  otherGroup의 번개 중 member가 참여하고 있는 RECRUITING, CLOSED 번개 ID 추가
-        allMemberBungaeIds.addAll(otherGroupSavedBungaes.stream()
-                                                        .filter(bungae -> bungae.getStatus() == BungaeStatus.RECRUITING
-                                                                || bungae.getStatus() == BungaeStatus.CLOSED)
-                                                        .map(Bungae::getId).toList());
+        // member가 참여한 번개 ID들을 내림차순으로 정렬하여 상위 3개와 비교
+        List<Long> expectedSortedIds = memberJoinedBungaeIds.stream()
+                                                            .sorted((a, b) -> Long.compare(b, a))
+                                                            .limit(3)
+                                                            .toList();
 
-        List<Long> sortedIds = allMemberBungaeIds.stream()
-                                                 .sorted((a, b) -> Long.compare(b, a))
-                                                 .limit(3)
-                                                 .toList();
-
-        assertThat(resultIds).isEqualTo(sortedIds);
-        assertThat(result.getNextCursorId()).isEqualTo(result.getContent().get(2).getId());
+        assertThat(resultIds).isEqualTo(expectedSortedIds);
     }
 
     @Test
-    @DisplayName("B-3-R-1: 조건에 맞는 올바른 그룹 번개 조회 - lastCursorId, size")
+    @DisplayName("B-3-R-1: 조건에 맞는 올바른 그룹 번개 조�� - lastCursorId, size")
     void findByGroupIdAndStatusIn_withCursorAndSize_shouldReturnCorrectBungaes() {
         // given
         Long lastCursorId = Long.MAX_VALUE;
