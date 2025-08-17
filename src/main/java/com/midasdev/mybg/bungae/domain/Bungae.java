@@ -80,7 +80,7 @@ public class Bungae implements LongIdentifiable {
     private Group group;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "group_member_id", nullable = false)
+    @JoinColumn(name = "host_group_member_id", nullable = false)
     private GroupMember host;
 
 }
