@@ -73,7 +73,7 @@ public class BungaeController {
             @AuthenticationPrincipal Member member,
             @Valid GetMyBungaesRequest request
     ) {
-        CursorPage<Bungae> bungaes = bungaeService.findBungaesByMemberIdAndStatuses(
+        CursorPage<BungaeDto> bungaes = bungaeService.findBungaesByMemberIdAndStatuses(
                 member, request.getStatuses(), request.toPageable()
         );
         CursorPage<BungaeResponse> responses = bungaes.map(BungaeResponse::from);

@@ -109,7 +109,7 @@ public class BungaeService {
         return savedBungae;
     }
 
-    public CursorPage<Bungae> findBungaesByMemberIdAndStatuses(
+    public CursorPage<BungaeDto> findBungaesByMemberIdAndStatuses(
             Member member,
             List<BungaeStatus> statuses,
             CursorPageable cursorPageable

@@ -1,6 +1,5 @@
 package com.midasdev.mybg.bungae.repository;
 
-import com.midasdev.mybg.bungae.domain.Bungae;
 import com.midasdev.mybg.bungae.domain.BungaeStatus;
 import com.midasdev.mybg.bungae.domain.QBungae;
 import com.midasdev.mybg.bungae.domain.QBungaeAttendee;
@@ -8,6 +7,7 @@ import com.midasdev.mybg.bungae.repository.dto.BungaeDto;
 import com.midasdev.mybg.bungae.repository.dto.QBungaeDto;
 import com.midasdev.mybg.global.util.cursor_page.CursorPage;
 import com.midasdev.mybg.global.util.cursor_page.CursorPageable;
+import com.querydsl.core.types.Expression;
 import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.core.types.dsl.Expressions;
 import com.querydsl.jpa.JPAExpressions;
@@ -24,7 +24,7 @@ public class CustomBungaeRepositoryImpl implements CustomBungaeRepository {
     private static final QBungae bungae = QBungae.bungae;
     private static final QBungaeAttendee attendee = QBungaeAttendee.bungaeAttendee;
 
-    public CursorPage<Bungae> findAllByAttendeeMemberIdAndStatusIn(
+    public CursorPage<BungaeDto> findAllByAttendeeMemberIdAndStatusIn(
             Long memberId,
             List<BungaeStatus> statuses,
             CursorPageable cursorPageable
@@ -39,14 +39,14 @@ public class CustomBungaeRepositoryImpl implements CustomBungaeRepository {
                 bungaeStatuesAndCursorCondition(cursorId, statuses)
         );
 
-        List<Bungae> fetchedContent = queryFactory
-                .selectFrom(bungae)
+        List<BungaeDto> fetchedContent = queryFactory
+                .select(createBungaeDtoProjection())
+                .from(bungae)
                 .join(attendee).on(attendee.bungae.eq(bungae))
-                .fetchJoin()
-                .join(bungae.group).fetchJoin()
-                .join(bungae.host).fetchJoin()
+                .join(bungae.group)
+                .join(bungae.host)
                 .where(condition)
-                .orderBy(bungae.id.desc()) // id 기준 내림차순 정렬 (최신순)
+                .orderBy(bungae.id.desc())
                 .limit(cursorPageable.getFetchSize())
                 .fetch();
 
@@ -64,35 +64,12 @@ public class CustomBungaeRepositoryImpl implements CustomBungaeRepository {
                 bungaeStatuesAndCursorCondition(cursorId, statuses)
         );
 
-        JPQLQuery<Integer> attendeeCount = JPAExpressions
-                .select(attendee.count().intValue())
-                .from(attendee)
-                .where(attendee.bungae.eq(bungae)
-                                      .and(attendee.deleted.isFalse()));
-
         List<BungaeDto> fetchedContent = queryFactory
-                .select(new QBungaeDto(
-                        bungae.id,
-                        bungae.name,
-                        bungae.description,
-                        bungae.minAttendees,
-                        bungae.maxAttendees,
-                        bungae.isOnline,
-                        bungae.location,
-                        bungae.bungaeDateTime.date,
-                        bungae.bungaeDateTime.time,
-                        bungae.dateVoteClosedAt,
-                        bungae.status,
-                        bungae.audit.createdAt,
-                        bungae.deleted,
-                        bungae.group.id,
-                        bungae.host.id,
-                        attendeeCount
-                ))
+                .select(createBungaeDtoProjection())
                 .from(bungae)
                 .join(bungae.group)
                 .join(bungae.host)
-                .where(condition) // 그룹 ID, 상태 조건, last cursor ID 조건
+                .where(condition)
                 .orderBy(bungae.id.desc())
                 .limit(cursorPageable.getFetchSize())
                 .fetch();
@@ -109,6 +86,35 @@ public class CustomBungaeRepositoryImpl implements CustomBungaeRepository {
                 statusCondition,
                 cursorId != null ? bungae.id.lt(cursorId) : null
         );
+    }
+
+    private Expression<BungaeDto> createBungaeDtoProjection() {
+        return new QBungaeDto(
+                bungae.id,
+                bungae.name,
+                bungae.description,
+                bungae.minAttendees,
+                bungae.maxAttendees,
+                bungae.isOnline,
+                bungae.location,
+                bungae.bungaeDateTime.date,
+                bungae.bungaeDateTime.time,
+                bungae.dateVoteClosedAt,
+                bungae.status,
+                bungae.audit.createdAt,
+                bungae.deleted,
+                bungae.group.id,
+                bungae.host.id,
+                createAttendeeCountSubQuery()
+        );
+    }
+
+    private JPQLQuery<Integer> createAttendeeCountSubQuery() {
+        return JPAExpressions
+                .select(attendee.count().intValue())
+                .from(attendee)
+                .where(attendee.bungae.eq(bungae)
+                                      .and(attendee.deleted.isFalse()));
     }
 
 }
