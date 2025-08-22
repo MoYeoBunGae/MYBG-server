@@ -148,7 +148,7 @@ class CustomBungaeRepositoryTest {
         CursorPageable cursorPageable = new CursorPageable(lastCursorId, pageSize);
 
         // when
-        CursorPage<Bungae> result = bungaeRepository.findAllByAttendeeMemberIdAndStatusIn(
+        CursorPage<BungaeDto> result = bungaeRepository.findAllByAttendeeMemberIdAndStatusIn(
                 member.getId(),
                 null,
                 cursorPageable
@@ -157,7 +157,7 @@ class CustomBungaeRepositoryTest {
         // then
         assertThat(result.getContent()).hasSize(pageSize);
         assertThat(result.getContent())
-                .extracting(Bungae::getId)
+                .extracting(BungaeDto::id)
                 .allMatch(id -> id < lastCursorId)
                 .allMatch(memberJoinedBungaeIds::contains);
     }
@@ -170,7 +170,7 @@ class CustomBungaeRepositoryTest {
         CursorPageable cursorPageable = new CursorPageable(null, 10);
 
         // when
-        CursorPage<Bungae> result = bungaeRepository.findAllByAttendeeMemberIdAndStatusIn(
+        CursorPage<BungaeDto> result = bungaeRepository.findAllByAttendeeMemberIdAndStatusIn(
                 member.getId(),
                 targetStatuses,
                 cursorPageable
@@ -179,10 +179,10 @@ class CustomBungaeRepositoryTest {
         // then
         assertThat(result.getContent()).hasSize(3); // DATE_VOTING 1개 + RECRUITING 2개
         assertThat(result.getContent())
-                .extracting(Bungae::getId)
+                .extracting(BungaeDto::id)
                 .allMatch(memberJoinedBungaeIds::contains);
         assertThat(result.getContent())
-                .extracting(Bungae::getStatus)
+                .extracting(BungaeDto::status)
                 .doesNotContain(BungaeStatus.RECRUITING_CLOSED, BungaeStatus.CLOSED, BungaeStatus.CANCELLED);
     }
 
@@ -193,7 +193,7 @@ class CustomBungaeRepositoryTest {
         CursorPageable cursorPageable = new CursorPageable(null, 10);
 
         // when
-        CursorPage<Bungae> result = bungaeRepository.findAllByAttendeeMemberIdAndStatusIn(
+        CursorPage<BungaeDto> result = bungaeRepository.findAllByAttendeeMemberIdAndStatusIn(
                 member.getId(),
                 null,
                 cursorPageable
@@ -202,10 +202,10 @@ class CustomBungaeRepositoryTest {
         // then
         assertThat(result.getContent()).hasSize(memberJoinedBungaeIds.size()); // member가 참여한 모든 번개 수와 일치
         assertThat(result.getContent())
-                .extracting(Bungae::getId)
+                .extracting(BungaeDto::id)
                 .containsExactlyInAnyOrderElementsOf(memberJoinedBungaeIds); // member가 참여한 모든 번개 ID와 정확히 일치
         assertThat(result.getContent())
-                .extracting(Bungae::getStatus)
+                .extracting(BungaeDto::status)
                 .contains(
                         BungaeStatus.DATE_VOTING,
                         BungaeStatus.RECRUITING,
@@ -222,7 +222,7 @@ class CustomBungaeRepositoryTest {
         CursorPageable cursorPageable = new CursorPageable(null, 3);
 
         // when
-        CursorPage<Bungae> result = bungaeRepository.findAllByAttendeeMemberIdAndStatusIn(
+        CursorPage<BungaeDto> result = bungaeRepository.findAllByAttendeeMemberIdAndStatusIn(
                 member.getId(),
                 null,
                 cursorPageable
@@ -233,7 +233,7 @@ class CustomBungaeRepositoryTest {
 
         // ID 기준 내림차순 정렬 확인 (최신순)
         List<Long> resultIds = result.getContent().stream()
-                                     .map(Bungae::getId)
+                                     .map(BungaeDto::id)
                                      .toList();
 
         // member가 참여한 번개 ID들을 내림차순으로 정렬하여 상위 3개와 비교
