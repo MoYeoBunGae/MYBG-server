@@ -13,6 +13,7 @@ import com.midasdev.mybg.bungae.repository.BungaeRepository;
 import com.midasdev.mybg.bungae.service.event.BungaeVoteCreatedEvent;
 import com.midasdev.mybg.group.domain.Group;
 import com.midasdev.mybg.group.fixture.GroupFixture;
+import com.midasdev.mybg.group.repository.GroupRepository;
 import com.midasdev.mybg.group_member.domain.GroupMember;
 import com.midasdev.mybg.group_member.fixture.GroupMemberFixture;
 import com.midasdev.mybg.group_member.repository.GroupMemberRepository;
@@ -45,21 +46,28 @@ class BungaeServiceEventTest {
     private BungaeAttendeeRepository bungaeAttendeeRepository;
     @Mock
     private ApplicationEventPublisher eventPublisher;
+    @Mock
+    private GroupRepository groupRepository;
 
     @InjectMocks
     private BungaeService bungaeService;
 
     private Group group;
+    private Member member;
     private GroupMember hostGroupMember;
 
     @BeforeEach
     void setUp() {
-        Member member = MemberFixture.create();
+        member = MemberFixture.create();
         group = GroupFixture.create(member);
         hostGroupMember = GroupMemberFixture.create(group, member);
 
-        when(groupMemberRepository.findByIdAndGroupIdAndDeletedFalse(hostGroupMember.getId(), group.getId()))
+        when(groupRepository.findByIdAndDeletedIsFalse(group.getId()))
+                .thenReturn(Optional.of(group));
+
+        when(groupMemberRepository.findByMemberAndGroup(member, group))
                 .thenReturn(Optional.of(hostGroupMember));
+
         when(bungaeRepository.save(any(Bungae.class)))
                 .thenAnswer(invocation -> invocation.getArgument(0));
     }
@@ -78,12 +86,11 @@ class BungaeServiceEventTest {
                 LocalTime.of(18, 0),
                 List.of(LocalDate.now().plusDays(1)),
                 null,
-                group.getId(),
-                hostGroupMember.getId()
+                group.getId()
         );
 
         // when
-        bungaeService.createBungae(request);
+        bungaeService.createBungae(member, request);
 
         // then
         verify(eventPublisher, times(1))
@@ -111,16 +118,14 @@ class BungaeServiceEventTest {
                 bungaeTime,
                 dateCandidates,
                 voteClosedAt,
-                group.getId(),
-                hostGroupMember.getId()
+                group.getId()
         );
 
         // when
-        bungaeService.createBungae(request);
+        bungaeService.createBungae(member, request);
 
         // then
         verify(eventPublisher, times(1))
                 .publishEvent(any(BungaeVoteCreatedEvent.class));
     }
 }
-

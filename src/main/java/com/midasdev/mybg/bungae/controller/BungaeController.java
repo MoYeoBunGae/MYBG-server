@@ -50,9 +50,10 @@ public class BungaeController {
     )
     @PostMapping()
     public ResponseEntity<BungaeResponse> createBungae(
+            @AuthenticationPrincipal Member member,
             @Valid @RequestBody BungaeCreateRequest request
     ) {
-        Bungae bungae = bungaeService.createBungae(request);
+        Bungae bungae = bungaeService.createBungae(member, request);
         return ResponseEntity.ok(BungaeResponse.from(bungae));
     }
 
@@ -73,7 +74,7 @@ public class BungaeController {
             @AuthenticationPrincipal Member member,
             @Valid GetMyBungaesRequest request
     ) {
-        CursorPage<Bungae> bungaes = bungaeService.findBungaesByMemberIdAndStatuses(
+        CursorPage<BungaeDto> bungaes = bungaeService.findBungaesByMemberIdAndStatuses(
                 member, request.getStatuses(), request.toPageable()
         );
         CursorPage<BungaeResponse> responses = bungaes.map(BungaeResponse::from);

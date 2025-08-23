@@ -52,11 +52,12 @@ class BungaeServiceTest {
     private BungaeRecruitDateOptionRepository bungaeRecruitDateOptionRepository;
 
     private Group group;
+    private Member member;
     private GroupMember hostGroupMember;
 
     @BeforeEach
     void setUp() {
-        Member member = memberRepository.save(MemberFixture.create());
+        member = memberRepository.save(MemberFixture.create());
         group = groupRepository.save(GroupFixture.create(member));
         hostGroupMember = groupMemberRepository.save(GroupMemberFixture.create(group, member));
     }
@@ -84,19 +85,18 @@ class BungaeServiceTest {
                 LocalTime.of(18, 0),
                 List.of(LocalDate.now().plusDays(1)),
                 null,
-                group.getId(),
-                hostGroupMember.getId()
+                group.getId()
         );
 
         // when
-        Bungae bungae = bungaeService.createBungae(request);
+        Bungae bungae = bungaeService.createBungae(member, request);
 
         // then
         assertThat(bungae.getStatus()).isEqualTo(BungaeStatus.RECRUITING);
         assertThat(bungae.getBungaeDateTime().getDate()).isEqualTo(request.dateCandidates().get(0));
         assertThat(bungae.getBungaeDateTime().getTime()).isEqualTo(request.bungaeTime());
         assertThat(bungae.getGroup().getId()).isEqualTo(request.groupId());
-        assertThat(bungae.getHost().getId()).isEqualTo(request.hostGroupMemberId());
+        assertThat(bungae.getHost().getId()).isEqualTo(hostGroupMember.getId());
     }
 
     @Test
@@ -120,23 +120,22 @@ class BungaeServiceTest {
                 bungaeTime,
                 dateCandidates,
                 voteClosedAt,
-                group.getId(),
-                hostGroupMember.getId()
+                group.getId()
         );
 
         // when
-        Bungae bungae = bungaeService.createBungae(request);
+        Bungae bungae = bungaeService.createBungae(member, request);
 
         // then
         assertThat(bungae.getStatus()).isEqualTo(BungaeStatus.DATE_VOTING);
         assertThat(bungae.getBungaeDateTime().getDate()).isNull();
         assertThat(bungae.getBungaeDateTime().getTime()).isEqualTo(bungaeTime);
         assertThat(bungae.getGroup().getId()).isEqualTo(request.groupId());
-        assertThat(bungae.getHost().getId()).isEqualTo(request.hostGroupMemberId());
+        assertThat(bungae.getHost().getId()).isEqualTo(hostGroupMember.getId());
     }
 
     @Test
-    @DisplayName("날짜 후보가 2개 이상일 때 BungaeRecruitDateOption이 후보 개수만큼 저장되고, 각 투표수는 1이다")
+    @DisplayName("날짜 후보가 2개 이상일 때 BungaeRecruitDateOption이 후보 개수만큼 저장된다.")
     void createBungae_withMultipleDateCandidates_shouldSaveAllDateOptionsAndVoteCountIsOne() {
         // given
         List<LocalDate> dateCandidates = List.of(
@@ -156,12 +155,11 @@ class BungaeServiceTest {
                 bungaeTime,
                 dateCandidates,
                 voteClosedAt,
-                group.getId(),
-                hostGroupMember.getId()
+                group.getId()
         );
 
         // when
-        bungaeService.createBungae(request);
+        bungaeService.createBungae(member, request);
 
         // then
         List<BungaeRecruitDateOption> options = bungaeRecruitDateOptionRepository.findAll();
@@ -169,8 +167,5 @@ class BungaeServiceTest {
         assertThat(options)
                 .extracting(BungaeRecruitDateOption::getDateOption)
                 .containsExactlyInAnyOrderElementsOf(dateCandidates);
-        assertThat(options)
-                .extracting(BungaeRecruitDateOption::getVoteCount)
-                .containsOnly(1);
     }
 }

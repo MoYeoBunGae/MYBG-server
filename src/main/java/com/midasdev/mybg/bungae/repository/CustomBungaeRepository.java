@@ -9,7 +9,7 @@ import java.util.List;
 
 public interface CustomBungaeRepository {
 
-    CursorPage<Bungae> findAllByAttendeeMemberIdAndStatusIn(
+    CursorPage<BungaeDto> findAllByAttendeeMemberIdAndStatusIn(
             Long memberId,
             List<BungaeStatus> statuses,
             CursorPageable cursorPageable

@@ -57,7 +57,6 @@ public class Group {
     @Column(nullable = false)
     private int maxMemberCount;
 
-    // TODO: GroupMember로 수정
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "owner_member_id")
     private Member owner;

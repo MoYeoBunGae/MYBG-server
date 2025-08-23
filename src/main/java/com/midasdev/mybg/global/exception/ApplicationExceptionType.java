@@ -109,7 +109,7 @@ public enum ApplicationExceptionType {
     GROUP_MEMBER_NOT_FOUND_BY_GROUP_ID(
         HttpStatus.BAD_REQUEST,
         "ERR_GROUP_MEMBER_008",
-        "해당 그룹({1})에 속하는 그룹멤버({0})를 찾을 수 없습니다."
+        "해당 그룹({1})에 속하는 멤버({0})를 찾을 수 없습니다."
     ),
 
     // authentication
