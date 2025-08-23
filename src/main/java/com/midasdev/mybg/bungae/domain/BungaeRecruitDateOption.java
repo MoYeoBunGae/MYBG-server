@@ -30,9 +30,6 @@ public class BungaeRecruitDateOption {
     @Column(name = "date_option", nullable = false)
     private LocalDate dateOption;
 
-    @Column(name = "vote_count", nullable = false)
-    private Integer voteCount;
-
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "bungae_id", nullable = false)
     private Bungae bungae;

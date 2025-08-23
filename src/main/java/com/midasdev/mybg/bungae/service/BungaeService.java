@@ -90,7 +90,6 @@ public class BungaeService {
             request.dateCandidates().forEach(date -> {
                 BungaeRecruitDateOption option = BungaeRecruitDateOption.builder()
                                                                         .dateOption(date)
-                                                                        .voteCount(1) // 주최자가 1표를 가진 것으로 초기화
                                                                         .bungae(savedBungae)
                                                                         .build();
                 bungaeRecruitDateOptionRepository.save(option);

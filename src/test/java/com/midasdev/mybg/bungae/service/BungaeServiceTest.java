@@ -135,7 +135,7 @@ class BungaeServiceTest {
     }
 
     @Test
-    @DisplayName("날짜 후보가 2개 이상일 때 BungaeRecruitDateOption이 후보 개수만큼 저장되고, 각 투표수는 1이다")
+    @DisplayName("날짜 후보가 2개 이상일 때 BungaeRecruitDateOption이 후보 개수만큼 저장된다.")
     void createBungae_withMultipleDateCandidates_shouldSaveAllDateOptionsAndVoteCountIsOne() {
         // given
         List<LocalDate> dateCandidates = List.of(
@@ -167,8 +167,5 @@ class BungaeServiceTest {
         assertThat(options)
                 .extracting(BungaeRecruitDateOption::getDateOption)
                 .containsExactlyInAnyOrderElementsOf(dateCandidates);
-        assertThat(options)
-                .extracting(BungaeRecruitDateOption::getVoteCount)
-                .containsOnly(1);
     }
 }
