@@ -10,6 +10,7 @@ import com.midasdev.mybg.bungae.domain.BungaeStatus;
 import com.midasdev.mybg.bungae.fixture.BungaeFixture;
 import com.midasdev.mybg.bungae.repository.dto.BungaeDto;
 import com.midasdev.mybg.config.QueryDslConfig;
+import com.midasdev.mybg.global.config.AuditingTestConfig;
 import com.midasdev.mybg.global.util.cursor_page.CursorPage;
 import com.midasdev.mybg.global.util.cursor_page.CursorPageable;
 import com.midasdev.mybg.group.domain.Group;
@@ -45,7 +46,7 @@ import org.springframework.context.annotation.Import;
  */
 
 @DataJpaTest
-@Import(QueryDslConfig.class)
+@Import({QueryDslConfig.class, AuditingTestConfig.class})
 class CustomBungaeRepositoryTest {
 
     @Autowired
@@ -417,7 +418,7 @@ class CustomBungaeRepositoryTest {
             softly.assertThat(targetBungae.bungaeDate()).isEqualTo(testBungae.getBungaeDateTime().getDate());
             softly.assertThat(targetBungae.bungaeTime()).isEqualTo(testBungae.getBungaeDateTime().getTime());
             softly.assertThat(targetBungae.status()).isEqualTo(testBungae.getStatus());
-            softly.assertThat(targetBungae.createdAt()).isEqualTo(testBungae.getAudit().getCreatedAt());
+            softly.assertThat(targetBungae.createdAt()).isEqualTo(testBungae.getCreatedAt());
             softly.assertThat(targetBungae.deleted()).isEqualTo(testBungae.getDeleted());
             softly.assertThat(targetBungae.groupId()).isEqualTo(testGroup.getId());
             softly.assertThat(targetBungae.hostGroupMemberId()).isEqualTo(testGroupMember.getId());
@@ -495,7 +496,7 @@ class CustomBungaeRepositoryTest {
             softly.assertThat(targetBungae.bungaeDate()).isEqualTo(testBungae.getBungaeDateTime().getDate());
             softly.assertThat(targetBungae.bungaeTime()).isEqualTo(testBungae.getBungaeDateTime().getTime());
             softly.assertThat(targetBungae.status()).isEqualTo(testBungae.getStatus());
-            softly.assertThat(targetBungae.createdAt()).isEqualTo(testBungae.getAudit().getCreatedAt());
+            softly.assertThat(targetBungae.createdAt()).isEqualTo((testBungae.getCreatedAt()));
             softly.assertThat(targetBungae.deleted()).isEqualTo(testBungae.getDeleted());
             softly.assertThat(targetBungae.groupId()).isEqualTo(testGroup.getId());
             softly.assertThat(targetBungae.hostGroupMemberId()).isEqualTo(testGroupMember.getId());
