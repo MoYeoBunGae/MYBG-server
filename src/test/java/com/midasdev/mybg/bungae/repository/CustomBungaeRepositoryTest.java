@@ -1,9 +1,11 @@
 package com.midasdev.mybg.bungae.repository;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.SoftAssertions.assertSoftly;
 
 import com.midasdev.mybg.bungae.domain.Bungae;
 import com.midasdev.mybg.bungae.domain.BungaeAttendee;
+import com.midasdev.mybg.bungae.domain.BungaeDateTime;
 import com.midasdev.mybg.bungae.domain.BungaeStatus;
 import com.midasdev.mybg.bungae.fixture.BungaeFixture;
 import com.midasdev.mybg.bungae.repository.dto.BungaeDto;
@@ -19,6 +21,8 @@ import com.midasdev.mybg.group_member.repository.GroupMemberRepository;
 import com.midasdev.mybg.member.domain.Member;
 import com.midasdev.mybg.member.fixture.MemberFixture;
 import com.midasdev.mybg.member.repository.MemberRepository;
+import java.time.LocalDate;
+import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.function.BiFunction;
@@ -341,6 +345,162 @@ class CustomBungaeRepositoryTest {
                                                 .toList();
 
         assertThat(resultIds).isEqualTo(sortedIds);
+    }
+
+    @Test
+    @DisplayName("B-2-R-5: 정확한 값이 있는 나의 번개 조회")
+    void findAllByAttendeeMemberIdAndStatusIn_shouldReturnCorrectFieldValues() {
+        // given
+        Member testMember = memberRepository.save(MemberFixture.create("B-2-R-5"));
+        Group testGroup = groupRepository.save(GroupFixture.create(testMember, "B-2-R-5 그룹", "B-2-R-5-invitation-code"));
+        GroupMember testGroupMember = groupMemberRepository.save(GroupMemberFixture.create(testGroup, testMember));
+        GroupMember testGroupMember2 = groupMemberRepository.save(GroupMemberFixture.create(testGroup, otherMember));
+
+        String bungaeName = "UniqueInTestBungae";
+        Bungae testBungae = Bungae.builder()
+                                  .name(bungaeName)
+                                  .description("테스트 설명")
+                                  .minAttendees(2)
+                                  .maxAttendees(10)
+                                  .isOnline(false)
+                                  .location("서울")
+                                  .bungaeDateTime(new BungaeDateTime(LocalDate.now().plusDays(1), LocalTime.of(18, 0)))
+                                  .status(BungaeStatus.RECRUITING)
+                                  .deleted(false)
+                                  .group(testGroup)
+                                  .host(testGroupMember)
+                                  .build();
+        Bungae savedTestBungae = bungaeRepository.save(testBungae);
+
+        BungaeAttendee testAttendee = BungaeAttendee.builder()
+                                                   .bungae(savedTestBungae)
+                                                   .groupMember(testGroupMember)
+                                                   .deleted(false)
+                                                   .build();
+        BungaeAttendee testAttendee2 = BungaeAttendee.builder()
+                                                    .bungae(savedTestBungae)
+                                                    .groupMember(testGroupMember2)
+                                                    .deleted(false)
+                                                    .build();
+        bungaeAttendeeRepository.save(testAttendee);
+        bungaeAttendeeRepository.save(testAttendee2);
+
+        CursorPageable cursorPageable = new CursorPageable(null, 10);
+
+        // when
+        CursorPage<BungaeDto> result = bungaeRepository.findAllByAttendeeMemberIdAndStatusIn(
+                testMember.getId(),
+                null,
+                cursorPageable
+        );
+
+        // then
+        assertThat(result.getContent()).isNotEmpty();
+
+        // setUp으로 인해 여러 결과과 있기 때문에 given에서 저장한 번개를 찾아서 검증
+        List<BungaeDto> target = result.getContent().stream()
+                                       .filter(dto -> dto.name().equals(bungaeName))
+                                       .toList();
+        if (target.size() != 1) {
+            throw new IllegalStateException(String.format("Bungae with name %s not found or multiple found (found : %d)", bungaeName, target.size()));
+        }
+
+        BungaeDto targetBungae = target.get(0);
+
+        assertSoftly(softly -> {
+            softly.assertThat(targetBungae.name()).isEqualTo(testBungae.getName());
+            softly.assertThat(targetBungae.description()).isEqualTo(testBungae.getDescription());
+            softly.assertThat(targetBungae.minAttendees()).isEqualTo(testBungae.getMinAttendees());
+            softly.assertThat(targetBungae.maxAttendees()).isEqualTo(testBungae.getMaxAttendees());
+            softly.assertThat(targetBungae.isOnline()).isEqualTo(testBungae.getIsOnline());
+            softly.assertThat(targetBungae.location()).isEqualTo(testBungae.getLocation());
+            softly.assertThat(targetBungae.bungaeDate()).isEqualTo(testBungae.getBungaeDateTime().getDate());
+            softly.assertThat(targetBungae.bungaeTime()).isEqualTo(testBungae.getBungaeDateTime().getTime());
+            softly.assertThat(targetBungae.status()).isEqualTo(testBungae.getStatus());
+            softly.assertThat(targetBungae.createdAt()).isEqualTo(testBungae.getAudit().getCreatedAt());
+            softly.assertThat(targetBungae.deleted()).isEqualTo(testBungae.getDeleted());
+            softly.assertThat(targetBungae.groupId()).isEqualTo(testGroup.getId());
+            softly.assertThat(targetBungae.hostGroupMemberId()).isEqualTo(testGroupMember.getId());
+            softly.assertThat(targetBungae.attendeeCount()).isEqualTo(2);
+        });
+    }
+
+    @Test
+    @DisplayName("B-3-R-5: 정확한 값이 있는 그룹 번개 조회")
+    void findByGroupIdAndStatusIn_shouldReturnCorrectFieldValues() {
+        // given
+        Member testMember = memberRepository.save(MemberFixture.create("B-3-R-5"));
+        Group testGroup = groupRepository.save(GroupFixture.create(testMember, "B-3-R-5 그룹", "B-3-R-5-invitation-code"));
+        GroupMember testGroupMember = groupMemberRepository.save(GroupMemberFixture.create(testGroup, testMember));
+        GroupMember testGroupMember2 = groupMemberRepository.save(GroupMemberFixture.create(testGroup, otherMember));
+
+        String bungaeName = "UniqueGroupTestBungae";
+        Bungae testBungae = Bungae.builder()
+                                  .name(bungaeName)
+                                  .description("그룹 테스트 설명")
+                                  .minAttendees(3)
+                                  .maxAttendees(15)
+                                  .isOnline(true)
+                                  .location("온라인")
+                                  .bungaeDateTime(new BungaeDateTime(LocalDate.now().plusDays(3), LocalTime.of(20, 0)))
+                                  .status(BungaeStatus.RECRUITING)
+                                  .deleted(false)
+                                  .group(testGroup)
+                                  .host(testGroupMember)
+                                  .build();
+        Bungae savedTestBungae = bungaeRepository.save(testBungae);
+
+        BungaeAttendee testAttendee = BungaeAttendee.builder()
+                                                   .bungae(savedTestBungae)
+                                                   .groupMember(testGroupMember)
+                                                   .deleted(false)
+                                                   .build();
+        BungaeAttendee testAttendee2 = BungaeAttendee.builder()
+                                                    .bungae(savedTestBungae)
+                                                    .groupMember(testGroupMember2)
+                                                    .deleted(false)
+                                                    .build();
+        bungaeAttendeeRepository.save(testAttendee);
+        bungaeAttendeeRepository.save(testAttendee2);
+
+        CursorPageable cursorPageable = new CursorPageable(null, 10);
+
+        // when
+        CursorPage<BungaeDto> result = bungaeRepository.findByGroupIdAndStatusIn(
+                testGroup.getId(),
+                null,
+                cursorPageable
+        );
+
+        // then
+        assertThat(result.getContent()).isNotEmpty();
+
+        // setUp으로 인해 여러 결과과 있기 때문에 given에서 저장한 번개를 찾아서 검증
+        List<BungaeDto> target = result.getContent().stream()
+                                       .filter(dto -> dto.name().equals(bungaeName))
+                                       .toList();
+        if (target.size() != 1) {
+            throw new IllegalStateException(String.format("Bungae with name %s not found or multiple found (found : %d)", bungaeName, target.size()));
+        }
+
+        BungaeDto targetBungae = target.get(0);
+
+        assertSoftly(softly -> {
+            softly.assertThat(targetBungae.name()).isEqualTo(testBungae.getName());
+            softly.assertThat(targetBungae.description()).isEqualTo(testBungae.getDescription());
+            softly.assertThat(targetBungae.minAttendees()).isEqualTo(testBungae.getMinAttendees());
+            softly.assertThat(targetBungae.maxAttendees()).isEqualTo(testBungae.getMaxAttendees());
+            softly.assertThat(targetBungae.isOnline()).isEqualTo(testBungae.getIsOnline());
+            softly.assertThat(targetBungae.location()).isEqualTo(testBungae.getLocation());
+            softly.assertThat(targetBungae.bungaeDate()).isEqualTo(testBungae.getBungaeDateTime().getDate());
+            softly.assertThat(targetBungae.bungaeTime()).isEqualTo(testBungae.getBungaeDateTime().getTime());
+            softly.assertThat(targetBungae.status()).isEqualTo(testBungae.getStatus());
+            softly.assertThat(targetBungae.createdAt()).isEqualTo(testBungae.getAudit().getCreatedAt());
+            softly.assertThat(targetBungae.deleted()).isEqualTo(testBungae.getDeleted());
+            softly.assertThat(targetBungae.groupId()).isEqualTo(testGroup.getId());
+            softly.assertThat(targetBungae.hostGroupMemberId()).isEqualTo(testGroupMember.getId());
+            softly.assertThat(targetBungae.attendeeCount()).isEqualTo(2);
+        });
     }
 
 }

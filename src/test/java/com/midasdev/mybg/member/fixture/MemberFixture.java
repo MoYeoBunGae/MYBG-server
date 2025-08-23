@@ -22,4 +22,13 @@ public class MemberFixture {
                      .oauthAccount(new OauthAccount(OauthProvider.KAKAO, "test-oauth-sub2"))
                      .build();
     }
+
+    public static Member create(String name) {
+        return Member.builder()
+                     .name(name)
+                     .profileImageUrl("http://test.com/profile.png")
+                     .deleted(false)
+                     .oauthAccount(new OauthAccount(OauthProvider.KAKAO, "test-oauth-"+name))
+                     .build();
+    }
 }
