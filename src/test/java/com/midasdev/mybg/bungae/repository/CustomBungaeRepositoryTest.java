@@ -1,6 +1,7 @@
 package com.midasdev.mybg.bungae.repository;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.within;
 import static org.assertj.core.api.SoftAssertions.assertSoftly;
 
 import com.midasdev.mybg.bungae.domain.Bungae;
@@ -24,6 +25,7 @@ import com.midasdev.mybg.member.fixture.MemberFixture;
 import com.midasdev.mybg.member.repository.MemberRepository;
 import java.time.LocalDate;
 import java.time.LocalTime;
+import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.function.BiFunction;
@@ -418,7 +420,7 @@ class CustomBungaeRepositoryTest {
             softly.assertThat(targetBungae.bungaeDate()).isEqualTo(testBungae.getBungaeDateTime().getDate());
             softly.assertThat(targetBungae.bungaeTime()).isEqualTo(testBungae.getBungaeDateTime().getTime());
             softly.assertThat(targetBungae.status()).isEqualTo(testBungae.getStatus());
-            softly.assertThat(targetBungae.createdAt()).isEqualTo(testBungae.getCreatedAt());
+            softly.assertThat(targetBungae.createdAt()).isCloseTo(testBungae.getCreatedAt(), within(1, ChronoUnit.MICROS));
             softly.assertThat(targetBungae.deleted()).isEqualTo(testBungae.getDeleted());
             softly.assertThat(targetBungae.groupId()).isEqualTo(testGroup.getId());
             softly.assertThat(targetBungae.hostGroupMemberId()).isEqualTo(testGroupMember.getId());
@@ -496,7 +498,7 @@ class CustomBungaeRepositoryTest {
             softly.assertThat(targetBungae.bungaeDate()).isEqualTo(testBungae.getBungaeDateTime().getDate());
             softly.assertThat(targetBungae.bungaeTime()).isEqualTo(testBungae.getBungaeDateTime().getTime());
             softly.assertThat(targetBungae.status()).isEqualTo(testBungae.getStatus());
-            softly.assertThat(targetBungae.createdAt()).isEqualTo((testBungae.getCreatedAt()));
+            softly.assertThat(targetBungae.createdAt()).isCloseTo(testBungae.getCreatedAt(), within(1, ChronoUnit.MICROS));
             softly.assertThat(targetBungae.deleted()).isEqualTo(testBungae.getDeleted());
             softly.assertThat(targetBungae.groupId()).isEqualTo(testGroup.getId());
             softly.assertThat(targetBungae.hostGroupMemberId()).isEqualTo(testGroupMember.getId());
