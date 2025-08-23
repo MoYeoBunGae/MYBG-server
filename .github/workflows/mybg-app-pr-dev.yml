@@ -38,4 +38,4 @@ jobs:
           fi
 
       - name: Run tests with Gradle
-        run: ./gradlew test --stacktrace --info
+        run: ./gradlew test --stacktrace
