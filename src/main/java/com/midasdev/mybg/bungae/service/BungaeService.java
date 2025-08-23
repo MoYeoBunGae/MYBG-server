@@ -38,16 +38,19 @@ public class BungaeService {
     private final GroupRepository groupRepository;
 
     @Transactional
-    public Bungae createBungae(BungaeCreateRequest request) {
-        // 1. groupId와 groupMemberId로 삭제되지 않은 groupMember 조회 (그룹에 속하는 그룹멤버가 없다면 예외)
-        // TODO: hostGroupMember는 요청을 보낸 사람이므로, member 정보를 통해 그룹멤버를 조회하는 로직으로 변경 필요
-        GroupMember hostGroupMember = groupMemberRepository.findByIdAndGroupIdAndDeletedFalse(request.hostGroupMemberId(), request.groupId())
+    public Bungae createBungae(Member member, BungaeCreateRequest request) {
+        // 1. 그룹 존재 여부 검증
+        Group group = groupRepository.findByIdAndDeletedIsFalse(request.groupId())
+                                    .orElseThrow(() -> new ApplicationException(ApplicationExceptionType.GROUP_NOT_FOUND_BY_ID, request.groupId()));
+
+        // 2. 로그인한 멤버가 해당 그룹에 속하는 GroupMember 조회
+        GroupMember hostGroupMember = groupMemberRepository.findByMemberAndGroup(member, group)
                                                            .orElseThrow(() -> new ApplicationException(
                                                                    ApplicationExceptionType.GROUP_MEMBER_NOT_FOUND_BY_GROUP_ID,
-                                                                   request.hostGroupMemberId(), request.groupId()
+                                                                   member.getId(), request.groupId()
                                                            ));
 
-        // 2. Bungae 엔티티 생성 - 날짜 후보에 따라 Status 및 bungaeDateTime 설정
+        // 3. Bungae 엔티티 생성 - 날짜 후보에 따라 Status 및 bungaeDateTime 설정
         BungaeStatus status = request.hasSingleDateCandidate()
                 ? BungaeStatus.RECRUITING
                 : BungaeStatus.DATE_VOTING;
@@ -75,14 +78,14 @@ public class BungaeService {
                               .dateVoteClosedAt(request.dateVoteClosedAt())
                               .status(status)
                               .deleted(false)
-                              .group(hostGroupMember.getGroup())
+                              .group(group)
                               .host(hostGroupMember)
                               .build();
 
-        // 3. Bungae 엔티티 저장
+        // 4. Bungae 엔티티 저장
         Bungae savedBungae = bungaeRepository.save(bungae);
 
-        // 4. 날짜 후보가 여러개라면 날짜 후보 저장 (BungaeRecruitDateOption)
+        // 5. 날짜 후보가 여러개라면 날짜 후보 저장 (BungaeRecruitDateOption)
         if (!request.hasSingleDateCandidate()) {
             request.dateCandidates().forEach(date -> {
                 BungaeRecruitDateOption option = BungaeRecruitDateOption.builder()
@@ -94,7 +97,7 @@ public class BungaeService {
             });
         }
 
-        // 5. Bungae 참여자에 host GroupMember 추가
+        // 6. Bungae 참여자에 host GroupMember 추가
         BungaeAttendee attendee = BungaeAttendee.builder()
                                                 .bungae(savedBungae)
                                                 .groupMember(hostGroupMember)
@@ -102,7 +105,6 @@ public class BungaeService {
                                                 .build();
         bungaeAttendeeRepository.save(attendee);
 
-        // 6. 투표 생성 이벤트 발행
         eventPublisher.publishEvent(new BungaeVoteCreatedEvent(savedBungae.getId()));
 
         // 필요하다면 반환

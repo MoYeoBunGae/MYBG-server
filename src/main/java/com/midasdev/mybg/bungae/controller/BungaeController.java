@@ -50,9 +50,10 @@ public class BungaeController {
     )
     @PostMapping()
     public ResponseEntity<BungaeResponse> createBungae(
+            @AuthenticationPrincipal Member member,
             @Valid @RequestBody BungaeCreateRequest request
     ) {
-        Bungae bungae = bungaeService.createBungae(request);
+        Bungae bungae = bungaeService.createBungae(member, request);
         return ResponseEntity.ok(BungaeResponse.from(bungae));
     }
 
