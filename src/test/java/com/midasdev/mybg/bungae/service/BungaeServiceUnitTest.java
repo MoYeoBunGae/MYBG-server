@@ -4,6 +4,7 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 
+import com.midasdev.mybg.bungae.controller.dto.request.BungaeCreateRequest;
 import com.midasdev.mybg.bungae.domain.BungaeStatus;
 import com.midasdev.mybg.bungae.repository.BungaeAttendeeRepository;
 import com.midasdev.mybg.bungae.repository.BungaeRecruitDateOptionRepository;
@@ -17,6 +18,8 @@ import com.midasdev.mybg.group.repository.GroupRepository;
 import com.midasdev.mybg.group_member.repository.GroupMemberRepository;
 import com.midasdev.mybg.member.domain.Member;
 import com.midasdev.mybg.member.fixture.MemberFixture;
+import java.time.LocalDate;
+import java.time.LocalTime;
 import java.util.List;
 import java.util.Optional;
 import org.junit.jupiter.api.DisplayName;
@@ -50,6 +53,38 @@ public class BungaeServiceUnitTest {
 
     @InjectMocks
     private BungaeService bungaeService;
+
+    @Test
+    @DisplayName("B-1-SU-1: 요청 멤버가 그룹에 속하지 않을 때 예외 발생")
+    void createBungae_ShouldThrowException_WhenMemberNotInGroup() {
+        // given
+        Member member = MemberFixture.create();
+        Member groupOwner = MemberFixture.create();
+        Group group = GroupFixture.create(groupOwner);
+
+        BungaeCreateRequest request = new BungaeCreateRequest(
+                "테스트 번개",
+                "설명",
+                2,
+                10,
+                false,
+                "서울",
+                LocalTime.of(18, 0),
+                List.of(LocalDate.now().plusDays(1)),
+                null,
+                group.getId()
+        );
+
+        // when - 그룹은 존재하지만 멤버가 그룹에 속하지 않도록 Mock 설정
+        when(groupRepository.findByIdAndDeletedIsFalse(group.getId()))
+                .thenReturn(Optional.of(group));
+        when(groupMemberRepository.findByMemberAndGroup(member, group))
+                .thenReturn(Optional.empty());
+
+        // then - 예외 발생 검증
+        assertThatThrownBy(() -> bungaeService.createBungae(member, request))
+                .isInstanceOf(ApplicationException.class);
+    }
 
     @Test
     @DisplayName("그룹이 존재하지 않을 때 예외 발생")
