@@ -65,5 +65,22 @@ public class BungaeFixture {
                      .group(group)
                      .host(host);
     }
+
+    public static Bungae createWithStatus(Group group, GroupMember host, BungaeStatus status) {
+        return Bungae.builder()
+                     .name("테스트 번개")
+                     .description("테스트용 번개 설명")
+                     .minAttendees(2)
+                     .maxAttendees(10)
+                     .isOnline(false)
+                     .location("서울 강남구")
+                     .bungaeDateTime(new BungaeDateTime(LocalDate.now().plusDays(1), LocalTime.of(18, 0)))
+                     .status(status)
+                     .deleted(false)
+                     .group(group)
+                     .host(host)
+                     .build();
+    }
+
 }
 
