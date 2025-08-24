@@ -4,6 +4,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.BDDMockito.given;
 
+import com.midasdev.mybg.TestConstant;
 import com.midasdev.mybg.global.exception.ApplicationException;
 import com.midasdev.mybg.global.exception.ApplicationExceptionType;
 import com.midasdev.mybg.group.domain.Group;
@@ -23,7 +24,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 @ExtendWith(MockitoExtension.class)
-class GroupMemberFinderTest {
+class GroupMemberFinderUnitTest {
 
     @Mock
     private GroupMemberRepository groupMemberRepository;
@@ -66,7 +67,7 @@ class GroupMemberFinderTest {
         // when & then
         assertThatThrownBy(() -> groupMemberFinder.findByMemberAndGroup(member, group))
                 .isInstanceOf(ApplicationException.class)
-                .hasFieldOrPropertyWithValue("exceptionType", ApplicationExceptionType.GROUP_MEMBER_NOT_FOUND_BY_GROUP_ID);
+                .hasFieldOrPropertyWithValue(TestConstant.EXCEPTION_TYPE_FIELD, ApplicationExceptionType.GROUP_MEMBER_NOT_FOUND_BY_GROUP_ID);
     }
 }
 

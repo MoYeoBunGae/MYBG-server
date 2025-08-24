@@ -4,6 +4,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.BDDMockito.given;
 
+import com.midasdev.mybg.TestConstant;
 import com.midasdev.mybg.bungae.domain.Bungae;
 import com.midasdev.mybg.bungae.fixture.BungaeFixture;
 import com.midasdev.mybg.bungae.repository.BungaeRepository;
@@ -62,7 +63,7 @@ class BungaeFinderUnitTest {
         // when & then
         assertThatThrownBy(() -> bungaeFinder.findById(nonExistentBungaeId))
                 .isInstanceOf(ApplicationException.class)
-                .hasFieldOrPropertyWithValue("exceptionType", ApplicationExceptionType.BUNGAE_NOT_FOUND_BY_ID);
+                .hasFieldOrPropertyWithValue(TestConstant.EXCEPTION_TYPE_FIELD, ApplicationExceptionType.BUNGAE_NOT_FOUND_BY_ID);
     }
 
 
