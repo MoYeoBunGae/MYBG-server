@@ -9,39 +9,49 @@ import com.midasdev.mybg.group_member.domain.GroupMember;
 import com.midasdev.mybg.group_member.fixture.GroupMemberFixture;
 import com.midasdev.mybg.member.domain.Member;
 import com.midasdev.mybg.member.fixture.MemberFixture;
-import java.util.stream.Stream;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
-import org.junit.jupiter.params.provider.Arguments;
-import org.junit.jupiter.params.provider.MethodSource;
+import org.junit.jupiter.params.provider.EnumSource;
 
 class BungaeDomainTest {
 
-    @ParameterizedTest
-    @MethodSource("provideStatusAndExpectedCanVote")
-    @DisplayName("BD-1-D-1: 번개 상태에 따른 canVote 결과 검증")
-    void canVote_ShouldReturnExpectedResult_BasedOnBungaeStatus(BungaeStatus status, boolean expectedCanVote) {
+    private Member member;
+    private Group group;
+    private GroupMember host;
+
+    @BeforeEach
+    void setUp() {
+        member = MemberFixture.create();
+        group = GroupFixture.create(member);
+        host = GroupMemberFixture.create(group, member);
+    }
+
+    @Test
+    @DisplayName("BD-1-D-1: 번개 상태가 DATE_VOTING 일 때 true 반환")
+    void canVote_ShouldReturnTrue_WhenStatusIsDateVoting() {
         // given
-        Member member = MemberFixture.create();
-        Group group = GroupFixture.create(member);
-        GroupMember host = GroupMemberFixture.create(group, member);
+        Bungae bungae = BungaeFixture.createWithStatus(group, host, BungaeStatus.DATE_VOTING);
+
+        // when
+        boolean actualCanVote = bungae.canVote();
+
+        // then
+        assertThat(actualCanVote).isTrue();
+    }
+
+    @ParameterizedTest
+    @EnumSource(value = BungaeStatus.class, mode = EnumSource.Mode.EXCLUDE, names = {"DATE_VOTING"})
+    @DisplayName("BD-1-D-2: 번개 상태가 DATE_VOTING이 아닐 때 false 반환")
+    void canVote_ShouldReturnFalse_WhenStatusIsNotDateVoting(BungaeStatus status) {
+        // given
         Bungae bungae = BungaeFixture.createWithStatus(group, host, status);
 
         // when
         boolean actualCanVote = bungae.canVote();
 
         // then
-        assertThat(actualCanVote).isEqualTo(expectedCanVote);
-    }
-
-    private static Stream<Arguments> provideStatusAndExpectedCanVote() {
-        return Stream.of(
-                Arguments.of(BungaeStatus.DATE_VOTING, true),
-                Arguments.of(BungaeStatus.RECRUITING, false),
-                Arguments.of(BungaeStatus.RECRUITING_CLOSED, false),
-                Arguments.of(BungaeStatus.CANCELLED, false),
-                Arguments.of(BungaeStatus.CLOSED, false)
-        );
+        assertThat(actualCanVote).isFalse();
     }
 }
-
