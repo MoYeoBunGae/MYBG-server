@@ -4,18 +4,25 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 
+import com.midasdev.mybg.TestConstant;
 import com.midasdev.mybg.bungae.controller.dto.request.BungaeCreateRequest;
+import com.midasdev.mybg.bungae.domain.Bungae;
 import com.midasdev.mybg.bungae.domain.BungaeStatus;
+import com.midasdev.mybg.bungae.fixture.BungaeFixture;
 import com.midasdev.mybg.bungae.repository.BungaeAttendeeRepository;
 import com.midasdev.mybg.bungae.repository.BungaeRecruitDateOptionRepository;
 import com.midasdev.mybg.bungae.repository.BungaeRepository;
 import com.midasdev.mybg.fixture.CursorPageableFixture;
 import com.midasdev.mybg.global.exception.ApplicationException;
+import com.midasdev.mybg.global.exception.ApplicationExceptionType;
 import com.midasdev.mybg.global.util.cursor_page.CursorPageable;
 import com.midasdev.mybg.group.domain.Group;
 import com.midasdev.mybg.group.fixture.GroupFixture;
 import com.midasdev.mybg.group.repository.GroupRepository;
+import com.midasdev.mybg.group_member.domain.GroupMember;
+import com.midasdev.mybg.group_member.fixture.GroupMemberFixture;
 import com.midasdev.mybg.group_member.repository.GroupMemberRepository;
+import com.midasdev.mybg.group_member.service.GroupMemberFinder;
 import com.midasdev.mybg.member.domain.Member;
 import com.midasdev.mybg.member.fixture.MemberFixture;
 import java.time.LocalDate;
@@ -50,6 +57,12 @@ public class BungaeServiceUnitTest {
 
     @Mock
     private GroupRepository groupRepository;
+
+    @Mock
+    private BungaeFinder bungaeFinder;
+
+    @Mock
+    private GroupMemberFinder groupMemberFinder;
 
     @InjectMocks
     private BungaeService bungaeService;
@@ -124,5 +137,25 @@ public class BungaeServiceUnitTest {
         assertThatThrownBy(() -> bungaeService.findBungaesByGroupIdAndStatuses(
                 member, 1L, statuses, cursorPageable))
                 .isInstanceOf(ApplicationException.class);
+    }
+
+    @Test
+    @DisplayName("B-4-SU-1: 번개의 상태가 DATE_VOTING이 아닐 때 예외 발생")
+    void getBungaeDateVoteOptions_ShouldThrowException_WhenBungaeStatusIsNotDateVoting() {
+        // given
+        Member member = MemberFixture.create();
+        Member groupOwner = MemberFixture.create();
+        Group group = GroupFixture.create(groupOwner);
+        GroupMember groupMember = GroupMemberFixture.create(group, member);
+        Bungae bungae = BungaeFixture.createWithRecruiting(group, groupMember);
+        Long bungaeId = 1L;
+
+        when(bungaeFinder.findById(bungaeId)).thenReturn(bungae);
+
+        // when & then
+        assertThatThrownBy(() -> bungaeService.getBungaeDateVoteOptions(member, bungaeId))
+                .isInstanceOf(ApplicationException.class)
+                .hasFieldOrPropertyWithValue(TestConstant.EXCEPTION_TYPE_FIELD, ApplicationExceptionType.BUNGAE_VOTE_UNAVAILABLE);
+
     }
 }

@@ -6,6 +6,7 @@ import com.midasdev.mybg.bungae.controller.dto.request.BungaeCreateRequest;
 import com.midasdev.mybg.bungae.domain.Bungae;
 import com.midasdev.mybg.bungae.domain.BungaeRecruitDateOption;
 import com.midasdev.mybg.bungae.domain.BungaeStatus;
+import com.midasdev.mybg.bungae.fixture.BungaeFixture;
 import com.midasdev.mybg.bungae.repository.BungaeRecruitDateOptionRepository;
 import com.midasdev.mybg.bungae.repository.BungaeRepository;
 import com.midasdev.mybg.group.domain.Group;
@@ -167,5 +168,34 @@ class BungaeServiceTest {
         assertThat(options)
                 .extracting(BungaeRecruitDateOption::getDateOption)
                 .containsExactlyInAnyOrderElementsOf(dateCandidates);
+    }
+
+    @Test
+    @DisplayName("B-4-S-1: 올바른 번개 투표 가능 날짜 조회")
+    void getBungaeDateVoteOptions_ShouldReturnDateOptions_WhenValidRequest() {
+        // given
+        Bungae bungae = bungaeRepository.save(BungaeFixture.createWithDateVoting(group, hostGroupMember));
+
+        List<LocalDate> dateOptions = List.of(
+                LocalDate.now().plusDays(1),
+                LocalDate.now().plusDays(2),
+                LocalDate.now().plusDays(3)
+        );
+
+        dateOptions.forEach(dateOption ->
+                bungaeRecruitDateOptionRepository.save(
+                        BungaeRecruitDateOption.builder()
+                                .dateOption(dateOption)
+                                .bungae(bungae)
+                                .build()
+                )
+        );
+
+        // when
+        List<LocalDate> result = bungaeService.getBungaeDateVoteOptions(member, bungae.getId());
+
+        // then
+        assertThat(result).hasSize(3);
+        assertThat(result).containsExactlyInAnyOrderElementsOf(dateOptions);
     }
 }

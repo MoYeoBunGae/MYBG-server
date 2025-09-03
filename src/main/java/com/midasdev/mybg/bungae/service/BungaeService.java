@@ -19,7 +19,9 @@ import com.midasdev.mybg.group.domain.Group;
 import com.midasdev.mybg.group.repository.GroupRepository;
 import com.midasdev.mybg.group_member.domain.GroupMember;
 import com.midasdev.mybg.group_member.repository.GroupMemberRepository;
+import com.midasdev.mybg.group_member.service.GroupMemberFinder;
 import com.midasdev.mybg.member.domain.Member;
+import java.time.LocalDate;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.ApplicationEventPublisher;
@@ -36,6 +38,8 @@ public class BungaeService {
     private final BungaeAttendeeRepository bungaeAttendeeRepository;
     private final ApplicationEventPublisher eventPublisher;
     private final GroupRepository groupRepository;
+    private final BungaeFinder bungaeFinder;
+    private final GroupMemberFinder groupMemberFinder;
 
     @Transactional
     public Bungae createBungae(Member member, BungaeCreateRequest request) {
@@ -130,6 +134,27 @@ public class BungaeService {
         // 3. 해당 그룹에 속하고 statuses에 포함된 번개모임 조회
         return bungaeRepository.findByGroupIdAndStatusIn(groupId, statuses, pageable);
 
+    }
+
+    public List<LocalDate> getBungaeDateVoteOptions(Member member, Long bungaeId) {
+
+        // 1. 번개 조회 - BungaeFinder로 위임
+        Bungae bungae = bungaeFinder.findById(bungaeId);
+
+        // 2. 번개 상태가 DATE_VOTING인지 검증
+        if (!bungae.canVote()) {
+            throw new ApplicationException(ApplicationExceptionType.BUNGAE_VOTE_UNAVAILABLE, bungaeId);
+        }
+
+        // 3. 멤버가 번개가 속한 그룹에 속하는지 검증 - GroupMemberFinder로 위임
+        groupMemberFinder.findByMemberAndGroup(member, bungae.getGroup());
+
+        // 4. 날짜 후보 조회
+        List<BungaeRecruitDateOption> dateOptions = bungaeRecruitDateOptionRepository.findAllByBungae(bungae);
+
+        return dateOptions.stream()
+                .map(BungaeRecruitDateOption::getDateOption)
+                .toList();
     }
 
 }

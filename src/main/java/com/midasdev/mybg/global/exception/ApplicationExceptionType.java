@@ -112,6 +112,16 @@ public enum ApplicationExceptionType {
         "해당 그룹({1})에 속하는 멤버({0})를 찾을 수 없습니다."
     ),
 
+    // bungae
+    /**
+     * - {0} : bungaeId
+     */
+    BUNGAE_NOT_FOUND_BY_ID(HttpStatus.BAD_REQUEST, "ERR_BUNGAE_001", "해당 ID의 번개를 찾을 수 없습니다. : {0}"),
+    /**
+     * - {0} : bungaeId
+     */
+    BUNGAE_VOTE_UNAVAILABLE(HttpStatus.BAD_REQUEST, "ERR_BUNGAE_002", "번개({0})에 대한 투표가 불가능합니다."),
+
     // authentication
     TOKEN_AUTHENTICATION_EXCEPTION(HttpStatus.FORBIDDEN, "ERR_AUTH_001", "토큰 인증에 실패했습니다. : {0}"),
     NOT_BEARER_TOKEN(HttpStatus.FORBIDDEN, "ERR_AUTH_002", "Bearer Token이 아닙니다."),

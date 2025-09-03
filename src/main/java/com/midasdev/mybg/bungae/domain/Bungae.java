@@ -101,4 +101,8 @@ public class Bungae implements LongIdentifiable {
         return audit != null ? audit.getModifiedAt() : null;
     }
 
+    public boolean canVote() {
+        return this.status == BungaeStatus.DATE_VOTING;
+    }
+
 }
