@@ -49,9 +49,7 @@ public class GroupController {
     public ResponseEntity<GroupResponse> createGroup(@AuthenticationPrincipal Member member,
                                                      @Valid @RequestBody GroupCreateRequest groupCreateRequest) {
         Group savedGroup = groupService.createGroup(member, groupCreateRequest);
-        return ResponseEntity.ok(GroupResponse.from(
-                groupService.findGroupWithStatisticsById(savedGroup.getId())
-        ));
+        return ResponseEntity.ok(GroupResponse.from(savedGroup));
     }
 
     @Operation(summary = "그룹 조회 By 초대코드", description = "초대 코드로 그룹을 조회합니다.", security = @SecurityRequirement(name = SECURITY_SCHEME_NAME))

@@ -42,13 +42,6 @@ public enum ApplicationExceptionType {
             "그룹 정보를 수정할 권한이 없습니다. 요청자(memberId: {0})는 그룹(groupId: {1})의 소유자가 아닙니다."
     ),
 
-    // group statistics
-    GROUP_STATISTICS_NOT_FOUND_BY_ID(
-            HttpStatus.BAD_REQUEST,
-            "ERR_GROUP_STATISTICS_001",
-            "해당 그룹 ID의 그룹 통계를 찾을 수 없습니다. : {0}"
-    ),
-
     // group member
     /**
      * - {0} : memberId

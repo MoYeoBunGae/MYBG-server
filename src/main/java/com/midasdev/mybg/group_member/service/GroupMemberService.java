@@ -5,9 +5,8 @@ import com.midasdev.mybg.global.exception.ApplicationExceptionType;
 import com.midasdev.mybg.global.s3.S3Directory;
 import com.midasdev.mybg.global.s3.S3ImageService;
 import com.midasdev.mybg.group.domain.Group;
-import com.midasdev.mybg.group.domain.GroupStatistics;
 import com.midasdev.mybg.group.repository.GroupRepository;
-import com.midasdev.mybg.group.repository.GroupStatisticsRepository;
+import com.midasdev.mybg.group.service.GroupFinder;
 import com.midasdev.mybg.group_member.controller.dto.request.GroupJoinRequest;
 import com.midasdev.mybg.group_member.controller.dto.request.GroupMemberProfileUpdateRequest;
 import com.midasdev.mybg.group_member.domain.GroupMember;
@@ -23,9 +22,9 @@ import org.springframework.web.multipart.MultipartFile;
 public class GroupMemberService {
 
     private final S3ImageService s3ImageService;
+    private final GroupFinder groupFinder;
     private final GroupRepository groupRepository;
     private final GroupMemberRepository groupMemberRepository;
-    private final GroupStatisticsRepository groupStatisticsRepository;
 
     /**
      * groupMemberId 기반으로 조회 후 로그인 사용자 본인 소유인지 검증
@@ -47,9 +46,8 @@ public class GroupMemberService {
     public GroupMember joinGroup(Member member, GroupJoinRequest groupJoinRequest) {
         // group 검증
         Long requestedGroupId = groupJoinRequest.groupId();
-        Group group = groupRepository.findWithStatisticsById(requestedGroupId)
-                                     .orElseThrow(() -> new ApplicationException(ApplicationExceptionType.GROUP_NOT_FOUND_BY_ID,
-                                                                                 requestedGroupId));
+        Group group = groupFinder.findGroupById(requestedGroupId);
+
         // group에 가입 가능한지 검증
         if (group.isFull()) {
             throw new ApplicationException(ApplicationExceptionType.GROUP_MEMBER_CAPACITY_REACHED, group.getId());
@@ -76,10 +74,7 @@ public class GroupMemberService {
 
     private GroupMember saveGroupMember(GroupMember groupMember, Group group) {
         GroupMember savedGroupMember = groupMemberRepository.save(groupMember);
-        GroupStatistics groupStatistics = groupStatisticsRepository.findById(group.getId()).orElseThrow(
-                () -> new ApplicationException(ApplicationExceptionType.GROUP_STATISTICS_NOT_FOUND_BY_ID, group.getId()));
-
-        groupStatistics.increaseTotalMemberCount();
+        group.addMember();
         return savedGroupMember;
     }
 
@@ -137,8 +132,6 @@ public class GroupMemberService {
         }
 
         groupMember.leave();
-
-        // 그룹 통계 인원 수 감소
-        group.getGroupStatistics().decreaseTotalMemberCount();
+        group.removeMember();
     }
 }

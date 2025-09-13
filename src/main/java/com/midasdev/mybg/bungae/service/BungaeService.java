@@ -17,6 +17,7 @@ import com.midasdev.mybg.global.util.cursor_page.CursorPage;
 import com.midasdev.mybg.global.util.cursor_page.CursorPageable;
 import com.midasdev.mybg.group.domain.Group;
 import com.midasdev.mybg.group.repository.GroupRepository;
+import com.midasdev.mybg.group.service.GroupFinder;
 import com.midasdev.mybg.group_member.domain.GroupMember;
 import com.midasdev.mybg.group_member.repository.GroupMemberRepository;
 import com.midasdev.mybg.group_member.service.GroupMemberFinder;
@@ -39,13 +40,13 @@ public class BungaeService {
     private final ApplicationEventPublisher eventPublisher;
     private final GroupRepository groupRepository;
     private final BungaeFinder bungaeFinder;
+    private final GroupFinder groupFinder;
     private final GroupMemberFinder groupMemberFinder;
 
     @Transactional
     public Bungae createBungae(Member member, BungaeCreateRequest request) {
         // 1. 그룹 존재 여부 검증
-        Group group = groupRepository.findByIdAndDeletedIsFalse(request.groupId())
-                                    .orElseThrow(() -> new ApplicationException(ApplicationExceptionType.GROUP_NOT_FOUND_BY_ID, request.groupId()));
+        Group group = groupFinder.findGroupById(request.groupId());
 
         // 2. 로그인한 멤버가 해당 그룹에 속하는 GroupMember 조회
         GroupMember hostGroupMember = groupMemberRepository.findByMemberAndGroup(member, group)

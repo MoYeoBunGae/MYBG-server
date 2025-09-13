@@ -69,8 +69,8 @@ public class Group {
     @Default
     private Audit audit = new Audit();
 
-    @OneToOne(mappedBy = "group")
-    GroupStatistics groupStatistics;
+    @Column(nullable = false)
+    private Integer totalMemberCount;
 
     public void updateInvitationCode(String invitationCode) {
         this.invitationCode = invitationCode;
@@ -80,12 +80,8 @@ public class Group {
         return this.owner.getId().equals(member.getId());
     }
 
-    public int getTotalMemberCount() {
-        return this.groupStatistics.getTotalMemberCount();
-    }
-
     public boolean isFull() {
-        return this.getTotalMemberCount() >= this.maxMemberCount;
+        return this.totalMemberCount >= this.maxMemberCount;
     }
 
     public void updateName(String name) {
@@ -93,11 +89,10 @@ public class Group {
     }
 
     public void updateMaxMemberCount(int newMaxCount) {
-        int currentTotal = this.getTotalMemberCount();
-        if (newMaxCount < currentTotal) {
+        if (newMaxCount < this.totalMemberCount) {
             throw new ApplicationException(
                     ApplicationExceptionType.GROUP_MAX_COUNT_BELOW_CURRENT,
-                    newMaxCount, currentTotal
+                    newMaxCount, this.maxMemberCount
             );
         }
         this.maxMemberCount = newMaxCount;
@@ -105,6 +100,14 @@ public class Group {
 
     public void updateProfileImageUrl(String imageUrl) {
         this.profileImageUrl = imageUrl;
+    }
+
+    public void addMember() {
+        this.totalMemberCount += 1;
+    }
+
+    public void removeMember() {
+        this.totalMemberCount -= 1;
     }
 
 }
