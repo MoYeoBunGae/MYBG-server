@@ -92,7 +92,7 @@ public class Group {
         if (newMaxCount < this.totalMemberCount) {
             throw new ApplicationException(
                     ApplicationExceptionType.GROUP_MAX_COUNT_BELOW_CURRENT,
-                    newMaxCount, this.maxMemberCount
+                    newMaxCount, this.totalMemberCount
             );
         }
         this.maxMemberCount = newMaxCount;
