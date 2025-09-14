@@ -6,9 +6,9 @@ import java.util.Optional;
 
 public interface GroupRepositoryCustom {
 
-    Optional<Group> findWithStatisticsById(Long groupId);
-
-    List<Group> findGroupsWithStatisticsByMemberId(Long memberId);
+    List<Group> findGroupsByMemberId(Long memberId);
 
     Optional<Group> findByInvitationCode(String invitationCode);
+
+
 }

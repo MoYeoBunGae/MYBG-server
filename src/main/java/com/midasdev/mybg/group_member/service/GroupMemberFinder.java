@@ -30,5 +30,17 @@ public class GroupMemberFinder {
                 ));
     }
 
+    private GroupMember findById(Long groupMemberId) {
+        return groupMemberRepository.findEntityById(groupMemberId)
+                                    .orElseThrow(() -> new ApplicationException(ApplicationExceptionType.GROUP_MEMBER_NOT_FOUND_BY_ID, groupMemberId));
+    }
+
+    public GroupMember findByIdAndMember(Long groupMemberId, Member member) {
+        GroupMember groupMember = findById(groupMemberId);
+        if (!groupMember.belongsTo(member.getId())) {
+            throw new ApplicationException(ApplicationExceptionType.GROUP_MEMBER_DOES_NOT_BELONG_TO_MEMBER, groupMemberId, member.getId());
+        }
+        return groupMember;
+    }
 }
 

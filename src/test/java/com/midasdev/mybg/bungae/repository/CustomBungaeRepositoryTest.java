@@ -84,6 +84,7 @@ class CustomBungaeRepositoryTest {
         groupMember = groupMemberRepository.save(GroupMemberFixture.create(group, member));
         otherGroupMember = groupMemberRepository.save(GroupMemberFixture.create(otherGroup, otherMember));
         memberInOtherGroup = groupMemberRepository.save(GroupMemberFixture.create(otherGroup, member));
+        otherGroup.addMember();
 
         // 각 BungaeStatus별로 Bungae 생성 및 저장
         groupSavedBungaes = new ArrayList<>();

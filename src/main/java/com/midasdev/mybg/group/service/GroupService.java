@@ -10,9 +10,7 @@ import com.midasdev.mybg.global.util.assertion.Assertion;
 import com.midasdev.mybg.group.controller.dto.request.GroupCreateRequest;
 import com.midasdev.mybg.group.controller.dto.request.GroupUpdateRequest;
 import com.midasdev.mybg.group.domain.Group;
-import com.midasdev.mybg.group.domain.GroupStatistics;
 import com.midasdev.mybg.group.repository.GroupRepository;
-import com.midasdev.mybg.group.repository.GroupStatisticsRepository;
 import com.midasdev.mybg.group.service.component.InvitationCodeGenerator;
 import com.midasdev.mybg.group_member.domain.GroupMember;
 import com.midasdev.mybg.group_member.repository.GroupMemberRepository;
@@ -35,20 +33,10 @@ public class GroupService {
 
     private final DefaultProfileImageService defaultProfileImageService;
     private final S3ImageService s3ImageService;
+    private final GroupFinder groupFinder;
     private final GroupRepository groupRepository;
     private final InvitationCodeGenerator invitationCodeGenerator;
     private final GroupMemberRepository groupMemberRepository;
-    private final GroupStatisticsRepository groupStatisticsRepository;
-
-    private Group findGroupById(Long groupId) {
-        return groupRepository.findByIdAndDeletedIsFalse(groupId)
-                                        .orElseThrow(() -> new ApplicationException(ApplicationExceptionType.GROUP_NOT_FOUND_BY_ID, groupId));
-    }
-
-    public Group findGroupWithStatisticsById(Long groupId) {
-        return groupRepository.findWithStatisticsById(groupId)
-                              .orElseThrow(() -> new ApplicationException(ApplicationExceptionType.GROUP_NOT_FOUND_BY_ID, groupId));
-    }
 
     @Transactional
     public Group createGroup(Member member, GroupCreateRequest groupCreateRequest) {
@@ -61,6 +49,7 @@ public class GroupService {
                            .name(groupCreateRequest.name())
                            .profileImageUrl(profileImageUrl)
                            .maxMemberCount(groupCreateRequest.maxMemberCount())
+                           .totalMemberCount(1) // 그룹 생성 시점에 방장 포함 1명
                            .deleted(false)
                            .build();
 
@@ -71,9 +60,6 @@ public class GroupService {
 
         // 그룹 생성자를 그룹 멤버로 추가
         addOwnerToGroupMember(member, savedGroup);
-
-        // 통계 테이블 row 생성
-        createGroupStatistics(savedGroup);
 
         return savedGroup;
     }
@@ -97,14 +83,6 @@ public class GroupService {
         return code;
     }
 
-    private void createGroupStatistics(Group group) {
-        groupStatisticsRepository.save(GroupStatistics.builder()
-                                                      .group(group)
-                                                      .totalMemberCount(1)
-                                                      .totalBungaeCount(0)
-                                                      .build());
-    }
-
     @Transactional(readOnly = true)
     public Group findGroupByInvitationCode(String invitationCode) {
         validateInvitationCode(invitationCode);
@@ -120,15 +98,12 @@ public class GroupService {
     }
 
     public List<Group> findGroupsByMember(Member member) {
-        return groupRepository.findGroupsWithStatisticsByMemberId(member.getId());
+        return groupRepository.findGroupsByMemberId(member.getId());
     }
 
     public int countGroupMembers(Long groupId) {
-        Group group = findGroupById(groupId);
-        GroupStatistics groupStatistics = groupStatisticsRepository.findById(group.getId())
-                                                                   .orElseThrow(() -> new ApplicationException(
-                                                                           ApplicationExceptionType.GROUP_STATISTICS_NOT_FOUND_BY_ID, group.getId()));
-        return groupStatistics.getTotalMemberCount();
+        Group group = groupFinder.findById(groupId);
+        return group.getTotalMemberCount();
     }
 
     /**
@@ -139,11 +114,7 @@ public class GroupService {
     @Transactional
     public Group updateGroup(Long groupId, Member member, GroupUpdateRequest request) {
         // 1. 그룹 조회
-        Group group = groupRepository.findById(groupId)
-                                     .orElseThrow(() -> new ApplicationException(
-                                             ApplicationExceptionType.GROUP_NOT_FOUND_BY_ID,
-                                             groupId
-                                     ));
+        Group group = groupFinder.findById(groupId);
 
         // 2. 그룹 소유자인지 검증
         if (!group.isOwnedBy(member)) {
@@ -175,7 +146,7 @@ public class GroupService {
 
     @Transactional(readOnly = true)
     public Pair<Group, List<GroupMember>> getAllGroupMembers(Long groupId, Member loginMember) {
-        Group group = findGroupById(groupId);
+        Group group = groupFinder.findById(groupId);
 
         // 요청자 검증 - 소속 여부 확인
         boolean isMember = groupMemberRepository.existsByGroupIdAndMemberIdAndDeletedFalse(groupId, loginMember.getId());

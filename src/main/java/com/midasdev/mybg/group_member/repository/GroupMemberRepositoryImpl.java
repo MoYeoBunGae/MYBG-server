@@ -45,4 +45,18 @@ public class GroupMemberRepositoryImpl implements GroupMemberRepositoryCustom {
         return Optional.ofNullable(result);
     }
 
+    @Override
+    public Optional<GroupMember> findEntityById(Long groupMemberId) {
+        GroupMember result = queryFactory.selectFrom(groupMember)
+                .leftJoin(groupMember.member, this.member).fetchJoin()
+                .leftJoin(groupMember.group, this.group).fetchJoin()
+                .where(
+                        groupMember.id.eq(groupMemberId),
+                        groupMember.deleted.isFalse()
+                )
+                .fetchOne();
+
+        return Optional.ofNullable(result);
+    }
+
 }

@@ -5,9 +5,7 @@ import com.midasdev.mybg.global.exception.ApplicationExceptionType;
 import com.midasdev.mybg.global.s3.S3Directory;
 import com.midasdev.mybg.global.s3.S3ImageService;
 import com.midasdev.mybg.group.domain.Group;
-import com.midasdev.mybg.group.domain.GroupStatistics;
-import com.midasdev.mybg.group.repository.GroupRepository;
-import com.midasdev.mybg.group.repository.GroupStatisticsRepository;
+import com.midasdev.mybg.group.service.GroupFinder;
 import com.midasdev.mybg.group_member.controller.dto.request.GroupJoinRequest;
 import com.midasdev.mybg.group_member.controller.dto.request.GroupMemberProfileUpdateRequest;
 import com.midasdev.mybg.group_member.domain.GroupMember;
@@ -23,33 +21,16 @@ import org.springframework.web.multipart.MultipartFile;
 public class GroupMemberService {
 
     private final S3ImageService s3ImageService;
-    private final GroupRepository groupRepository;
+    private final GroupFinder groupFinder;
     private final GroupMemberRepository groupMemberRepository;
-    private final GroupStatisticsRepository groupStatisticsRepository;
-
-    /**
-     * groupMemberId 기반으로 조회 후 로그인 사용자 본인 소유인지 검증
-     */
-    private GroupMember findGroupMemberByIdAndMember(Long groupMemberId, Member loginMember) {
-        GroupMember groupMember = groupMemberRepository.findById(groupMemberId)
-                                                       .orElseThrow(() -> new ApplicationException(
-                                                               ApplicationExceptionType.GROUP_MEMBER_NOT_FOUND, groupMemberId));
-
-        if (!groupMember.belongsTo(loginMember.getId())) {
-            throw new ApplicationException(ApplicationExceptionType.GROUP_MEMBER_DOES_NOT_BELONG_TO_MEMBER,
-                                           groupMemberId, loginMember.getId());
-        }
-
-        return groupMember;
-    }
+    private final GroupMemberFinder groupMemberFinder;
 
     @Transactional
     public GroupMember joinGroup(Member member, GroupJoinRequest groupJoinRequest) {
         // group 검증
         Long requestedGroupId = groupJoinRequest.groupId();
-        Group group = groupRepository.findWithStatisticsById(requestedGroupId)
-                                     .orElseThrow(() -> new ApplicationException(ApplicationExceptionType.GROUP_NOT_FOUND_BY_ID,
-                                                                                 requestedGroupId));
+        Group group = groupFinder.findById(requestedGroupId);
+
         // group에 가입 가능한지 검증
         if (group.isFull()) {
             throw new ApplicationException(ApplicationExceptionType.GROUP_MEMBER_CAPACITY_REACHED, group.getId());
@@ -76,10 +57,7 @@ public class GroupMemberService {
 
     private GroupMember saveGroupMember(GroupMember groupMember, Group group) {
         GroupMember savedGroupMember = groupMemberRepository.save(groupMember);
-        GroupStatistics groupStatistics = groupStatisticsRepository.findById(group.getId()).orElseThrow(
-                () -> new ApplicationException(ApplicationExceptionType.GROUP_STATISTICS_NOT_FOUND_BY_ID, group.getId()));
-
-        groupStatistics.increaseTotalMemberCount();
+        group.addMember();
         return savedGroupMember;
     }
 
@@ -90,27 +68,15 @@ public class GroupMemberService {
 
     @Transactional
     public GroupMember updateProfile(Long groupMemberId, Member member, GroupMemberProfileUpdateRequest request) {
-        // 1. 그룹 멤버 조회
-        GroupMember groupMember = groupMemberRepository.findById(groupMemberId)
-                                                       .orElseThrow(() -> new ApplicationException(
-                                                               ApplicationExceptionType.GROUP_MEMBER_NOT_FOUND,
-                                                               member.getId(), groupMemberId
-                                                       ));
+        // 1. 검증된 그룹 멤버 조회
+        GroupMember groupMember = groupMemberFinder.findByIdAndMember(groupMemberId, member);
 
-        // 2. 요청 유저의 소유 여부 검증
-        if (!groupMember.belongsTo(member.getId())) {
-            throw new ApplicationException(
-                    ApplicationExceptionType.GROUP_MEMBER_NOT_FOUND,
-                    member.getId(), groupMemberId
-            );
-        }
-
-        // 3. 닉네임 업데이트
+        // 2. 닉네임 업데이트
         if (request.nickname() != null) {
             groupMember.updateNickname(request.nickname());
         }
 
-        // 4. 이미지 업데이트
+        // 3. 이미지 업데이트
         MultipartFile image = request.image();
         if (image != null && !image.isEmpty()) {
             String imageUrl = s3ImageService.upload(image, S3Directory.GROUP_MEMBER_PROFILE_IMAGES);
@@ -127,7 +93,7 @@ public class GroupMemberService {
      */
     @Transactional
     public void leaveGroup(Long groupMemberId, Member loginMember) {
-        GroupMember groupMember = findGroupMemberByIdAndMember(groupMemberId, loginMember);
+        GroupMember groupMember = groupMemberFinder.findByIdAndMember(groupMemberId, loginMember);
 
         Group group = groupMember.getGroup();
 
@@ -137,8 +103,6 @@ public class GroupMemberService {
         }
 
         groupMember.leave();
-
-        // 그룹 통계 인원 수 감소
-        group.getGroupStatistics().decreaseTotalMemberCount();
+        group.removeMember();
     }
 }
