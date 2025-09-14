@@ -6,20 +6,18 @@ import com.midasdev.mybg.bungae.domain.BungaeAttendee;
 import com.midasdev.mybg.bungae.domain.BungaeDateTime;
 import com.midasdev.mybg.bungae.domain.BungaeRecruitDateOption;
 import com.midasdev.mybg.bungae.domain.BungaeStatus;
-import com.midasdev.mybg.bungae.repository.dto.BungaeDto;
 import com.midasdev.mybg.bungae.repository.BungaeAttendeeRepository;
 import com.midasdev.mybg.bungae.repository.BungaeRecruitDateOptionRepository;
 import com.midasdev.mybg.bungae.repository.BungaeRepository;
+import com.midasdev.mybg.bungae.repository.dto.BungaeDto;
 import com.midasdev.mybg.bungae.service.event.BungaeVoteCreatedEvent;
 import com.midasdev.mybg.global.exception.ApplicationException;
 import com.midasdev.mybg.global.exception.ApplicationExceptionType;
 import com.midasdev.mybg.global.util.cursor_page.CursorPage;
 import com.midasdev.mybg.global.util.cursor_page.CursorPageable;
 import com.midasdev.mybg.group.domain.Group;
-import com.midasdev.mybg.group.repository.GroupRepository;
 import com.midasdev.mybg.group.service.GroupFinder;
 import com.midasdev.mybg.group_member.domain.GroupMember;
-import com.midasdev.mybg.group_member.repository.GroupMemberRepository;
 import com.midasdev.mybg.group_member.service.GroupMemberFinder;
 import com.midasdev.mybg.member.domain.Member;
 import java.time.LocalDate;
@@ -33,12 +31,10 @@ import org.springframework.transaction.annotation.Transactional;
 @RequiredArgsConstructor
 public class BungaeService {
 
-    private final GroupMemberRepository groupMemberRepository;
     private final BungaeRepository bungaeRepository;
     private final BungaeRecruitDateOptionRepository bungaeRecruitDateOptionRepository;
     private final BungaeAttendeeRepository bungaeAttendeeRepository;
     private final ApplicationEventPublisher eventPublisher;
-    private final GroupRepository groupRepository;
     private final BungaeFinder bungaeFinder;
     private final GroupFinder groupFinder;
     private final GroupMemberFinder groupMemberFinder;
@@ -46,14 +42,10 @@ public class BungaeService {
     @Transactional
     public Bungae createBungae(Member member, BungaeCreateRequest request) {
         // 1. 그룹 존재 여부 검증
-        Group group = groupFinder.findGroupById(request.groupId());
+        Group group = groupFinder.findById(request.groupId());
 
         // 2. 로그인한 멤버가 해당 그룹에 속하는 GroupMember 조회
-        GroupMember hostGroupMember = groupMemberRepository.findByMemberAndGroup(member, group)
-                                                           .orElseThrow(() -> new ApplicationException(
-                                                                   ApplicationExceptionType.GROUP_MEMBER_NOT_FOUND_BY_GROUP_ID,
-                                                                   member.getId(), request.groupId()
-                                                           ));
+        GroupMember hostGroupMember = groupMemberFinder.findByMemberAndGroup(member, group);
 
         // 3. Bungae 엔티티 생성 - 날짜 후보에 따라 Status 및 bungaeDateTime 설정
         BungaeStatus status = request.hasSingleDateCandidate()
@@ -125,12 +117,10 @@ public class BungaeService {
 
     public CursorPage<BungaeDto> findBungaesByGroupIdAndStatuses(Member member, Long groupId, List<BungaeStatus> statuses, CursorPageable pageable) {
         // 1. 그룹 존재 여부 검증
-        Group group = groupRepository.findByIdAndDeletedIsFalse(groupId)
-                                    .orElseThrow(() -> new ApplicationException(ApplicationExceptionType.GROUP_NOT_FOUND_BY_ID, groupId));
+        Group group = groupFinder.findById(groupId);
 
         // 2. 멤버가 그룹에 속하는지 검증
-        groupMemberRepository.findByMemberAndGroup(member, group)
-                             .orElseThrow(() -> new ApplicationException(ApplicationExceptionType.GROUP_MEMBER_NOT_FOUND_BY_GROUP_ID, member.getId(), groupId));
+        groupMemberFinder.findByMemberAndGroup(member, group);
 
         // 3. 해당 그룹에 속하고 statuses에 포함된 번개모임 조회
         return bungaeRepository.findByGroupIdAndStatusIn(groupId, statuses, pageable);

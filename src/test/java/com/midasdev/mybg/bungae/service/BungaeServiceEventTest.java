@@ -13,17 +13,16 @@ import com.midasdev.mybg.bungae.repository.BungaeRepository;
 import com.midasdev.mybg.bungae.service.event.BungaeVoteCreatedEvent;
 import com.midasdev.mybg.group.domain.Group;
 import com.midasdev.mybg.group.fixture.GroupFixture;
-import com.midasdev.mybg.group.repository.GroupRepository;
+import com.midasdev.mybg.group.service.GroupFinder;
 import com.midasdev.mybg.group_member.domain.GroupMember;
 import com.midasdev.mybg.group_member.fixture.GroupMemberFixture;
-import com.midasdev.mybg.group_member.repository.GroupMemberRepository;
+import com.midasdev.mybg.group_member.service.GroupMemberFinder;
 import com.midasdev.mybg.member.domain.Member;
 import com.midasdev.mybg.member.fixture.MemberFixture;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.List;
-import java.util.Optional;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -37,8 +36,6 @@ import org.springframework.context.ApplicationEventPublisher;
 class BungaeServiceEventTest {
 
     @Mock
-    private GroupMemberRepository groupMemberRepository;
-    @Mock
     private BungaeRepository bungaeRepository;
     @Mock
     private BungaeRecruitDateOptionRepository bungaeRecruitDateOptionRepository;
@@ -47,7 +44,9 @@ class BungaeServiceEventTest {
     @Mock
     private ApplicationEventPublisher eventPublisher;
     @Mock
-    private GroupRepository groupRepository;
+    private GroupFinder groupFinder;
+    @Mock
+    private GroupMemberFinder groupMemberFinder;
 
     @InjectMocks
     private BungaeService bungaeService;
@@ -61,12 +60,6 @@ class BungaeServiceEventTest {
         member = MemberFixture.create();
         group = GroupFixture.create(member);
         hostGroupMember = GroupMemberFixture.create(group, member);
-
-        when(groupRepository.findByIdAndDeletedIsFalse(group.getId()))
-                .thenReturn(Optional.of(group));
-
-        when(groupMemberRepository.findByMemberAndGroup(member, group))
-                .thenReturn(Optional.of(hostGroupMember));
 
         when(bungaeRepository.save(any(Bungae.class)))
                 .thenAnswer(invocation -> invocation.getArgument(0));

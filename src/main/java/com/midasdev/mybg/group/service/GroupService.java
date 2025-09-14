@@ -102,7 +102,7 @@ public class GroupService {
     }
 
     public int countGroupMembers(Long groupId) {
-        Group group = groupFinder.findGroupById(groupId);
+        Group group = groupFinder.findById(groupId);
         return group.getTotalMemberCount();
     }
 
@@ -114,11 +114,7 @@ public class GroupService {
     @Transactional
     public Group updateGroup(Long groupId, Member member, GroupUpdateRequest request) {
         // 1. 그룹 조회
-        Group group = groupRepository.findById(groupId)
-                                     .orElseThrow(() -> new ApplicationException(
-                                             ApplicationExceptionType.GROUP_NOT_FOUND_BY_ID,
-                                             groupId
-                                     ));
+        Group group = groupFinder.findById(groupId);
 
         // 2. 그룹 소유자인지 검증
         if (!group.isOwnedBy(member)) {
@@ -150,7 +146,7 @@ public class GroupService {
 
     @Transactional(readOnly = true)
     public Pair<Group, List<GroupMember>> getAllGroupMembers(Long groupId, Member loginMember) {
-        Group group = groupFinder.findGroupById(groupId);
+        Group group = groupFinder.findById(groupId);
 
         // 요청자 검증 - 소속 여부 확인
         boolean isMember = groupMemberRepository.existsByGroupIdAndMemberIdAndDeletedFalse(groupId, loginMember.getId());

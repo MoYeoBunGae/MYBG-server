@@ -104,6 +104,11 @@ public enum ApplicationExceptionType {
         "ERR_GROUP_MEMBER_008",
         "해당 그룹({1})에 속하는 멤버({0})를 찾을 수 없습니다."
     ),
+    GROUP_MEMBER_NOT_FOUND_BY_ID(
+        HttpStatus.BAD_REQUEST,
+        "ERR_GROUP_MEMBER_009",
+        "해당 ID의 그룹 멤버를 찾을 수 없습니다. : {0}"
+    ),
 
     // bungae
     /**
