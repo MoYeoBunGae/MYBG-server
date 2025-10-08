@@ -29,4 +29,12 @@ public class BungaeDateTime {
         this.time = time;
     }
 
+    public void updateDate(LocalDate date) {
+        this.date = date;
+    }
+
+    public boolean isDateSet() {
+        return this.date != null;
+    }
+
 }

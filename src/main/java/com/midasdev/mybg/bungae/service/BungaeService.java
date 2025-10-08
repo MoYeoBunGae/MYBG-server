@@ -1,18 +1,23 @@
 package com.midasdev.mybg.bungae.service;
 
 import com.midasdev.mybg.bungae.controller.dto.request.BungaeCreateRequest;
+import com.midasdev.mybg.bungae.controller.dto.response.BungaeDateVoteResponse;
 import com.midasdev.mybg.bungae.domain.Bungae;
 import com.midasdev.mybg.bungae.domain.BungaeAttendee;
 import com.midasdev.mybg.bungae.domain.BungaeDateTime;
+import com.midasdev.mybg.bungae.domain.BungaeDateVote;
 import com.midasdev.mybg.bungae.domain.BungaeRecruitDateOption;
 import com.midasdev.mybg.bungae.domain.BungaeStatus;
 import com.midasdev.mybg.bungae.repository.BungaeAttendeeRepository;
+import com.midasdev.mybg.bungae.repository.BungaeDateVoteRepository;
 import com.midasdev.mybg.bungae.repository.BungaeRecruitDateOptionRepository;
 import com.midasdev.mybg.bungae.repository.BungaeRepository;
+import com.midasdev.mybg.bungae.repository.dto.BungaeDateVoteInfoDto;
 import com.midasdev.mybg.bungae.repository.dto.BungaeDto;
 import com.midasdev.mybg.bungae.service.event.BungaeVoteCreatedEvent;
 import com.midasdev.mybg.global.exception.ApplicationException;
 import com.midasdev.mybg.global.exception.ApplicationExceptionType;
+import com.midasdev.mybg.global.lock.NamedLockManager;
 import com.midasdev.mybg.global.util.cursor_page.CursorPage;
 import com.midasdev.mybg.global.util.cursor_page.CursorPageable;
 import com.midasdev.mybg.group.domain.Group;
@@ -38,6 +43,8 @@ public class BungaeService {
     private final BungaeFinder bungaeFinder;
     private final GroupFinder groupFinder;
     private final GroupMemberFinder groupMemberFinder;
+    private final BungaeDateVoteRepository bungaeDateVoteRepository;
+    private final NamedLockManager namedLockManager;
 
     @Transactional
     public Bungae createBungae(Member member, BungaeCreateRequest request) {
@@ -93,6 +100,7 @@ public class BungaeService {
             });
         }
 
+        // TODO: 삭제
         // 6. Bungae 참여자에 host GroupMember 추가
         BungaeAttendee attendee = BungaeAttendee.builder()
                                                 .bungae(savedBungae)
@@ -102,6 +110,7 @@ public class BungaeService {
         bungaeAttendeeRepository.save(attendee);
 
         eventPublisher.publishEvent(new BungaeVoteCreatedEvent(savedBungae.getId()));
+        // TODO: 투표 생성 이벤트 처리 (필요한가? - 처리할 리스트 정리부터)
 
         // 필요하다면 반환
         return savedBungae;
@@ -144,8 +153,88 @@ public class BungaeService {
         List<BungaeRecruitDateOption> dateOptions = bungaeRecruitDateOptionRepository.findAllByBungae(bungae);
 
         return dateOptions.stream()
-                .map(BungaeRecruitDateOption::getDateOption)
-                .toList();
+                          .map(BungaeRecruitDateOption::getDateOption)
+                          .toList();
+    }
+
+    /**
+     * 번개 날짜 투표 서비스
+     *
+     * @param member   로그인 멤버
+     * @param bungaeId 번개 ID
+     * @param voteDate 투표 날짜
+     * @return BungaeDateVoteResponse
+     */
+    @Transactional
+    public BungaeDateVoteResponse voteBungaeDate(Member member, Long bungaeId, LocalDate voteDate) {
+        // 0. 동시성 제어: 번개 ID 기반 락 획득
+        String lockKey = "bungae:" + bungaeId;
+        boolean lockAcquired = false;
+
+        for (int i = 0; i < 3; i++) { // 최대 3회 재시도
+            lockAcquired = namedLockManager.tryAcquire(lockKey, 1);
+            if (lockAcquired) {
+                break;
+            }
+        }
+
+        if (!lockAcquired) {
+            throw new ApplicationException(ApplicationExceptionType.BUNGAE_VOTE_CONCURRENCY_LOCK_FAILED, bungaeId);
+        }
+
+        //  1. 번개 조회 및 검증
+        Bungae bungae = bungaeFinder.findById(bungaeId);
+
+        //  2. 그룹 멤버 검증
+        GroupMember groupMember = groupMemberFinder.findByMemberAndGroup(member, bungae.getGroup());
+
+        boolean hasVoted = false;
+        // 3. 투표 가능 조건: 번개가 DATE_VOTING 상태여야 함 (이미 구현됨)
+        if (bungae.canVote()) {
+            // 3t. 투표가 가능하다면
+            // 3t-1) 투표 날짜 정보를 조회. (BungaeRecruitDateOption를 기반으로, 해당 날짜 투표수와 내가 투표했는지 여부를 함께 조회)
+            BungaeDateVoteInfoDto voteInfoDto = bungaeRecruitDateOptionRepository.findVoteInfoByDate(bungaeId, voteDate, groupMember.getId())
+                                                                                 .orElseThrow(() -> new ApplicationException(
+                                                                                         ApplicationExceptionType.BUNGAE_DATE_OPTION_NOT_FOUND,
+                                                                                         bungaeId, voteDate));
+
+            if (Boolean.TRUE.equals(voteInfoDto.voted())) {
+                throw new ApplicationException(ApplicationExceptionType.ALREADY_VOTED_FOR_BUNGAE_DATE, bungaeId, voteDate);
+            }
+
+            // 3t-2) 투표처리 : BungaeDateVote 엔티티 생성 및 저장
+            BungaeDateVote dateVote = BungaeDateVote.builder()
+                                                    .voter(groupMember)
+                                                    .dateOption(voteInfoDto.dateOption())
+                                                    .build();
+            bungaeDateVoteRepository.save(dateVote);
+            hasVoted = true;
+
+            if (bungae.isOneLeftToMinAttendees(voteInfoDto.voteCount())) {
+                // 3t-3t)-1) 최소 인원수 달성 시 날짜 확정 및 상태 변경
+                bungae.confirmDate(voteDate);
+
+                // 3t-4)-2) 해당 날짜에 투표한 인원들은 번개 참여자로 변경
+                List<BungaeDateVote> voters = bungaeDateVoteRepository.findBungaeDateVotesByDateOption(voteInfoDto.dateOption());
+
+                bungaeAttendeeRepository.saveAll(voters.stream()
+                                                       .map(BungaeDateVote::getVoter)
+                                                       .map(voter -> BungaeAttendee.builder()
+                                                                                   .bungae(bungae)
+                                                                                   .groupMember(voter)
+                                                                                   .deleted(false)
+                                                                                   .build())
+                                                       .toList());
+                // 3t-4)-3) TODO: 채팅방 생성 및 푸쉬 알림 전송
+            }
+        }
+
+        return BungaeDateVoteResponse.builder()
+                                     .isVoteSucceeded(hasVoted)
+                                     .isDateFixed(bungae.isDateFixed())
+                                     .isJoinable(bungae.canJoin())
+                                     .bungaeStatus(bungae.getStatus())
+                                     .build();
     }
 
 }
