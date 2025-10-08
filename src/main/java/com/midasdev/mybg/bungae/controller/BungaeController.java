@@ -5,6 +5,7 @@ import static com.midasdev.mybg.config.swagger.SwaggerConfig.SECURITY_SCHEME_NAM
 import com.midasdev.mybg.bungae.controller.dto.request.BungaeCreateRequest;
 import com.midasdev.mybg.bungae.controller.dto.request.GetMyBungaesRequest;
 import com.midasdev.mybg.bungae.controller.dto.request.GetGroupBungaesRequest;
+import com.midasdev.mybg.bungae.controller.dto.response.BungaeDateVoteResponse;
 import com.midasdev.mybg.bungae.controller.dto.response.BungaeResponse;
 import com.midasdev.mybg.bungae.controller.dto.response.BungaeDateVoteOptionResponse;
 import com.midasdev.mybg.bungae.domain.Bungae;
@@ -16,6 +17,7 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotNull;
 import java.time.LocalDate;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -130,6 +132,24 @@ public class BungaeController {
                 member, bungaeId
         );
         return ResponseEntity.ok(new BungaeDateVoteOptionResponse(dateOptions));
+    }
+
+    @Operation(
+            summary = "번개 날짜 투표 API",
+            description = """
+                    번개 날짜에 투표합니다.
+                    - Response : BungaeDateVoteResponse
+                    """,
+            security = @SecurityRequirement(name = SECURITY_SCHEME_NAME)
+    )
+    @PostMapping(value = "/{bungaeId}/date-vote")
+    public ResponseEntity<BungaeDateVoteResponse> voteBungaeDate(
+            @AuthenticationPrincipal Member member,
+            @PathVariable Long bungaeId,
+            @RequestBody @NotNull LocalDate voteDate
+    ) {
+        BungaeDateVoteResponse response = bungaeService.voteBungaeDate(member, bungaeId, voteDate);
+        return ResponseEntity.ok(response);
     }
 
 }
