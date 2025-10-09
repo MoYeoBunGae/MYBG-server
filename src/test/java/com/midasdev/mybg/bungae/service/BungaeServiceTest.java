@@ -3,10 +3,13 @@ package com.midasdev.mybg.bungae.service;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import com.midasdev.mybg.bungae.controller.dto.request.BungaeCreateRequest;
+import com.midasdev.mybg.bungae.controller.dto.response.BungaeDateVoteResponse;
 import com.midasdev.mybg.bungae.domain.Bungae;
+import com.midasdev.mybg.bungae.domain.BungaeDateVote;
 import com.midasdev.mybg.bungae.domain.BungaeRecruitDateOption;
 import com.midasdev.mybg.bungae.domain.BungaeStatus;
 import com.midasdev.mybg.bungae.fixture.BungaeFixture;
+import com.midasdev.mybg.bungae.repository.BungaeDateVoteRepository;
 import com.midasdev.mybg.bungae.repository.BungaeRecruitDateOptionRepository;
 import com.midasdev.mybg.bungae.repository.BungaeRepository;
 import com.midasdev.mybg.group.domain.Group;
@@ -52,15 +55,22 @@ class BungaeServiceTest {
     @Autowired
     private BungaeRecruitDateOptionRepository bungaeRecruitDateOptionRepository;
 
+    @Autowired
+    private BungaeDateVoteRepository bungaeDateVoteRepository;
+
     private Group group;
     private Member member;
+    private Member member2;
     private GroupMember hostGroupMember;
+    private GroupMember groupMember2;
 
     @BeforeEach
     void setUp() {
         member = memberRepository.save(MemberFixture.create());
+        member2 = memberRepository.save(MemberFixture.createSecondMember());
         group = groupRepository.save(GroupFixture.create(member));
         hostGroupMember = groupMemberRepository.save(GroupMemberFixture.create(group, member));
+        groupMember2 = groupMemberRepository.save(GroupMemberFixture.create(group, member2));
     }
 
     @AfterEach
@@ -197,5 +207,31 @@ class BungaeServiceTest {
         // then
         assertThat(result).hasSize(3);
         assertThat(result).containsExactlyInAnyOrderElementsOf(dateOptions);
+    }
+
+    @Test
+    @DisplayName("B-5-S-1: 투표가 가능한 상태에서 투표하면 해당 날짜의 투표가 추가되고, isVoteSucceeded=true 반환")
+    void voteBungaeDate_ShouldSucceedAndIncreaseVoteCount_WhenVoteIsAvailable() {
+        // given
+        Bungae bungae = bungaeRepository.save(BungaeFixture.createWithDateVoting(group, hostGroupMember));
+        LocalDate voteDate = LocalDate.now().plusDays(1);
+        BungaeRecruitDateOption dateOption = bungaeRecruitDateOptionRepository.save(
+                BungaeRecruitDateOption.builder()
+                        .dateOption(voteDate)
+                        .bungae(bungae)
+                        .build()
+        );
+
+        // when
+        BungaeDateVoteResponse response = bungaeService.voteBungaeDate(member2, bungae.getId(), voteDate);
+
+        // then
+        assertThat(response.isVoteSucceeded()).isTrue();
+
+        // BungaeDateVote 데이터가 실제로 추가되었는지 검증
+        List<BungaeDateVote> votes = bungaeDateVoteRepository.findBungaeDateVotesByDateOption(dateOption);
+        assertThat(votes.stream()
+                .anyMatch(voter -> voter.getVoter().getId().equals(groupMember2.getId())))
+                .isTrue();
     }
 }
