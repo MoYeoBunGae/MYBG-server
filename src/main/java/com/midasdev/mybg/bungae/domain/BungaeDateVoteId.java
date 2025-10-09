@@ -3,10 +3,12 @@ package com.midasdev.mybg.bungae.domain;
 import jakarta.persistence.Embeddable;
 import java.util.Objects;
 import lombok.AccessLevel;
+import lombok.AllArgsConstructor;
 import lombok.NoArgsConstructor;
 
 @Embeddable
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
+@AllArgsConstructor
 public class BungaeDateVoteId {
 
     private Long voterId;

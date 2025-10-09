@@ -6,6 +6,7 @@ import com.midasdev.mybg.bungae.domain.Bungae;
 import com.midasdev.mybg.bungae.domain.BungaeAttendee;
 import com.midasdev.mybg.bungae.domain.BungaeDateTime;
 import com.midasdev.mybg.bungae.domain.BungaeDateVote;
+import com.midasdev.mybg.bungae.domain.BungaeDateVoteId;
 import com.midasdev.mybg.bungae.domain.BungaeRecruitDateOption;
 import com.midasdev.mybg.bungae.domain.BungaeStatus;
 import com.midasdev.mybg.bungae.repository.BungaeAttendeeRepository;
@@ -99,6 +100,8 @@ public class BungaeService {
                 bungaeRecruitDateOptionRepository.save(option);
             });
         }
+
+        // TODO: 날짜 후보에 대해 번개 생성자의 투표를 저장
 
         // TODO: 삭제
         // 6. Bungae 참여자에 host GroupMember 추가
@@ -204,6 +207,7 @@ public class BungaeService {
 
             // 3t-2) 투표처리 : BungaeDateVote 엔티티 생성 및 저장
             BungaeDateVote dateVote = BungaeDateVote.builder()
+                                                    .id(new BungaeDateVoteId(groupMember.getId(), voteInfoDto.dateOption().getId()))
                                                     .voter(groupMember)
                                                     .dateOption(voteInfoDto.dateOption())
                                                     .build();
@@ -217,6 +221,7 @@ public class BungaeService {
                 // 3t-4)-2) 해당 날짜에 투표한 인원들은 번개 참여자로 변경
                 List<BungaeDateVote> voters = bungaeDateVoteRepository.findBungaeDateVotesByDateOption(voteInfoDto.dateOption());
 
+                // TODO: voters에서 groupMember 조회 쿼리 나가는지 확인
                 bungaeAttendeeRepository.saveAll(voters.stream()
                                                        .map(BungaeDateVote::getVoter)
                                                        .map(voter -> BungaeAttendee.builder()
