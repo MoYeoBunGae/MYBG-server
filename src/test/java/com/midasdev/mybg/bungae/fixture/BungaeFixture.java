@@ -57,7 +57,7 @@ public class BungaeFixture {
         return Bungae.builder()
                      .name("테스트 번개")
                      .description("테스트용 번개 설명")
-                     .minAttendees(2)
+                     .minAttendees(3)
                      .maxAttendees(10)
                      .isOnline(false)
                      .location("서울 강남구")

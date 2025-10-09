@@ -1,17 +1,22 @@
 package com.midasdev.mybg.bungae.service;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
+import com.midasdev.mybg.TestConstant;
 import com.midasdev.mybg.bungae.controller.dto.request.BungaeCreateRequest;
 import com.midasdev.mybg.bungae.controller.dto.response.BungaeDateVoteResponse;
 import com.midasdev.mybg.bungae.domain.Bungae;
 import com.midasdev.mybg.bungae.domain.BungaeDateVote;
+import com.midasdev.mybg.bungae.domain.BungaeDateVoteId;
 import com.midasdev.mybg.bungae.domain.BungaeRecruitDateOption;
 import com.midasdev.mybg.bungae.domain.BungaeStatus;
 import com.midasdev.mybg.bungae.fixture.BungaeFixture;
 import com.midasdev.mybg.bungae.repository.BungaeDateVoteRepository;
 import com.midasdev.mybg.bungae.repository.BungaeRecruitDateOptionRepository;
 import com.midasdev.mybg.bungae.repository.BungaeRepository;
+import com.midasdev.mybg.global.exception.ApplicationException;
+import com.midasdev.mybg.global.exception.ApplicationExceptionType;
 import com.midasdev.mybg.group.domain.Group;
 import com.midasdev.mybg.group.fixture.GroupFixture;
 import com.midasdev.mybg.group.repository.GroupRepository;
@@ -210,7 +215,7 @@ class BungaeServiceTest {
     }
 
     @Test
-    @DisplayName("B-5-S-1: 투표가 가능한 상태에서 투표하면 해당 날짜의 투표가 추가되고, isVoteSucceeded=true 반환")
+    @DisplayName("B-5-S-1: 날짜 투표가 가능한 조건에서 투표가 성공합니다.")
     void voteBungaeDate_ShouldSucceedAndIncreaseVoteCount_WhenVoteIsAvailable() {
         // given
         Bungae bungae = bungaeRepository.save(BungaeFixture.createWithDateVoting(group, hostGroupMember));
@@ -233,5 +238,33 @@ class BungaeServiceTest {
         assertThat(votes.stream()
                 .anyMatch(voter -> voter.getVoter().getId().equals(groupMember2.getId())))
                 .isTrue();
+    }
+
+    @Test
+    @DisplayName("B-5-S-2: 같은 날짜에 중복 투표를 할 수 없습니다.")
+    void voteBungaeDate_ShouldThrowException_WhenAlreadyVotedForSameDate() {
+        // given
+        Bungae bungae = bungaeRepository.save(BungaeFixture.createWithDateVoting(group, hostGroupMember));
+        LocalDate voteDate = LocalDate.now().plusDays(1);
+        BungaeRecruitDateOption dateOption = bungaeRecruitDateOptionRepository.save(
+                BungaeRecruitDateOption.builder()
+                        .dateOption(voteDate)
+                        .bungae(bungae)
+                        .build()
+        );
+
+        // 이미 groupMember2가 voteDate에 투표한 상태로 만듦
+        bungaeDateVoteRepository.save(
+                BungaeDateVote.builder()
+                        .id(new BungaeDateVoteId(groupMember2.getId(), dateOption.getId()))
+                        .voter(groupMember2)
+                        .dateOption(dateOption)
+                        .build()
+        );
+
+        // when & then
+        assertThatThrownBy(() -> bungaeService.voteBungaeDate(member2, bungae.getId(), voteDate))
+                .isInstanceOf(ApplicationException.class)
+                .hasFieldOrPropertyWithValue(TestConstant.EXCEPTION_TYPE_FIELD, ApplicationExceptionType.ALREADY_VOTED_FOR_BUNGAE_DATE);
     }
 }
