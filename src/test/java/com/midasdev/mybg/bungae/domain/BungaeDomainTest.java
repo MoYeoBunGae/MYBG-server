@@ -246,6 +246,19 @@ class BungaeDomainTest {
     }
 
     @Test
+    @DisplayName("BD-4-D-3: isDateFixed - bungaeDateTime이 null일 경우 false 반환")
+    void isDateFixed_ShouldReturnFalse_WhenBungaeDateTimeIsNull() {
+        // given
+        Bungae bungae = BungaeFixture.createWithBungaeDateTime(group, host, null);
+
+        // when
+        boolean result = bungae.isDateFixed();
+
+        // then
+        assertThat(result).isFalse();
+    }
+
+    @Test
     @DisplayName("BD-5-D-1: canJoin - 번개 상태가 RECRUITING일 때 true 반환")
     void canJoin_ShouldReturnTrue_WhenStatusIsRecruiting() {
         // given
