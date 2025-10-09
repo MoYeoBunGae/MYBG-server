@@ -82,5 +82,37 @@ public class BungaeFixture {
                      .build();
     }
 
+    public static Bungae createWithMinAttendees(Group group, GroupMember host, int minAttendees) {
+        return Bungae.builder()
+                     .name("테스트 번개")
+                     .description("테스트용 번개 설명")
+                     .minAttendees(minAttendees)
+                     .maxAttendees(minAttendees + 10)
+                     .isOnline(false)
+                     .location("서울 강남구")
+                     .bungaeDateTime(new BungaeDateTime(LocalDate.now().plusDays(1), LocalTime.of(18, 0)))
+                     .status(BungaeStatus.RECRUITING)
+                     .deleted(false)
+                     .group(group)
+                     .host(host)
+                     .build();
+    }
+
+    public static Bungae createWithBungaeDateTime(Group group, GroupMember host, BungaeDateTime bungaeDateTime) {
+        return Bungae.builder()
+                     .name("테스트 번개")
+                     .description("테스트용 번개 설명")
+                     .minAttendees(2)
+                     .maxAttendees(10)
+                     .isOnline(false)
+                     .location("서울 강남구")
+                     .bungaeDateTime(bungaeDateTime)
+                     .status(BungaeStatus.RECRUITING)
+                     .deleted(false)
+                     .group(group)
+                     .host(host)
+                     .build();
+    }
+
 }
 
