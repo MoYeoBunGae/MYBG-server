@@ -233,6 +233,7 @@ public class BungaeService {
                                      .isVoteSucceeded(hasVoted)
                                      .isDateFixed(bungae.isDateFixed())
                                      .isJoinable(bungae.canJoin())
+                                     .fixedDate(bungae.getBungaeDate())
                                      .bungaeStatus(bungae.getStatus())
                                      .build();
     }
