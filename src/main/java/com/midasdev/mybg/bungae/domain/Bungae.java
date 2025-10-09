@@ -137,7 +137,7 @@ public class Bungae implements LongIdentifiable {
     }
 
     public boolean isDateFixed() {
-        return this.bungaeDateTime.isDateSet();
+        return this.bungaeDateTime != null && this.bungaeDateTime.isDateSet();
     }
 
     public boolean canJoin() {
