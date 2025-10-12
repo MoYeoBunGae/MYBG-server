@@ -7,11 +7,13 @@ import com.midasdev.mybg.TestConstant;
 import com.midasdev.mybg.bungae.controller.dto.request.BungaeCreateRequest;
 import com.midasdev.mybg.bungae.controller.dto.response.BungaeDateVoteResponse;
 import com.midasdev.mybg.bungae.domain.Bungae;
+import com.midasdev.mybg.bungae.domain.BungaeAttendee;
 import com.midasdev.mybg.bungae.domain.BungaeDateVote;
 import com.midasdev.mybg.bungae.domain.BungaeDateVoteId;
 import com.midasdev.mybg.bungae.domain.BungaeRecruitDateOption;
 import com.midasdev.mybg.bungae.domain.BungaeStatus;
 import com.midasdev.mybg.bungae.fixture.BungaeFixture;
+import com.midasdev.mybg.bungae.repository.BungaeAttendeeRepository;
 import com.midasdev.mybg.bungae.repository.BungaeDateVoteRepository;
 import com.midasdev.mybg.bungae.repository.BungaeRecruitDateOptionRepository;
 import com.midasdev.mybg.bungae.repository.BungaeRepository;
@@ -63,6 +65,9 @@ class BungaeServiceTest {
     @Autowired
     private BungaeDateVoteRepository bungaeDateVoteRepository;
 
+    @Autowired
+    private BungaeAttendeeRepository bungaeAttendeeRepository;
+
     private Group group;
     private Member member;
     private Member member2;
@@ -76,15 +81,6 @@ class BungaeServiceTest {
         group = groupRepository.save(GroupFixture.create(member));
         hostGroupMember = groupMemberRepository.save(GroupMemberFixture.create(group, member));
         groupMember2 = groupMemberRepository.save(GroupMemberFixture.create(group, member2));
-    }
-
-    @AfterEach
-    void clear() {
-        bungaeRecruitDateOptionRepository.deleteAll();
-        bungaeRepository.deleteAll();
-        groupMemberRepository.deleteAll();
-        groupRepository.deleteAll();
-        memberRepository.deleteAll();
     }
 
     @Test
@@ -198,12 +194,12 @@ class BungaeServiceTest {
         );
 
         dateOptions.forEach(dateOption ->
-                bungaeRecruitDateOptionRepository.save(
-                        BungaeRecruitDateOption.builder()
-                                .dateOption(dateOption)
-                                .bungae(bungae)
-                                .build()
-                )
+                                    bungaeRecruitDateOptionRepository.save(
+                                            BungaeRecruitDateOption.builder()
+                                                                   .dateOption(dateOption)
+                                                                   .bungae(bungae)
+                                                                   .build()
+                                    )
         );
 
         // when
@@ -222,9 +218,9 @@ class BungaeServiceTest {
         LocalDate voteDate = LocalDate.now().plusDays(1);
         BungaeRecruitDateOption dateOption = bungaeRecruitDateOptionRepository.save(
                 BungaeRecruitDateOption.builder()
-                        .dateOption(voteDate)
-                        .bungae(bungae)
-                        .build()
+                                       .dateOption(voteDate)
+                                       .bungae(bungae)
+                                       .build()
         );
 
         // when
@@ -236,7 +232,7 @@ class BungaeServiceTest {
         // BungaeDateVote 데이터가 실제로 추가되었는지 검증
         List<BungaeDateVote> votes = bungaeDateVoteRepository.findBungaeDateVotesByDateOption(dateOption);
         assertThat(votes.stream()
-                .anyMatch(voter -> voter.getVoter().getId().equals(groupMember2.getId())))
+                        .anyMatch(voter -> voter.getVoter().getId().equals(groupMember2.getId())))
                 .isTrue();
     }
 
@@ -248,23 +244,162 @@ class BungaeServiceTest {
         LocalDate voteDate = LocalDate.now().plusDays(1);
         BungaeRecruitDateOption dateOption = bungaeRecruitDateOptionRepository.save(
                 BungaeRecruitDateOption.builder()
-                        .dateOption(voteDate)
-                        .bungae(bungae)
-                        .build()
+                                       .dateOption(voteDate)
+                                       .bungae(bungae)
+                                       .build()
         );
 
         // 이미 groupMember2가 voteDate에 투표한 상태로 만듦
         bungaeDateVoteRepository.save(
                 BungaeDateVote.builder()
-                        .id(new BungaeDateVoteId(groupMember2.getId(), dateOption.getId()))
-                        .voter(groupMember2)
-                        .dateOption(dateOption)
-                        .build()
+                              .id(new BungaeDateVoteId(groupMember2.getId(), dateOption.getId()))
+                              .voter(groupMember2)
+                              .dateOption(dateOption)
+                              .build()
         );
 
         // when & then
         assertThatThrownBy(() -> bungaeService.voteBungaeDate(member2, bungae.getId(), voteDate))
                 .isInstanceOf(ApplicationException.class)
                 .hasFieldOrPropertyWithValue(TestConstant.EXCEPTION_TYPE_FIELD, ApplicationExceptionType.ALREADY_VOTED_FOR_BUNGAE_DATE);
+    }
+
+    @Test
+    @DisplayName("B-5-S-3: 최소 인원 도달 시 날짜가 확정되고 해당 날짜의 투표자들은 참가자로 전환됩니다.")
+    void voteBungaeDate_ShouldFixDateAndConvertVotersToAttendees_WhenMinAttendeesReached() {
+        // given
+        Bungae bungae = bungaeRepository.save(BungaeFixture.createWithDateVoting(group, hostGroupMember, 2, 10));
+        LocalDate voteDate = LocalDate.now().plusDays(1);
+        BungaeRecruitDateOption dateOption = bungaeRecruitDateOptionRepository.save(
+                BungaeRecruitDateOption.builder()
+                                       .dateOption(voteDate)
+                                       .bungae(bungae)
+                                       .build()
+        );
+        // 첫 번째 투표자(호스트)가 미리 투표
+        bungaeDateVoteRepository.save(
+                BungaeDateVote.builder()
+                              .id(new BungaeDateVoteId(hostGroupMember.getId(), dateOption.getId()))
+                              .voter(hostGroupMember)
+                              .dateOption(dateOption)
+                              .build()
+        );
+
+        // when
+        BungaeDateVoteResponse response = bungaeService.voteBungaeDate(member2, bungae.getId(), voteDate);
+
+        // then
+        assertThat(response.isDateFixed()).isTrue();
+        assertThat(response.fixedDate()).isEqualTo(voteDate);
+
+        // 해당 날짜 투표자들이 모두 BungaeAttendee로 등록되었는지 확인
+        List<BungaeDateVote> votes = bungaeDateVoteRepository.findBungaeDateVotesByDateOption(dateOption);
+        List<Long> voterIds = votes.stream().map(v -> v.getVoter().getId()).toList();
+
+        List<Long> attendeeIds = bungaeAttendeeRepository.findByBungaeIdAndDeletedFalse(bungae.getId())
+                                                         .stream()
+                                                         .map(attendee -> attendee.getGroupMember().getId())
+                                                         .toList();
+
+        assertThat(attendeeIds).containsExactlyInAnyOrderElementsOf(voterIds);
+    }
+
+    @Test
+    @DisplayName("B-5-S-4: 투표 불가, 참여 가능 시 올바른 반환값을 반환합니다.")
+    void voteBungaeDate_ShouldReturnJoinableTrueAndDateFixed_WhenVoteUnavailableButJoinable() {
+        // given
+        // 번개가 이미 날짜가 확정되어 RECRUITING 상태(투표 불가, 참여 가능)
+        int minAttendees = 2;
+        int maxAttendees = 10;
+        LocalDate fixedDate = LocalDate.now().plusDays(1);
+        Bungae bungae = bungaeRepository.save(BungaeFixture.createWithRecruiting(group, hostGroupMember, fixedDate, minAttendees, maxAttendees));
+
+        // minAttendees 이상, maxAttendees 미만의 BungaeAttendee 데이터 세팅
+        bungaeAttendeeRepository.saveAll(List.of(
+                BungaeAttendee.builder()
+                              .bungae(bungae)
+                              .groupMember(hostGroupMember)
+                              .deleted(false)
+                              .build(),
+                BungaeAttendee.builder()
+                              .bungae(bungae)
+                              .groupMember(groupMember2)
+                              .deleted(false)
+                              .build()
+        ));
+
+        // when
+        BungaeDateVoteResponse response = bungaeService.voteBungaeDate(member2, bungae.getId(), fixedDate);
+
+        // then
+        assertThat(response.isVoteSucceeded()).isFalse();
+        assertThat(response.isJoinable()).isTrue();
+        assertThat(response.isDateFixed()).isTrue();
+        assertThat(response.fixedDate()).isEqualTo(fixedDate);
+        assertThat(response.bungaeStatus()).isEqualTo(BungaeStatus.RECRUITING);
+    }
+
+    @Test
+    @DisplayName("B-5-S-5: 투표 불가, 참여 불가 시 올바른 반환값을 반환합니다.")
+    void voteBungaeDate_ShouldReturnJoinableFalseAndDateFixed_WhenVoteUnavailableAndNotJoinable() {
+        // given
+        // 번개가 이미 날짜가 확정되어 RECRUITING_CLOSED 상태(투표 불가, 참여 불가)
+        LocalDate fixedDate = LocalDate.now().plusDays(1);
+        int minAttendees = 2;
+        int maxAttendees = 2;
+        Bungae bungae = bungaeRepository.save(
+                BungaeFixture.createWithRecruitingClosed(group, hostGroupMember, fixedDate, minAttendees, maxAttendees));
+
+        // maxAttendees와 같은 BungaeAttendee 데이터 세팅
+        bungaeAttendeeRepository.saveAll(List.of(
+                BungaeAttendee.builder()
+                              .bungae(bungae)
+                              .groupMember(hostGroupMember)
+                              .deleted(false)
+                              .build(),
+                BungaeAttendee.builder()
+                              .bungae(bungae)
+                              .groupMember(groupMember2)
+                              .deleted(false)
+                              .build()
+        ));
+
+        // when
+        BungaeDateVoteResponse response = bungaeService.voteBungaeDate(member2, bungae.getId(), fixedDate);
+
+        // then
+        assertThat(response.isVoteSucceeded()).isFalse();
+        assertThat(response.isJoinable()).isFalse();
+        assertThat(response.isDateFixed()).isTrue();
+        assertThat(response.fixedDate()).isEqualTo(fixedDate);
+        assertThat(response.bungaeStatus()).isEqualTo(BungaeStatus.RECRUITING_CLOSED);
+    }
+
+    @Test
+    @DisplayName("B-5-S-6: 잘못된 날짜 투표할 수 없습니다.")
+    void voteBungaeDate_ShouldThrowException_WhenVoteDateOptionNotFound() {
+        // given
+        Bungae bungae = bungaeRepository.save(BungaeFixture.createWithDateVoting(group, hostGroupMember));
+        // 날짜 후보 세팅
+        List<LocalDate> dateOptions = List.of(
+                LocalDate.now().plusDays(1),
+                LocalDate.now().plusDays(2)
+        );
+        dateOptions.forEach(dateOption ->
+                bungaeRecruitDateOptionRepository.save(
+                        BungaeRecruitDateOption.builder()
+                                .dateOption(dateOption)
+                                .bungae(bungae)
+                                .build()
+                )
+        );
+
+        // when & then
+        // 존재하지 않는 날짜(후보에 없음)
+        LocalDate invalidDate = LocalDate.now().plusDays(100);
+
+        assertThatThrownBy(() -> bungaeService.voteBungaeDate(member2, bungae.getId(), invalidDate))
+                .isInstanceOf(ApplicationException.class)
+                .hasFieldOrPropertyWithValue(TestConstant.EXCEPTION_TYPE_FIELD, ApplicationExceptionType.BUNGAE_DATE_OPTION_NOT_FOUND);
     }
 }

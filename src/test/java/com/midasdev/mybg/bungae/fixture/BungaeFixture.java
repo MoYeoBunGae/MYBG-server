@@ -20,6 +20,14 @@ public class BungaeFixture {
                 .build();
     }
 
+    // DATE_VOTING WITH ATTENDEES
+    public static Bungae createWithDateVoting(Group group, GroupMember host, int minAttendees, int maxAttendees) {
+        return bungaeBaseBuilder(group, host, minAttendees, maxAttendees)
+                .status(BungaeStatus.DATE_VOTING)
+                .dateVoteClosedAt(LocalDateTime.now().plusDays(1))
+                .build();
+    }
+
     // RECRUITING
     public static Bungae createWithRecruiting(Group group, GroupMember host) {
         return bungaeBaseBuilder(group, host)
@@ -28,11 +36,32 @@ public class BungaeFixture {
                 .build();
     }
 
+    public static Bungae createWithRecruiting(Group group, GroupMember host, LocalDate date) {
+        return bungaeBaseBuilder(group, host)
+                .status(BungaeStatus.RECRUITING)
+                .bungaeDateTime(new BungaeDateTime(date))
+                .build();
+    }
+
+    public static Bungae createWithRecruiting(Group group, GroupMember host, LocalDate date, int minAttendees, int maxAttendees) {
+        return bungaeBaseBuilder(group, host, minAttendees, maxAttendees)
+                .status(BungaeStatus.RECRUITING)
+                .bungaeDateTime(new BungaeDateTime(date))
+                .build();
+    }
+
     // RECRUITING_CLOSED
     public static Bungae createWithRecruitingClosed(Group group, GroupMember host) {
         return bungaeBaseBuilder(group, host)
                 .status(BungaeStatus.RECRUITING_CLOSED)
                 .bungaeDateTime(new BungaeDateTime(LocalDate.now().plusDays(2)))
+                .build();
+    }
+
+    public static Bungae createWithRecruitingClosed(Group group, GroupMember host, LocalDate date, int minAttendees, int maxAttendees) {
+        return bungaeBaseBuilder(group, host, minAttendees, maxAttendees)
+                .status(BungaeStatus.RECRUITING_CLOSED)
+                .bungaeDateTime(new BungaeDateTime(date))
                 .build();
     }
 
@@ -54,11 +83,15 @@ public class BungaeFixture {
 
 
     private static Bungae.BungaeBuilder bungaeBaseBuilder(Group group, GroupMember host) {
+        return bungaeBaseBuilder(group, host, 3, 10);
+    }
+
+    private static Bungae.BungaeBuilder bungaeBaseBuilder(Group group, GroupMember host, int minAttendees, int maxAttendees) {
         return Bungae.builder()
                      .name("테스트 번개")
                      .description("테스트용 번개 설명")
-                     .minAttendees(3)
-                     .maxAttendees(10)
+                     .minAttendees(minAttendees)
+                     .maxAttendees(maxAttendees)
                      .isOnline(false)
                      .location("서울 강남구")
                      .deleted(false)
