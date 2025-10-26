@@ -115,6 +115,8 @@ public class BungaeService {
         eventPublisher.publishEvent(new BungaeVoteCreatedEvent(savedBungae.getId()));
         // TODO: 투표 생성 이벤트 처리 (필요한가? - 처리할 리스트 정리부터)
 
+        // TODO: 7. 알림 전송 (번개 생성 알림)
+
         // 필요하다면 반환
         return savedBungae;
     }

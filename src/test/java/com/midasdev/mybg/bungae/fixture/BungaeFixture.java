@@ -12,7 +12,9 @@ import java.time.LocalTime;
 
 public class BungaeFixture {
 
-    // DATE_VOTING
+    /**
+     * DATE_VOTING 상태, 기본 참석자 수 설정(3~10)
+     */
     public static Bungae createWithDateVoting(Group group, GroupMember host) {
         return bungaeBaseBuilder(group, host)
                 .status(BungaeStatus.DATE_VOTING)
