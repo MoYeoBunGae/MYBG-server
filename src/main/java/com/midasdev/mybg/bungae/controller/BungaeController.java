@@ -3,11 +3,12 @@ package com.midasdev.mybg.bungae.controller;
 import static com.midasdev.mybg.config.swagger.SwaggerConfig.SECURITY_SCHEME_NAME;
 
 import com.midasdev.mybg.bungae.controller.dto.request.BungaeCreateRequest;
-import com.midasdev.mybg.bungae.controller.dto.request.GetMyBungaesRequest;
+import com.midasdev.mybg.bungae.controller.dto.request.BungaeDateVoteRequest;
 import com.midasdev.mybg.bungae.controller.dto.request.GetGroupBungaesRequest;
+import com.midasdev.mybg.bungae.controller.dto.request.GetMyBungaesRequest;
+import com.midasdev.mybg.bungae.controller.dto.response.BungaeDateVoteOptionResponse;
 import com.midasdev.mybg.bungae.controller.dto.response.BungaeDateVoteResponse;
 import com.midasdev.mybg.bungae.controller.dto.response.BungaeResponse;
-import com.midasdev.mybg.bungae.controller.dto.response.BungaeDateVoteOptionResponse;
 import com.midasdev.mybg.bungae.domain.Bungae;
 import com.midasdev.mybg.bungae.repository.dto.BungaeDto;
 import com.midasdev.mybg.bungae.service.BungaeService;
@@ -17,8 +18,8 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
-import jakarta.validation.constraints.NotNull;
 import java.time.LocalDate;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
@@ -30,8 +31,6 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-
-import java.util.List;
 
 @Slf4j
 @Tag(name = "Bungae APIs")
@@ -138,7 +137,7 @@ public class BungaeController {
             summary = "번개 날짜 투표 API",
             description = """
                     번개 날짜에 투표합니다.
-                    - Response : BungaeDateVoteResponse
+                    - Response : BungaeDateVoteResponse (전체적인 투표 결과)
                     """,
             security = @SecurityRequirement(name = SECURITY_SCHEME_NAME)
     )
@@ -146,9 +145,9 @@ public class BungaeController {
     public ResponseEntity<BungaeDateVoteResponse> voteBungaeDate(
             @AuthenticationPrincipal Member member,
             @PathVariable Long bungaeId,
-            @RequestBody @NotNull LocalDate voteDate
+            @Valid @RequestBody BungaeDateVoteRequest request
     ) {
-        BungaeDateVoteResponse response = bungaeService.voteBungaeDate(member, bungaeId, voteDate);
+        BungaeDateVoteResponse response = bungaeService.voteBungaeDates(member, bungaeId, request.getVoteDates());
         return ResponseEntity.ok(response);
     }
 

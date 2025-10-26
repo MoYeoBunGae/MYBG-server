@@ -10,6 +10,7 @@ import com.querydsl.jpa.JPAExpressions;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import jakarta.persistence.EntityManager;
 import java.time.LocalDate;
+import java.util.List;
 import java.util.Optional;
 import org.springframework.stereotype.Repository;
 
@@ -23,7 +24,7 @@ public class CustomBungaeRecruitDateOptionRepositoryImpl implements CustomBungae
     }
 
     @Override
-    public Optional<BungaeDateVoteInfoDto> findVoteInfoByDate(Long bungaeId, LocalDate dateOption, Long groupMemberId) {
+    public List<BungaeDateVoteInfoDto> findVoteInfoByDates(Long bungaeId, List<LocalDate> dateOptions, Long groupMemberId) {
         QBungaeRecruitDateOption bungaeRecruitDateOption = QBungaeRecruitDateOption.bungaeRecruitDateOption;
         QBungaeDateVote bungaeDateVote = QBungaeDateVote.bungaeDateVote;
 
@@ -33,7 +34,7 @@ public class CustomBungaeRecruitDateOptionRepositoryImpl implements CustomBungae
                 .from(bungaeDateVote)
                 .where(
                         bungaeDateVote.dateOption.id.eq(bungaeRecruitDateOption.id)
-                );;
+                );
 
         BooleanExpression userVotedCondition = JPAExpressions
                 .selectOne()
@@ -44,19 +45,17 @@ public class CustomBungaeRecruitDateOptionRepositoryImpl implements CustomBungae
                 )
                 .exists();
 
-
-        BungaeDateVoteInfoDto result = queryFactory
-            .select(new QBungaeDateVoteInfoDto(
-                bungaeRecruitDateOption,
-                totalVotesSubquery,
-                userVotedCondition
-            ))
-            .from(bungaeRecruitDateOption)
-            .where(
-                bungaeRecruitDateOption.bungae.id.eq(bungaeId),
-                bungaeRecruitDateOption.dateOption.eq(dateOption)
-            )
-            .fetchOne();
-        return Optional.ofNullable(result);
+        return queryFactory
+                .select(new QBungaeDateVoteInfoDto(
+                        bungaeRecruitDateOption,
+                        totalVotesSubquery,
+                        userVotedCondition
+                ))
+                .from(bungaeRecruitDateOption)
+                .where(
+                        bungaeRecruitDateOption.bungae.id.eq(bungaeId),
+                        bungaeRecruitDateOption.dateOption.in(dateOptions)
+                )
+                .fetch();
     }
 }
