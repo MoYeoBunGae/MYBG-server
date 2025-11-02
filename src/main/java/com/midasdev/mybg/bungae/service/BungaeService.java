@@ -6,7 +6,6 @@ import com.midasdev.mybg.bungae.domain.Bungae;
 import com.midasdev.mybg.bungae.domain.BungaeAttendee;
 import com.midasdev.mybg.bungae.domain.BungaeDateTime;
 import com.midasdev.mybg.bungae.domain.BungaeDateVote;
-import com.midasdev.mybg.bungae.domain.BungaeDateVoteId;
 import com.midasdev.mybg.bungae.domain.BungaeRecruitDateOption;
 import com.midasdev.mybg.bungae.domain.BungaeStatus;
 import com.midasdev.mybg.bungae.repository.BungaeAttendeeRepository;
@@ -228,7 +227,6 @@ public class BungaeService {
 
                 // 투표 저장
                 BungaeDateVote dateVote = BungaeDateVote.builder()
-                        .id(new BungaeDateVoteId(groupMember.getId(), voteInfoDto.dateOption().getId()))
                         .voter(groupMember)
                         .dateOption(voteInfoDto.dateOption())
                         .build();

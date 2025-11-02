@@ -1,15 +1,12 @@
 package com.midasdev.mybg.bungae.service;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
-import com.midasdev.mybg.TestConstant;
 import com.midasdev.mybg.bungae.controller.dto.request.BungaeCreateRequest;
 import com.midasdev.mybg.bungae.controller.dto.response.BungaeDateVoteResponse;
 import com.midasdev.mybg.bungae.domain.Bungae;
 import com.midasdev.mybg.bungae.domain.BungaeAttendee;
 import com.midasdev.mybg.bungae.domain.BungaeDateVote;
-import com.midasdev.mybg.bungae.domain.BungaeDateVoteId;
 import com.midasdev.mybg.bungae.domain.BungaeRecruitDateOption;
 import com.midasdev.mybg.bungae.domain.BungaeStatus;
 import com.midasdev.mybg.bungae.fixture.BungaeFixture;
@@ -17,8 +14,6 @@ import com.midasdev.mybg.bungae.repository.BungaeAttendeeRepository;
 import com.midasdev.mybg.bungae.repository.BungaeDateVoteRepository;
 import com.midasdev.mybg.bungae.repository.BungaeRecruitDateOptionRepository;
 import com.midasdev.mybg.bungae.repository.BungaeRepository;
-import com.midasdev.mybg.global.exception.ApplicationException;
-import com.midasdev.mybg.global.exception.ApplicationExceptionType;
 import com.midasdev.mybg.group.domain.Group;
 import com.midasdev.mybg.group.fixture.GroupFixture;
 import com.midasdev.mybg.group.repository.GroupRepository;
@@ -223,10 +218,11 @@ class BungaeServiceTest {
         );
 
         // when
-        BungaeDateVoteResponse response = bungaeService.voteBungaeDate(member2, bungae.getId(), voteDate);
+        BungaeDateVoteResponse response = bungaeService.voteBungaeDates(member2, bungae.getId(), List.of(voteDate));
 
         // then
-        assertThat(response.isVoteSucceeded()).isTrue();
+        assertThat(response.wasVotable()).isTrue();
+        assertThat(response.failedVoteDates()).isEmpty();
 
         // BungaeDateVote 데이터가 실제로 추가되었는지 검증
         List<BungaeDateVote> votes = bungaeDateVoteRepository.findBungaeDateVotesByDateOption(dateOption);
@@ -251,16 +247,18 @@ class BungaeServiceTest {
         // 이미 groupMember2가 voteDate에 투표한 상태로 만듦
         bungaeDateVoteRepository.save(
                 BungaeDateVote.builder()
-                              .id(new BungaeDateVoteId(groupMember2.getId(), dateOption.getId()))
                               .voter(groupMember2)
                               .dateOption(dateOption)
                               .build()
         );
 
-        // when & then
-        assertThatThrownBy(() -> bungaeService.voteBungaeDate(member2, bungae.getId(), voteDate))
-                .isInstanceOf(ApplicationException.class)
-                .hasFieldOrPropertyWithValue(TestConstant.EXCEPTION_TYPE_FIELD, ApplicationExceptionType.ALREADY_VOTED_FOR_BUNGAE_DATE);
+        // when
+        BungaeDateVoteResponse response = bungaeService.voteBungaeDates(member2, bungae.getId(), List.of(voteDate));
+
+        // then
+        // 이미 투표한 날짜는 failedVoteDates에 포함되어야 함
+        assertThat(response.wasVotable()).isTrue();
+        assertThat(response.failedVoteDates()).contains(voteDate);
     }
 
     @Test
@@ -278,16 +276,17 @@ class BungaeServiceTest {
         // 첫 번째 투표자(호스트)가 미리 투표
         bungaeDateVoteRepository.save(
                 BungaeDateVote.builder()
-                              .id(new BungaeDateVoteId(hostGroupMember.getId(), dateOption.getId()))
                               .voter(hostGroupMember)
                               .dateOption(dateOption)
                               .build()
         );
 
         // when
-        BungaeDateVoteResponse response = bungaeService.voteBungaeDate(member2, bungae.getId(), voteDate);
+        BungaeDateVoteResponse response = bungaeService.voteBungaeDates(member2, bungae.getId(), List.of(voteDate));
 
         // then
+        assertThat(response.wasVotable()).isTrue();
+        assertThat(response.failedVoteDates()).isEmpty();
         assertThat(response.isDateFixed()).isTrue();
         assertThat(response.fixedDate()).isEqualTo(voteDate);
 
@@ -328,10 +327,11 @@ class BungaeServiceTest {
         ));
 
         // when
-        BungaeDateVoteResponse response = bungaeService.voteBungaeDate(member2, bungae.getId(), fixedDate);
+        BungaeDateVoteResponse response = bungaeService.voteBungaeDates(member2, bungae.getId(), List.of(fixedDate));
 
         // then
-        assertThat(response.isVoteSucceeded()).isFalse();
+        assertThat(response.wasVotable()).isFalse();
+        assertThat(response.failedVoteDates()).isNull();
         assertThat(response.isJoinable()).isTrue();
         assertThat(response.isDateFixed()).isTrue();
         assertThat(response.fixedDate()).isEqualTo(fixedDate);
@@ -364,10 +364,11 @@ class BungaeServiceTest {
         ));
 
         // when
-        BungaeDateVoteResponse response = bungaeService.voteBungaeDate(member2, bungae.getId(), fixedDate);
+        BungaeDateVoteResponse response = bungaeService.voteBungaeDates(member2, bungae.getId(), List.of(fixedDate));
 
         // then
-        assertThat(response.isVoteSucceeded()).isFalse();
+        assertThat(response.wasVotable()).isFalse();
+        assertThat(response.failedVoteDates()).isNull();
         assertThat(response.isJoinable()).isFalse();
         assertThat(response.isDateFixed()).isTrue();
         assertThat(response.fixedDate()).isEqualTo(fixedDate);
@@ -393,12 +394,15 @@ class BungaeServiceTest {
                 )
         );
 
-        // when & then
+        // when
         // 존재하지 않는 날짜(후보에 없음)
         LocalDate invalidDate = LocalDate.now().plusDays(100);
 
-        assertThatThrownBy(() -> bungaeService.voteBungaeDate(member2, bungae.getId(), invalidDate))
-                .isInstanceOf(ApplicationException.class)
-                .hasFieldOrPropertyWithValue(TestConstant.EXCEPTION_TYPE_FIELD, ApplicationExceptionType.BUNGAE_DATE_OPTION_NOT_FOUND);
+        BungaeDateVoteResponse response = bungaeService.voteBungaeDates(member2, bungae.getId(), List.of(invalidDate));
+
+        // then
+        // 존재하지 않는 날짜는 failedVoteDates에 포함되어야 함
+        assertThat(response.wasVotable()).isTrue();
+        assertThat(response.failedVoteDates()).contains(invalidDate);
     }
 }

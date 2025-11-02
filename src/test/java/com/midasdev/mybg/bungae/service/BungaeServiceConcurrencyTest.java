@@ -5,7 +5,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 import com.midasdev.mybg.bungae.domain.Bungae;
 import com.midasdev.mybg.bungae.domain.BungaeAttendee;
 import com.midasdev.mybg.bungae.domain.BungaeDateVote;
-import com.midasdev.mybg.bungae.domain.BungaeDateVoteId;
 import com.midasdev.mybg.bungae.domain.BungaeRecruitDateOption;
 import com.midasdev.mybg.bungae.fixture.BungaeFixture;
 import com.midasdev.mybg.bungae.repository.BungaeAttendeeRepository;
@@ -21,6 +20,8 @@ import com.midasdev.mybg.group_member.repository.GroupMemberRepository;
 import com.midasdev.mybg.member.domain.Member;
 import com.midasdev.mybg.member.fixture.MemberFixture;
 import com.midasdev.mybg.member.repository.MemberRepository;
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.PersistenceContext;
 import java.time.LocalDate;
 import java.util.List;
 import org.junit.jupiter.api.AfterEach;
@@ -56,6 +57,9 @@ class BungaeServiceConcurrencyTest {
 
     @Autowired
     private BungaeAttendeeRepository bungaeAttendeeRepository;
+
+    @PersistenceContext
+    private EntityManager entityManager;
 
     private Group group;
     private Member member;
@@ -95,10 +99,10 @@ class BungaeServiceConcurrencyTest {
                         .bungae(bungae)
                         .build()
         );
+
         // 이미 한 명이 투표한 상태로 만듦 (minAttendees=2, 현재 1명 투표)
         bungaeDateVoteRepository.save(
                 BungaeDateVote.builder()
-                        .id(new BungaeDateVoteId(hostGroupMember.getId(), dateOption.getId()))
                         .voter(hostGroupMember)
                         .dateOption(dateOption)
                         .build()
@@ -116,7 +120,7 @@ class BungaeServiceConcurrencyTest {
         for (int i = 0; i < 100; i++) {
             final int idx = i;
             threads[i] = new Thread(() -> {
-                bungaeService.voteBungaeDate(members[idx], bungae.getId(), voteDate);
+                bungaeService.voteBungaeDates(members[idx], bungae.getId(), List.of(voteDate));
             });
         }
         for (Thread thread : threads) thread.start();
