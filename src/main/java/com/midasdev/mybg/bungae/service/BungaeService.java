@@ -149,7 +149,7 @@ public class BungaeService {
         Bungae bungae = bungaeFinder.findById(bungaeId);
 
         // 2. 번개 상태가 DATE_VOTING인지 검증
-        if (!bungae.canVote()) {
+        if (!bungae.isVotableStatus()) {
             throw new ApplicationException(ApplicationExceptionType.BUNGAE_VOTE_UNAVAILABLE, bungaeId);
         }
 
@@ -195,10 +195,10 @@ public class BungaeService {
         //  2. 그룹 멤버 검증
         GroupMember groupMember = groupMemberFinder.findByMemberAndGroup(member, bungae.getGroup());
 
-        boolean wasVotable = bungae.canVote();
+        boolean isVotableStatus = bungae.isVotableStatus();
         List<LocalDate> failedVoteDates = new ArrayList<>();
 
-        if (wasVotable) {
+        if (isVotableStatus) {
             // 3. 한 번에 모든 날짜에 대한 투표 정보 조회
             List<BungaeDateVoteInfoDto> voteInfoList = bungaeRecruitDateOptionRepository.findVoteInfoByDates(
                     bungaeId, voteDates, groupMember.getId());
@@ -259,12 +259,12 @@ public class BungaeService {
 
         // 5. 응답 생성 (현재 번개의 상태를 반영)
         return BungaeDateVoteResponse.builder()
-                .wasVotable(wasVotable)
+                .wasVotable(isVotableStatus)
                 .isDateFixed(bungae.isDateFixed())
                 .isJoinable(bungae.canJoin())
                 .fixedDate(bungae.getBungaeDate())
                 .bungaeStatus(bungae.getStatus())
-                .failedVoteDates(wasVotable ? failedVoteDates : null)
+                .failedVoteDates(isVotableStatus ? failedVoteDates : null)
                 .build();
     }
 

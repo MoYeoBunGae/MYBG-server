@@ -15,7 +15,6 @@ import com.midasdev.mybg.group_member.domain.GroupMember;
 import com.midasdev.mybg.group_member.fixture.GroupMemberFixture;
 import com.midasdev.mybg.member.domain.Member;
 import com.midasdev.mybg.member.fixture.MemberFixture;
-import java.time.LocalDateTime;
 import java.time.LocalTime;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -39,12 +38,12 @@ class BungaeDomainTest {
 
     @Test
     @DisplayName("BD-1-D-1: canVote - 번개 상태가 DATE_VOTING 일 때 true 반환")
-    void canVote_ShouldReturnTrue_WhenStatusIsDateVoting() {
+    void isVotableStatus_ShouldReturnTrue_WhenStatusIsDateVoting() {
         // given
         Bungae bungae = BungaeFixture.createWithStatus(group, host, BungaeStatus.DATE_VOTING);
 
         // when
-        boolean actualCanVote = bungae.canVote();
+        boolean actualCanVote = bungae.isVotableStatus();
 
         // then
         assertThat(actualCanVote).isTrue();
@@ -53,12 +52,12 @@ class BungaeDomainTest {
     @ParameterizedTest
     @EnumSource(value = BungaeStatus.class, mode = EnumSource.Mode.EXCLUDE, names = { "DATE_VOTING" })
     @DisplayName("BD-1-D-2: canVote - 번개 상태가 DATE_VOTING이 아닐 때 false 반환 - ParameterizedTest")
-    void canVote_ShouldReturnFalse_WhenStatusIsNotDateVoting(BungaeStatus status) {
+    void isVotableStatus_ShouldReturnFalse_WhenStatusIsNotDateVoting(BungaeStatus status) {
         // given
         Bungae bungae = BungaeFixture.createWithStatus(group, host, status);
 
         // when
-        boolean actualCanVote = bungae.canVote();
+        boolean actualCanVote = bungae.isVotableStatus();
 
         // then
         assertThat(actualCanVote).isFalse();
