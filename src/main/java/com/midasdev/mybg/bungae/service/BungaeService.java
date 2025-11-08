@@ -259,9 +259,9 @@ public class BungaeService {
 
         // 5. 응답 생성 (현재 번개의 상태를 반영)
         return BungaeDateVoteResponse.builder()
-                .wasVotable(isVotableStatus)
+                .wasVotableBungae(isVotableStatus)
                 .isDateFixed(bungae.isDateFixed())
-                .isJoinable(bungae.canJoin())
+                .isJoinable(bungae.isDateFixed() ? bungae.canJoin() : null)
                 .fixedDate(bungae.getBungaeDate())
                 .bungaeStatus(bungae.getStatus())
                 .failedVoteDates(isVotableStatus ? failedVoteDates : null)

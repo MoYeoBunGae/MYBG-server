@@ -9,13 +9,13 @@ import lombok.Builder;
 @Builder
 public record BungaeDateVoteResponse(
         // 투표 데이터를 반영하기 전에 투표가 가능했는지 여부
-        boolean wasVotable,
+        boolean wasVotableBungae,
 
         // 번개 날짜가 확정되었는지 여부
         boolean isDateFixed,
 
         // 확정된 날짜에 추가로 참여 가능한지 여부
-        boolean isJoinable,
+        Boolean isJoinable,
 
         // 확정된 날짜
         LocalDate fixedDate,
