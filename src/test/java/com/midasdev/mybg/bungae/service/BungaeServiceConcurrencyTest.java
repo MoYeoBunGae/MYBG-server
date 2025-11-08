@@ -89,7 +89,7 @@ class BungaeServiceConcurrencyTest {
 
     @Test
     @DisplayName("B-5-S-7: 최소모집인원까지 1명의 투표가 남은 상황에서 100명이 동시에 투표를 할 경우 한 명만 성공합니다.")
-    void voteBungaeDate_ShouldAllowOnlyOneVote_WhenHundredVoteSimultaneouslyAtMinAttendeesMinusOne() throws Exception {
+    void B_5_S_7() throws Exception {
         // given
         Bungae bungae = bungaeRepository.save(BungaeFixture.createWithDateVoting(group, hostGroupMember, 2, 5));
         LocalDate voteDate = LocalDate.now().plusDays(1);
