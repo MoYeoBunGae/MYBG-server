@@ -1,6 +1,8 @@
 HELP.md
 .gradle
 build/
+problems
+gradle.properties
 
 # Prompt files
 prompt/
