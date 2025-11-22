@@ -215,7 +215,10 @@ public class BungaeService {
                 }
             }
 
-            // 4. 각 날짜별로 투표 처리
+            // 4. 각 날짜별로 투표 처리 및 최소 인원 도달 확인
+            BungaeRecruitDateOption tempConfirmedDateOption = null;
+            List<BungaeDateVote> votesToSave = new ArrayList<>();
+
             for (BungaeDateVoteInfoDto voteInfoDto : voteInfoList) {
                 LocalDate voteDate = voteInfoDto.dateOption().getDateOption();
 
@@ -225,35 +228,45 @@ public class BungaeService {
                     continue;
                 }
 
-                // 투표 저장
+                // 투표 생성
                 BungaeDateVote dateVote = BungaeDateVote.builder()
                         .voter(groupMember)
                         .dateOption(voteInfoDto.dateOption())
                         .build();
-                bungaeDateVoteRepository.save(dateVote);
+                votesToSave.add(dateVote);
 
-                // 최소 인원 달성 처리
+                // 최소 인원 달성 여부 확인
                 if (bungae.isOneLeftToMinAttendees(voteInfoDto.voteCount())) {
-                    // 날짜 확정 및 상태 변경
-                    bungae.confirmDate(voteDate);
-
-                    // 해당 날짜에 투표한 인원들은 번개 참여자로 변경
-                    List<BungaeDateVote> voters = bungaeDateVoteRepository.findBungaeDateVotesByDateOption(voteInfoDto.dateOption());
-
-                    bungaeAttendeeRepository.saveAll(voters.stream()
-                            .map(BungaeDateVote::getVoter)
-                            .map(voter -> BungaeAttendee.builder()
-                                    .bungae(bungae)
-                                    .groupMember(voter)
-                                    .deleted(false)
-                                    .build())
-                            .toList());
-
-                    // TODO: 채팅방 생성 및 푸쉬 알림 전송 (알림 데이터: 투표한 날짜, 정해진 날짜)
-
-                    // 날짜가 확정되면 더 이상 처리하지 않음
-                    break;
+                    // 여러 날짜가 동시에 최소 인원에 도달할 수 있는 경우, 가장 빠른 날짜 선택
+                    if (tempConfirmedDateOption == null || voteDate.isBefore(tempConfirmedDateOption.getDateOption())) {
+                        tempConfirmedDateOption = voteInfoDto.dateOption();
+                    }
                 }
+            }
+
+            // 모든 투표 저장
+            if (!votesToSave.isEmpty()) {
+                bungaeDateVoteRepository.saveAll(votesToSave);
+            }
+
+            // 날짜 확정 처리 (가장 빠른 날짜로)
+            final BungaeRecruitDateOption confirmedDateOption = tempConfirmedDateOption;
+            if (confirmedDateOption != null) {
+                bungae.confirmDate(confirmedDateOption.getDateOption());
+
+                // 해당 날짜에 투표한 인원들은 번개 참여자로 변경
+                List<BungaeDateVote> voters = bungaeDateVoteRepository.findBungaeDateVotesByDateOption(confirmedDateOption);
+
+                bungaeAttendeeRepository.saveAll(voters.stream()
+                        .map(BungaeDateVote::getVoter)
+                        .map(voter -> BungaeAttendee.builder()
+                                .bungae(bungae)
+                                .groupMember(voter)
+                                .deleted(false)
+                                .build())
+                        .toList());
+
+                // TODO: 채팅방 생성 및 푸쉬 알림 전송 (알림 데이터: 투표한 날짜, 정해진 날짜)
             }
         }
 
