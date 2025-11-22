@@ -3,6 +3,7 @@ HELP.md
 build/
 problems
 gradle.properties
+debug/
 
 # Prompt files
 prompt/
