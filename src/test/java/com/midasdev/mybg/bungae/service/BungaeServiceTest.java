@@ -28,6 +28,7 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.List;
+import org.assertj.core.api.SoftAssertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -227,9 +228,6 @@ class BungaeServiceTest {
         );
 
         // then
-        assertThat(response.wasVotableBungae()).isTrue();
-        assertThat(response.failedVoteDates()).isEmpty();
-
         // 해당 번개의 해당 투표자가 투표한 BungaeDateVote 리스트를 조회
         List<BungaeDateVote> votes = bungaeDateVoteTestRepository.findByBungaeIdAndVoterId(
                 bungae.getId(),
@@ -241,8 +239,11 @@ class BungaeServiceTest {
                 .map(vote -> vote.getDateOption().getDateOption())
                 .toList();
 
-        // 모든 날짜에 투표가 되었는지 검증
-        assertThat(votedDates).containsAll(voteDates);
+        SoftAssertions.assertSoftly(softly -> {
+            softly.assertThat(response.wasVotableBungae()).isTrue();
+            softly.assertThat(response.failedVoteDates()).isEmpty();
+            softly.assertThat(votedDates).containsAll(voteDates);
+        });
     }
 
     /**
@@ -284,9 +285,10 @@ class BungaeServiceTest {
         BungaeDateVoteResponse response = bungaeService.voteBungaeDates(member2, bungae.getId(), List.of(voteDate));
 
         // then
-        // 이미 투표한 날짜는 failedVoteDates에 포함되어야 함
-        assertThat(response.wasVotableBungae()).isTrue();
-        assertThat(response.failedVoteDates()).contains(voteDate);
+        SoftAssertions.assertSoftly(softly -> {
+            softly.assertThat(response.wasVotableBungae()).isTrue();
+            softly.assertThat(response.failedVoteDates()).contains(voteDate);
+        });
     }
 
     @Test
@@ -313,11 +315,6 @@ class BungaeServiceTest {
         BungaeDateVoteResponse response = bungaeService.voteBungaeDates(member2, bungae.getId(), List.of(voteDate));
 
         // then
-        assertThat(response.wasVotableBungae()).isTrue();
-        assertThat(response.failedVoteDates()).isEmpty();
-        assertThat(response.isDateFixed()).isTrue();
-        assertThat(response.fixedDate()).isEqualTo(voteDate);
-
         // 해당 날짜 투표자들이 모두 BungaeAttendee로 등록되었는지 확인
         List<BungaeDateVote> votes = bungaeDateVoteRepository.findBungaeDateVotesByDateOption(dateOption);
         List<Long> voterIds = votes.stream().map(v -> v.getVoter().getId()).toList();
@@ -327,7 +324,13 @@ class BungaeServiceTest {
                                                          .map(attendee -> attendee.getGroupMember().getId())
                                                          .toList();
 
-        assertThat(attendeeIds).containsExactlyInAnyOrderElementsOf(voterIds);
+        SoftAssertions.assertSoftly(softly -> {
+            softly.assertThat(response.wasVotableBungae()).isTrue();
+            softly.assertThat(response.failedVoteDates()).isEmpty();
+            softly.assertThat(response.isDateFixed()).isTrue();
+            softly.assertThat(response.fixedDate()).isEqualTo(voteDate);
+            softly.assertThat(attendeeIds).containsExactlyInAnyOrderElementsOf(voterIds);
+        });
     }
 
     @Test
@@ -358,12 +361,14 @@ class BungaeServiceTest {
         BungaeDateVoteResponse response = bungaeService.voteBungaeDates(member2, bungae.getId(), List.of(fixedDate));
 
         // then
-        assertThat(response.wasVotableBungae()).isFalse();
-        assertThat(response.failedVoteDates()).isNull();
-        assertThat(response.isJoinable()).isTrue();
-        assertThat(response.isDateFixed()).isTrue();
-        assertThat(response.fixedDate()).isEqualTo(fixedDate);
-        assertThat(response.bungaeStatus()).isEqualTo(BungaeStatus.RECRUITING);
+        SoftAssertions.assertSoftly(softly -> {
+            softly.assertThat(response.wasVotableBungae()).isFalse();
+            softly.assertThat(response.failedVoteDates()).isNull();
+            softly.assertThat(response.isJoinable()).isTrue();
+            softly.assertThat(response.isDateFixed()).isTrue();
+            softly.assertThat(response.fixedDate()).isEqualTo(fixedDate);
+            softly.assertThat(response.bungaeStatus()).isEqualTo(BungaeStatus.RECRUITING);
+        });
 
         // TODO: 투표가 처리되지 않았음을 검증
     }
@@ -397,12 +402,14 @@ class BungaeServiceTest {
         BungaeDateVoteResponse response = bungaeService.voteBungaeDates(member2, bungae.getId(), List.of(fixedDate));
 
         // then
-        assertThat(response.wasVotableBungae()).isFalse();
-        assertThat(response.failedVoteDates()).isNull();
-        assertThat(response.isJoinable()).isFalse();
-        assertThat(response.isDateFixed()).isTrue();
-        assertThat(response.fixedDate()).isEqualTo(fixedDate);
-        assertThat(response.bungaeStatus()).isEqualTo(BungaeStatus.RECRUITING_CLOSED);
+        SoftAssertions.assertSoftly(softly -> {
+            softly.assertThat(response.wasVotableBungae()).isFalse();
+            softly.assertThat(response.failedVoteDates()).isNull();
+            softly.assertThat(response.isJoinable()).isFalse();
+            softly.assertThat(response.isDateFixed()).isTrue();
+            softly.assertThat(response.fixedDate()).isEqualTo(fixedDate);
+            softly.assertThat(response.bungaeStatus()).isEqualTo(BungaeStatus.RECRUITING_CLOSED);
+        });
 
         // TODO: 투표가 처리되지 않았음을 검증
     }
@@ -433,9 +440,10 @@ class BungaeServiceTest {
         BungaeDateVoteResponse response = bungaeService.voteBungaeDates(member2, bungae.getId(), List.of(invalidDate));
 
         // then
-        // 존재하지 않는 날짜는 failedVoteDates에 포함되어야 함
-        assertThat(response.wasVotableBungae()).isTrue();
-        assertThat(response.failedVoteDates()).contains(invalidDate);
+        SoftAssertions.assertSoftly(softly -> {
+            softly.assertThat(response.wasVotableBungae()).isTrue();
+            softly.assertThat(response.failedVoteDates()).contains(invalidDate);
+        });
     }
 
     @Test
@@ -468,15 +476,16 @@ class BungaeServiceTest {
         );
 
         // then
-        assertThat(response.wasVotableBungae()).isTrue();
-        assertThat(response.failedVoteDates()).isEmpty();
-        assertThat(response.isDateFixed()).isTrue();
-        assertThat(response.fixedDate()).isEqualTo(date3); // 가장 빠른 날짜로 확정
-
-        // 번개 상태 검증
         Bungae updatedBungae = bungaeRepository.findById(bungae.getId()).orElseThrow();
-        assertThat(updatedBungae.getStatus()).isEqualTo(BungaeStatus.RECRUITING);
-        assertThat(updatedBungae.getBungaeDate()).isEqualTo(date3);
+
+        SoftAssertions.assertSoftly(softly -> {
+            softly.assertThat(response.wasVotableBungae()).isTrue();
+            softly.assertThat(response.failedVoteDates()).isEmpty();
+            softly.assertThat(response.isDateFixed()).isTrue();
+            softly.assertThat(response.fixedDate()).isEqualTo(date2);
+            softly.assertThat(updatedBungae.getStatus()).isEqualTo(BungaeStatus.RECRUITING);
+            softly.assertThat(updatedBungae.getBungaeDate()).isEqualTo(date1);
+        });
     }
 
     /**
