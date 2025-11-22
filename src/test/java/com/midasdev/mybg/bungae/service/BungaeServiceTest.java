@@ -437,4 +437,80 @@ class BungaeServiceTest {
         assertThat(response.wasVotableBungae()).isTrue();
         assertThat(response.failedVoteDates()).contains(invalidDate);
     }
+
+    @Test
+    @DisplayName("B-5-S-8: 여러 개의 투표 후보가 동시에 최소 인원을 도달할 수 있는 상황이라면, 가장 빠른 날짜가 번개 날짜로 확정됩니다.")
+    void B_5_S_8() {
+        // given
+        Bungae bungae = bungaeRepository.save(BungaeFixture.createWithDateVoting(group, hostGroupMember, 3, 10));
+
+        // 3개의 날짜 후보 생성 (date3이 가장 빠른 날짜)
+        LocalDate date1 = LocalDate.now().plusDays(3);
+        LocalDate date2 = LocalDate.now().plusDays(2);
+        LocalDate date3 = LocalDate.now().plusDays(1);
+        List<LocalDate> dates = List.of(date1, date2, date3);
+
+        // 날짜 옵션 생성 및 저장
+        List<BungaeRecruitDateOption> options = createAndSaveDateOptions(bungae, dates);
+
+        // 호스트와 groupMember2가 모든 날짜에 투표 (각 날짜마다 2명)
+        voteForMultipleDateOptions(hostGroupMember, options);
+        voteForMultipleDateOptions(groupMember2, options);
+
+        // when
+        // member3가 모든 날짜에 투표하면, 세 날짜 모두 최소 인원(3명)에 도달
+        GroupMember groupMember3 = createNewGroupMember("테스트멤버3");
+
+        BungaeDateVoteResponse response = bungaeService.voteBungaeDates(
+                groupMember3.getMember(),
+                bungae.getId(),
+                dates
+        );
+
+        // then
+        assertThat(response.wasVotableBungae()).isTrue();
+        assertThat(response.failedVoteDates()).isEmpty();
+        assertThat(response.isDateFixed()).isTrue();
+        assertThat(response.fixedDate()).isEqualTo(date3); // 가장 빠른 날짜로 확정
+
+        // 번개 상태 검증
+        Bungae updatedBungae = bungaeRepository.findById(bungae.getId()).orElseThrow();
+        assertThat(updatedBungae.getStatus()).isEqualTo(BungaeStatus.RECRUITING);
+        assertThat(updatedBungae.getBungaeDate()).isEqualTo(date3);
+    }
+
+    /**
+     * 번개와 날짜 리스트에 대해 BungaeRecruitDateOption을 저장하고 옵션 리스트를 반환하는 테스트 유틸 메서드
+     */
+    private List<BungaeRecruitDateOption> createAndSaveDateOptions(Bungae bungae, List<LocalDate> dates) {
+        return dates.stream()
+                    .map(date -> bungaeRecruitDateOptionRepository.save(
+                            BungaeRecruitDateOption.builder()
+                                                   .dateOption(date)
+                                                   .bungae(bungae)
+                                                   .build()
+                    ))
+                    .toList();
+    }
+
+    /**
+     * 특정 그룹 멤버가 여러 날짜 옵션에 투표하는 테스트 유틸 메서드
+     */
+    private void voteForMultipleDateOptions(GroupMember voter, List<BungaeRecruitDateOption> options) {
+        List<BungaeDateVote> votes = options.stream()
+                                            .map(option -> BungaeDateVote.builder()
+                                                                         .voter(voter)
+                                                                         .dateOption(option)
+                                                                         .build())
+                                            .toList();
+        bungaeDateVoteRepository.saveAll(votes);
+    }
+
+    /**
+     * 새로운 멤버와 그룹 멤버를 생성하는 테스트 유틸 메서드
+     */
+    private GroupMember createNewGroupMember(String memberName) {
+        Member newMember = memberRepository.save(MemberFixture.create(memberName));
+        return groupMemberRepository.save(GroupMemberFixture.create(group, newMember));
+    }
 }
