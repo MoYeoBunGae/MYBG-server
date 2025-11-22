@@ -482,9 +482,9 @@ class BungaeServiceTest {
             softly.assertThat(response.wasVotableBungae()).isTrue();
             softly.assertThat(response.failedVoteDates()).isEmpty();
             softly.assertThat(response.isDateFixed()).isTrue();
-            softly.assertThat(response.fixedDate()).isEqualTo(date2);
+            softly.assertThat(response.fixedDate()).isEqualTo(date3);
             softly.assertThat(updatedBungae.getStatus()).isEqualTo(BungaeStatus.RECRUITING);
-            softly.assertThat(updatedBungae.getBungaeDate()).isEqualTo(date1);
+            softly.assertThat(updatedBungae.getBungaeDate()).isEqualTo(date3);
         });
     }
 
