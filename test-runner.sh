@@ -8,20 +8,31 @@ set -a
 source ./local-env/.test-env 2>/dev/null || true
 set +a
 
-TEST_PATTERN="${1:-*}"
+# 인자가 없으면 모든 테스트 실행
+if [ $# -eq 0 ]; then
+    TEST_PATTERNS=("*")
+else
+    TEST_PATTERNS=("$@")
+fi
+
 mkdir -p debug/logs
 LOG_FILE="debug/logs/test-output-$(date +%Y%m%d-%H%M%S).log"
 
 echo "================================================"
-echo "Running tests: ${TEST_PATTERN}"
+echo "Running tests: ${TEST_PATTERNS[*]}"
 echo "Log file: ${LOG_FILE}"
 echo "Started at: $(date)"
 echo "================================================"
 echo ""
 
-# Gradle 테스트 실행
+# Gradle 테스트 실행 - 여러 --tests 옵션 생성
+TESTS_ARGS=()
+for pattern in "${TEST_PATTERNS[@]}"; do
+    TESTS_ARGS+=("--tests" "${pattern}")
+done
+
 ./gradlew test \
-  --tests "${TEST_PATTERN}" \
+  "${TESTS_ARGS[@]}" \
   --rerun-tasks \
   --console=plain 2>&1 | tee "${LOG_FILE}"
 
@@ -52,8 +63,6 @@ FAILED_TESTS=0
 # 로그 파일에서 테스트 결과 추출
 # 패턴 예: "BungaeServiceTest > B-5-S-1: 날짜 투표... PASSED"
 while IFS= read -r line; do
-    # "TestClass > test name PASSED" 또는 "TestClass > test name FAILED" 패턴 매칭
-    # > 문자를 명시적으로 포함하여 Task 라인은 자연스럽게 제외됨
     if [[ $line =~ [^[:space:]]+[[:space:]]+\>[[:space:]]+(.+)[[:space:]]+(PASSED|FAILED)[[:space:]]*$ ]]; then
         test_name="${BASH_REMATCH[1]}"
         test_status="${BASH_REMATCH[2]}"
