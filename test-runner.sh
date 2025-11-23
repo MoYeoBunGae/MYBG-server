@@ -4,10 +4,6 @@
 # 사용법: ./test-runner.sh <test-pattern>
 # 예: ./test-runner.sh '*B_5_S_8'
 
-set -a
-source ./local-env/.test-env 2>/dev/null || true
-set +a
-
 # 인자가 없으면 모든 테스트 실행
 if [ $# -eq 0 ]; then
     TEST_PATTERNS=("*")
