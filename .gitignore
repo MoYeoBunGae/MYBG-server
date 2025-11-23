@@ -4,6 +4,7 @@ build/
 problems
 gradle.properties
 debug/
+instructions/
 
 # Prompt files
 prompt/
