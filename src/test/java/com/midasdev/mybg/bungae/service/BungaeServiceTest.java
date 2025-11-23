@@ -357,10 +357,14 @@ class BungaeServiceTest {
                               .build()
         ));
 
+        long voteCountBefore = bungaeDateVoteRepository.count();
+
         // when
         BungaeDateVoteResponse response = bungaeService.voteBungaeDates(member2, bungae.getId(), List.of(fixedDate));
 
         // then
+        long voteCountAfter = bungaeDateVoteRepository.count();
+
         SoftAssertions.assertSoftly(softly -> {
             softly.assertThat(response.wasVotableBungae()).isFalse();
             softly.assertThat(response.failedVoteDates()).isNull();
@@ -368,9 +372,10 @@ class BungaeServiceTest {
             softly.assertThat(response.isDateFixed()).isTrue();
             softly.assertThat(response.fixedDate()).isEqualTo(fixedDate);
             softly.assertThat(response.bungaeStatus()).isEqualTo(BungaeStatus.RECRUITING);
-        });
 
-        // TODO: 투표가 처리되지 않았음을 검증
+            // 투표는 처리되지 않음
+            softly.assertThat(voteCountAfter).isEqualTo(voteCountBefore);
+        });
     }
 
     @Test
@@ -398,10 +403,14 @@ class BungaeServiceTest {
                               .build()
         ));
 
+        long voteCountBefore = bungaeDateVoteRepository.count();
+
         // when
         BungaeDateVoteResponse response = bungaeService.voteBungaeDates(member2, bungae.getId(), List.of(fixedDate));
 
         // then
+        long voteCountAfter = bungaeDateVoteRepository.count();
+
         SoftAssertions.assertSoftly(softly -> {
             softly.assertThat(response.wasVotableBungae()).isFalse();
             softly.assertThat(response.failedVoteDates()).isNull();
@@ -409,9 +418,10 @@ class BungaeServiceTest {
             softly.assertThat(response.isDateFixed()).isTrue();
             softly.assertThat(response.fixedDate()).isEqualTo(fixedDate);
             softly.assertThat(response.bungaeStatus()).isEqualTo(BungaeStatus.RECRUITING_CLOSED);
-        });
 
-        // TODO: 투표가 처리되지 않았음을 검증
+            // 투표는 처리되지 않음
+            softly.assertThat(voteCountAfter).isEqualTo(voteCountBefore);
+        });
     }
 
     @Test
@@ -433,6 +443,9 @@ class BungaeServiceTest {
                 )
         );
 
+        // 투표 전 투표 수 확인
+        long voteCountBefore = bungaeDateVoteRepository.count();
+
         // when
         // 존재하지 않는 날짜(후보에 없음)
         LocalDate invalidDate = LocalDate.now().plusDays(100);
@@ -440,9 +453,14 @@ class BungaeServiceTest {
         BungaeDateVoteResponse response = bungaeService.voteBungaeDates(member2, bungae.getId(), List.of(invalidDate));
 
         // then
+        long voteCountAfter = bungaeDateVoteRepository.count();
+
         SoftAssertions.assertSoftly(softly -> {
             softly.assertThat(response.wasVotableBungae()).isTrue();
             softly.assertThat(response.failedVoteDates()).contains(invalidDate);
+
+            // 투표는 처리되지 않음
+            softly.assertThat(voteCountAfter).isEqualTo(voteCountBefore);
         });
     }
 
