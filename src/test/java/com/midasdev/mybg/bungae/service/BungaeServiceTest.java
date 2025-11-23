@@ -522,4 +522,44 @@ class BungaeServiceTest {
         Member newMember = memberRepository.save(MemberFixture.create(memberName));
         return groupMemberRepository.save(GroupMemberFixture.create(group, newMember));
     }
+
+    @Test
+    @DisplayName("B-5-S-9: 투표로 날짜가 확정되지 않은 경우, 올바른 반환값을 반환합니다.")
+    void B_5_S_9() {
+        // given
+        Bungae bungae = bungaeRepository.save(BungaeFixture.createWithDateVoting(group, hostGroupMember, 3, 10));
+
+        // 2개의 날짜 후보 생성
+        LocalDate date1 = LocalDate.now().plusDays(1);
+        LocalDate date2 = LocalDate.now().plusDays(2);
+        List<LocalDate> dates = List.of(date1, date2);
+
+        // 날짜 옵션 생성 및 저장
+        List<BungaeRecruitDateOption> options = createAndSaveDateOptions(bungae, dates);
+
+        // 호스트가 모든 날짜에 투표 (각 날짜마다 1명, 최소 인원 3명 미달)
+        voteForMultipleDateOptions(hostGroupMember, options);
+
+        // when
+        // groupMember2가 모든 날짜에 투표해도 각 날짜는 2명이므로 최소 인원(3명)에 도달하지 못함
+        BungaeDateVoteResponse response = bungaeService.voteBungaeDates(
+                member2,
+                bungae.getId(),
+                dates
+        );
+
+        // then
+        Bungae updatedBungae = bungaeRepository.findById(bungae.getId()).orElseThrow();
+
+        SoftAssertions.assertSoftly(softly -> {
+            softly.assertThat(response.wasVotableBungae()).isTrue();
+            softly.assertThat(response.failedVoteDates()).isEmpty();
+            softly.assertThat(response.isDateFixed()).isFalse();
+            softly.assertThat(response.fixedDate()).isNull();
+            softly.assertThat(response.isJoinable()).isNull();
+            softly.assertThat(response.bungaeStatus()).isEqualTo(BungaeStatus.DATE_VOTING);
+            softly.assertThat(updatedBungae.getStatus()).isEqualTo(BungaeStatus.DATE_VOTING);
+            softly.assertThat(updatedBungae.getBungaeDate()).isNull();
+        });
+    }
 }
