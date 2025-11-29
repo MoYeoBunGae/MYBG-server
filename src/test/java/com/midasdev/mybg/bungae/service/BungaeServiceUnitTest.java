@@ -62,7 +62,7 @@ public class BungaeServiceUnitTest {
 
     @Test
     @DisplayName("B-3-SU-1: 멤버가 그룹에 속하는지 검증 기능 호출")
-    void findBungaesByGroupIdAndStatuses_ShouldCallGroupMemberValidation() {
+    void B_3_SU_1() {
         // given
         Member member = MemberFixture.create();
         Member groupOwner = MemberFixture.create();
@@ -80,7 +80,7 @@ public class BungaeServiceUnitTest {
 
     @Test
     @DisplayName("B-4-SU-1: 번개의 상태가 DATE_VOTING이 아닐 때 예외 발생")
-    void getBungaeDateVoteOptions_ShouldThrowException_WhenBungaeStatusIsNotDateVoting() {
+    void B_4_SU_1() {
         // given
         Member member = MemberFixture.create();
         Member groupOwner = MemberFixture.create();

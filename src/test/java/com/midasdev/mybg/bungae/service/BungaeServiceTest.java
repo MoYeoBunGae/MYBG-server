@@ -83,8 +83,8 @@ class BungaeServiceTest {
     }
 
     @Test
-    @DisplayName("날짜 후보가 1개일 때 Bungae 생성 시 번개 날짜가 fix되어 저장되고, 상태가 RECRUITING이어야 한다")
-    void createBungae_withSingleDateCandidate_shouldSetStatusRecruiting() {
+    @DisplayName("B-1-S-1: 날짜 후보가 1개일 때 Bungae 생성")
+    void B_1_S_1() {
         // given
         BungaeCreateRequest request = new BungaeCreateRequest(
                 "테스트 번개",
@@ -111,8 +111,8 @@ class BungaeServiceTest {
     }
 
     @Test
-    @DisplayName("날짜 후보가 2개 이상일 때 Bungae 생성 시 상태가 DATE_VOTING이고, 날짜 정보 없이 시간만 저장된다")
-    void createBungae_withMultipleDateCandidates_shouldSetStatusDateVotingAndTimeOnly() {
+    @DisplayName("B-1-S-2: 날짜 후보가 2개 이상 일 때 Bungae 생성")
+    void B_1_S_2() {
         // given
         List<LocalDate> dateCandidates = List.of(
                 LocalDate.now().plusDays(1),
@@ -146,8 +146,8 @@ class BungaeServiceTest {
     }
 
     @Test
-    @DisplayName("날짜 후보가 2개 이상일 때 BungaeRecruitDateOption이 후보 개수만큼 저장된다.")
-    void createBungae_withMultipleDateCandidates_shouldSaveAllDateOptionsAndVoteCountIsOne() {
+    @DisplayName("B-1-S-3: 날짜 후보가 2개 이상일 때 BungaeRecruitDateOption이 후보 개수만큼 저장됨")
+    void B_1_S_3() {
         // given
         List<LocalDate> dateCandidates = List.of(
                 LocalDate.now().plusDays(1),
@@ -182,7 +182,7 @@ class BungaeServiceTest {
 
     @Test
     @DisplayName("B-4-S-1: 올바른 번개 투표 가능 날짜 조회")
-    void getBungaeDateVoteOptions_ShouldReturnDateOptions_WhenValidRequest() {
+    void B_4_S_1() {
         // given
         Bungae bungae = bungaeRepository.save(BungaeFixture.createWithDateVoting(group, hostGroupMember));
 

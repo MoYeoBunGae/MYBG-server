@@ -149,7 +149,7 @@ class CustomBungaeRepositoryTest {
 
     @Test
     @DisplayName("B-2-R-1: 조건에 맞는 올바른 나의 번개 조회 - lastCursorId, size")
-    void findAllByAttendeeMemberIdAndStatusIn_withCursorAndSize_shouldReturnCorrectBungaes() {
+    void B_2_R_1() {
         // given
         Long lastCursorId = Long.MAX_VALUE;
         int pageSize = 2;
@@ -172,7 +172,7 @@ class CustomBungaeRepositoryTest {
 
     @Test
     @DisplayName("B-2-R-2: 조건에 맞는 올바른 나의 번개 조회 - status")
-    void findAllByAttendeeMemberIdAndStatusIn_withStatus_shouldReturnFilteredBungaes() {
+    void B_2_R_2() {
         // given
         List<BungaeStatus> targetStatuses = List.of(BungaeStatus.DATE_VOTING, BungaeStatus.RECRUITING);
         CursorPageable cursorPageable = new CursorPageable(null, 10);
@@ -196,7 +196,7 @@ class CustomBungaeRepositoryTest {
 
     @Test
     @DisplayName("B-2-R-3: 조건에 맞는 올바른 나의 번개 조회 - status가 null일 경우")
-    void findAllByAttendeeMemberIdAndStatusIn_withNullStatus_shouldReturnAllBungaes() {
+    void B_2_R_3() {
         // given
         CursorPageable cursorPageable = new CursorPageable(null, 10);
 
@@ -225,7 +225,7 @@ class CustomBungaeRepositoryTest {
 
     @Test
     @DisplayName("B-2-R-4: lastCursorId가 null일 경우 가장 최근 것부터 나의 번개 조회")
-    void findAllByAttendeeMemberIdAndStatusIn_withNullCursor_shouldReturnFromLatest() {
+    void B_2_R_4() {
         // given
         CursorPageable cursorPageable = new CursorPageable(null, 3);
 
@@ -255,7 +255,7 @@ class CustomBungaeRepositoryTest {
 
     @Test
     @DisplayName("B-3-R-1: 조건에 맞는 올바른 그룹 번개 조회 - lastCursorId, size")
-    void findByGroupIdAndStatusIn_withCursorAndSize_shouldReturnCorrectBungaes() {
+    void B_3_R_1() {
         // given
         Long lastCursorId = Long.MAX_VALUE;
         int pageSize = 2;
@@ -281,7 +281,7 @@ class CustomBungaeRepositoryTest {
 
     @Test
     @DisplayName("B-3-R-2: 조건에 맞는 올바른 그룹 번개 조회 - status")
-    void findByGroupIdAndStatusIn_withStatus_shouldReturnFilteredBungaes() {
+    void B_3_R_2() {
         // given
         List<BungaeStatus> targetStatuses = List.of(BungaeStatus.RECRUITING, BungaeStatus.CLOSED);
         CursorPageable cursorPageable = new CursorPageable(null, 10);
@@ -305,7 +305,7 @@ class CustomBungaeRepositoryTest {
 
     @Test
     @DisplayName("B-3-R-3: 조건에 맞는 올바른 그룹 번개 조회 - status가 null일 경우")
-    void findByGroupIdAndStatusIn_withNullStatus_shouldReturnAllBungaes() {
+    void B_3_R_3() {
         // given
         CursorPageable cursorPageable = new CursorPageable(null, 10);
 
@@ -325,7 +325,7 @@ class CustomBungaeRepositoryTest {
 
     @Test
     @DisplayName("B-3-R-4: lastCursorId가 null일 경우 가장 최근 것부터 그룹 번개 조회")
-    void findByGroupIdAndStatusIn_withNullCursor_shouldReturnFromLatest() {
+    void B_3_R_4() {
         // given
         CursorPageable cursorPageable = new CursorPageable(null, 3);
 
@@ -353,7 +353,7 @@ class CustomBungaeRepositoryTest {
 
     @Test
     @DisplayName("B-2-R-5: 정확한 값이 있는 나의 번개 조회")
-    void findAllByAttendeeMemberIdAndStatusIn_shouldReturnCorrectFieldValues() {
+    void B_2_R_5() {
         // given
         Member testMember = memberRepository.save(MemberFixture.create("B-2-R-5"));
         Group testGroup = groupRepository.save(GroupFixture.create(testMember, "B-2-R-5 그룹", "B-2-R-5-invitation-code"));
@@ -431,7 +431,7 @@ class CustomBungaeRepositoryTest {
 
     @Test
     @DisplayName("B-3-R-5: 정확한 값이 있는 그룹 번개 조회")
-    void findByGroupIdAndStatusIn_shouldReturnCorrectFieldValues() {
+    void B_3_R_5() {
         // given
         Member testMember = memberRepository.save(MemberFixture.create("B-3-R-5"));
         Group testGroup = groupRepository.save(GroupFixture.create(testMember, "B-3-R-5 그룹", "B-3-R-5-invitation-code"));
