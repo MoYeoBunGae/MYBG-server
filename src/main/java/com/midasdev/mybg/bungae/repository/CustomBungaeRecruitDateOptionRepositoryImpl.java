@@ -1,5 +1,10 @@
 package com.midasdev.mybg.bungae.repository;
 
+import java.time.LocalDate;
+import java.util.List;
+
+import org.springframework.stereotype.Repository;
+
 import com.midasdev.mybg.bungae.domain.QBungaeDateVote;
 import com.midasdev.mybg.bungae.domain.QBungaeRecruitDateOption;
 import com.midasdev.mybg.bungae.repository.dto.BungaeDateVoteInfoDto;
@@ -8,11 +13,8 @@ import com.querydsl.core.types.SubQueryExpression;
 import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.jpa.JPAExpressions;
 import com.querydsl.jpa.impl.JPAQueryFactory;
+
 import jakarta.persistence.EntityManager;
-import java.time.LocalDate;
-import java.util.List;
-import java.util.Optional;
-import org.springframework.stereotype.Repository;
 
 @Repository
 public class CustomBungaeRecruitDateOptionRepositoryImpl implements CustomBungaeRecruitDateOptionRepository {
