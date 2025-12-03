@@ -2,6 +2,7 @@ package com.midasdev.mybg.bungae.service;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+import com.midasdev.mybg.DatabaseTestSupport;
 import com.midasdev.mybg.bungae.controller.dto.request.BungaeCreateRequest;
 import com.midasdev.mybg.bungae.controller.dto.response.BungaeDateVoteResponse;
 import com.midasdev.mybg.bungae.domain.Bungae;
@@ -38,7 +39,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 @SpringBootTest
 @Transactional
-class BungaeServiceTest {
+class BungaeServiceTest extends DatabaseTestSupport {
 
     @Autowired
     private BungaeService bungaeService;

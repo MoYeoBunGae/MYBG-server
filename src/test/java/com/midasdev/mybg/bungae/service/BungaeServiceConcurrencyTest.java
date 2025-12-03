@@ -2,6 +2,7 @@ package com.midasdev.mybg.bungae.service;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+import com.midasdev.mybg.DatabaseTestSupport;
 import com.midasdev.mybg.bungae.domain.Bungae;
 import com.midasdev.mybg.bungae.domain.BungaeAttendee;
 import com.midasdev.mybg.bungae.domain.BungaeDateVote;
@@ -32,7 +33,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
 @SpringBootTest
-class BungaeServiceConcurrencyTest {
+class BungaeServiceConcurrencyTest extends DatabaseTestSupport{
 
     @Autowired
     private BungaeService bungaeService;
