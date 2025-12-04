@@ -7,6 +7,8 @@ import org.springframework.test.context.DynamicPropertyRegistry;
 import org.springframework.test.context.DynamicPropertySource;
 import org.testcontainers.containers.MySQLContainer;
 
+import lombok.extern.slf4j.Slf4j;
+
 /**
  * Base class for database integration tests.
  * <p>
@@ -22,6 +24,7 @@ import org.testcontainers.containers.MySQLContainer;
  * ./gradlew test -Dspring.profiles.active=test_local
  * </pre>
  */
+@Slf4j
 public abstract class DatabaseTestSupport {
 
     private static final String TESTCONTAINERS_PROFILE = "test_ci";
@@ -36,6 +39,7 @@ public abstract class DatabaseTestSupport {
                     .withDatabaseName("testdb")
                     .withUsername("testuser")
                     .withPassword("testpass");
+            log.info("Starting MySQL Testcontainer for profile '{}'", TESTCONTAINERS_PROFILE);
             mysql.start();
         }
     }
