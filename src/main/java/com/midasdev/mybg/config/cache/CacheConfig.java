@@ -23,16 +23,16 @@ public class CacheConfig {
         CachingProvider provider = Caching.getCachingProvider();
         CacheManager cacheManager = provider.getCacheManager();
 
-        CacheConfiguration<String, String> configuration =
-                CacheConfigurationBuilder.newCacheConfigurationBuilder(
-                                                 String.class,
-                                                 String.class,
-                                                 ResourcePoolsBuilder.heap(10)
-                                         )
-                                         .withExpiry(ExpiryPolicyBuilder.timeToLiveExpiration(Duration.ofDays(7)))
-                                         .build();
-
-        cacheManager.createCache(Cache.OIDC_PUBLIC_KEYS, Eh107Configuration.fromEhcacheCacheConfiguration(configuration));
+        CacheConfiguration<String, String> configuration = CacheConfigurationBuilder.newCacheConfigurationBuilder(
+                String.class,
+                String.class,
+                ResourcePoolsBuilder.heap(10))
+                .withExpiry(ExpiryPolicyBuilder.timeToLiveExpiration(Duration.ofDays(7)))
+                .build();
+        if (cacheManager.getCache(Cache.OIDC_PUBLIC_KEYS) == null) {
+            cacheManager.createCache(Cache.OIDC_PUBLIC_KEYS,
+                    Eh107Configuration.fromEhcacheCacheConfiguration(configuration));
+        }
         return cacheManager;
     }
 
