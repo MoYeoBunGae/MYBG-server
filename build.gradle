@@ -87,16 +87,21 @@ dependencies {
 }
 
 tasks.named('test') {
-    doFirst {
-        systemProperty 'spring.profiles.active', 'test'
-    }
     useJUnitPlatform()
+
+    doFirst {
+        if (project.hasProperty('profile')) {
+            systemProperty 'spring.profiles.active', project.getProperty('profile')
+        } else {
+            systemProperty 'spring.profiles.active', 'test'
+        }
+    }
 }
 
 tasks.withType(Test) {
     testLogging {
         events "passed", "failed", "skipped"
-        showStandardStreams = true
+        showStandardStreams = false
         exceptionFormat "full"
     }
 }

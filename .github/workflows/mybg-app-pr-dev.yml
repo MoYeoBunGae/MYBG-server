@@ -49,7 +49,7 @@ jobs:
             ${{ runner.os }}-buildx-
 
       - name: Run tests with Gradle
-        run: ./gradlew test --stacktrace -Dspring.profiles.active=test_ci
+        run: ./gradlew test --stacktrace -Pprofile=test_ci
 
 #      - name: Upload Test Report
 #        if: always()
