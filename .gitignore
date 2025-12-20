@@ -52,7 +52,7 @@ out/
 
 ### Custom ###
 ## profiles
-application-local.yml
+application-local.yml*
 application-localtest.yml
 data.sql
 TempJwtGenerator.java
