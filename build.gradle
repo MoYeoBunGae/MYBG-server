@@ -101,7 +101,7 @@ tasks.named('test') {
 tasks.withType(Test) {
     testLogging {
         events "passed", "failed", "skipped"
-        showStandardStreams = true
+        showStandardStreams = false
         exceptionFormat "full"
     }
 }
