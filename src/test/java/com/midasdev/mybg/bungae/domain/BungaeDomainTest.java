@@ -124,7 +124,7 @@ class BungaeDomainTest {
                               .build();
 
         // when
-        bungae.confirmDate(LocalDate.of(2024, 7, 1));
+        bungae.confirmDate(LocalDate.now().plusDays(1));
 
         // then
         assertThat(bungae.getStatus()).isEqualTo(BungaeStatus.RECRUITING_CLOSED);
@@ -147,7 +147,7 @@ class BungaeDomainTest {
                               .build();
 
         // when
-        bungae.confirmDate(LocalDate.of(2024, 7, 2));
+        bungae.confirmDate(LocalDate.now().plusDays(1));
 
         // then
         assertThat(bungae.getStatus()).isEqualTo(BungaeStatus.RECRUITING);
@@ -170,7 +170,7 @@ class BungaeDomainTest {
                               .build();
 
         // when & then
-        assertThatThrownBy(() -> bungae.confirmDate(LocalDate.of(2024, 7, 3)))
+        assertThatThrownBy(() -> bungae.confirmDate(LocalDate.now().plusDays(1)))
                 .isInstanceOf(ApplicationException.class)
                 .hasFieldOrPropertyWithValue(TestConstant.EXCEPTION_TYPE_FIELD, ApplicationExceptionType.INVALID_ATTENDEE_LIMITS);
     }
@@ -190,10 +190,10 @@ class BungaeDomainTest {
                               .build();
 
         // when
-        bungae.confirmDate(LocalDate.of(2024, 7, 4));
+        bungae.confirmDate(LocalDate.now().plusDays(1));
 
         // then
-        assertThat(bungae.getBungaeDate()).isEqualTo(LocalDate.of(2024, 7, 4));
+        assertThat(bungae.getBungaeDate()).isEqualTo(LocalDate.now().plusDays(1));
     }
 
     @Test
@@ -211,10 +211,10 @@ class BungaeDomainTest {
                               .bungaeDateTime(new BungaeDateTime(LocalTime.of(18, 0)))
                               .build();
         // when
-        bungae.confirmDate(LocalDate.of(2024, 7, 5));
+        bungae.confirmDate(LocalDate.now().plusDays(1));
 
         // then
-        assertThat(bungae.getBungaeDate()).isEqualTo(LocalDate.of(2024, 7, 5));
+        assertThat(bungae.getBungaeDate()).isEqualTo(LocalDate.now().plusDays(1));
     }
 
     @Test
@@ -222,7 +222,7 @@ class BungaeDomainTest {
     void BD_4_D_1() {
         // given
         Bungae bungae = BungaeFixture.createWithBungaeDateTime(group, host,
-                new BungaeDateTime(LocalDate.of(2024, 7, 6), LocalTime.of(18, 0)));
+                new BungaeDateTime(LocalDate.now().plusDays(1), LocalTime.of(18, 0)));
         // when
         boolean result = bungae.isDateFixed();
 
