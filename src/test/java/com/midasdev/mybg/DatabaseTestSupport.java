@@ -16,7 +16,7 @@ import lombok.extern.slf4j.Slf4j;
  * <li><b>test-ci</b>: Uses Testcontainers for MySQL</li>
  * </ul>
  * <p>
- * To run tests with Testcontainers, activate the 'test-ci' profile:
+ * To run tests with Testcontainers, activate the 'test_ci' profile:
  * 
  * <pre>
  * ./gradlew test -Dspring.profiles.active=test_ci

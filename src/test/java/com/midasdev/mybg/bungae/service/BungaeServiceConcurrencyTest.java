@@ -25,6 +25,8 @@ import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
 import java.time.LocalDate;
 import java.util.List;
+import java.util.concurrent.CountDownLatch;
+
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -118,14 +120,27 @@ class BungaeServiceConcurrencyTest extends DatabaseTestSupport{
 
         // when: 100명이 동시에 투표 시도
         Thread[] threads = new Thread[100];
+
+        CountDownLatch startLatch = new CountDownLatch(1);
+        CountDownLatch doneLatch = new CountDownLatch(100);
+
         for (int i = 0; i < 100; i++) {
             final int idx = i;
             threads[i] = new Thread(() -> {
-                bungaeService.voteBungaeDates(members[idx], bungae.getId(), List.of(voteDate));
+                try {
+                    startLatch.await(); // 모든 스레드가 준비될 때까지 대기
+                    bungaeService.voteBungaeDates(members[idx], bungae.getId(), List.of(voteDate));
+                } catch (InterruptedException e) {
+                    Thread.currentThread().interrupt();
+                } finally {
+                    doneLatch.countDown(); // 작업 완료 신호
+                }
             });
         }
+
         for (Thread thread : threads) thread.start();
-        for (Thread thread : threads) thread.join();
+        startLatch.countDown(); // 모든 스레드 시작
+        doneLatch.await(); // 모든 스레드 완료 대기
 
         // then: 투표 성공자는 1명, 실패자는 99명이어야 함
         long voteCount = bungaeDateVoteRepository.findBungaeDateVotesByDateOption(dateOption).size();
