@@ -1,7 +1,6 @@
 package com.midasdev.mybg.global.lock;
 
 import jakarta.persistence.EntityManager;
-import jakarta.persistence.PersistenceContext;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.hibernate.Session;
@@ -26,11 +25,11 @@ public class NamedLockManager {
      */
     public boolean tryAcquire(String key, int waitSec) {
         // 1) 같은 EntityManager로 GET_LOCK 실행 → 같은 커넥션 사용
-        Integer lock = ((Number) entityManager.createNativeQuery("SELECT GET_LOCK(:k, :w)")
+        int lock = ((Number) entityManager.createNativeQuery("SELECT GET_LOCK(:k, :w)")
                                              .setParameter("k", key)
                                              .setParameter("w", waitSec)
                                              .getSingleResult()).intValue();
-        if (lock == null || lock == 0) {
+        if (lock == 0) {
             log.error("Failed to acquire named lock: {}", key);
             return false;
         }
