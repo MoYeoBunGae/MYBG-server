@@ -175,19 +175,7 @@ public class BungaeService {
     @Transactional
     public BungaeDateVoteResponse voteBungaeDates(Member member, Long bungaeId, List<LocalDate> voteDates) {
         // 0. 동시성 제어: 번개 ID 기반 락 획득
-        String lockKey = "bungae:" + bungaeId;
-        boolean lockAcquired = false;
-
-        for (int i = 0; i < 3; i++) { // 최대 3회 재시도
-            lockAcquired = namedLockManager.tryAcquire(lockKey, 1);
-            if (lockAcquired) {
-                break;
-            }
-        }
-
-        if (!lockAcquired) {
-            throw new ApplicationException(ApplicationExceptionType.BUNGAE_VOTE_CONCURRENCY_LOCK_FAILED, bungaeId);
-        }
+        acquireLockByBungae(bungaeId);
 
         //  1. 번개 조회 및 검증
         Bungae bungae = bungaeFinder.findById(bungaeId);
@@ -279,6 +267,31 @@ public class BungaeService {
                 .bungaeStatus(bungae.getStatus())
                 .failedVoteDates(isVotableStatus ? failedVoteDates : null)
                 .build();
+    }
+
+    private void acquireLockByBungae(Long bungaeId) {
+        String lockKey = "bungae:" + bungaeId;
+        boolean lockAcquired = false;
+
+        for (int i = 0; i < 3; i++) { // 최대 3회 재시도
+            lockAcquired = namedLockManager.tryAcquire(lockKey, 1);
+            if (lockAcquired) {
+                break;
+            }
+
+            if (i < 2) { // 마지막 시도가 아니면 50ms 대기 후 재시도
+                try {
+                    Thread.sleep(50);
+                } catch (InterruptedException e) {
+                    Thread.currentThread().interrupt();
+                    throw new ApplicationException(ApplicationExceptionType.BUNGAE_VOTE_CONCURRENCY_LOCK_FAILED, bungaeId);
+                }
+            }
+        }
+
+        if (!lockAcquired) {
+            throw new ApplicationException(ApplicationExceptionType.BUNGAE_VOTE_CONCURRENCY_LOCK_FAILED, bungaeId);
+        }
     }
 
 }
