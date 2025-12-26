@@ -14,7 +14,6 @@ import org.springframework.transaction.support.TransactionSynchronizationManager
 @RequiredArgsConstructor
 public class NamedLockManager {
 
-    @PersistenceContext
     private final EntityManager entityManager;
 
     /**
