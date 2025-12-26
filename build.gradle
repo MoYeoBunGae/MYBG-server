@@ -78,13 +78,32 @@ dependencies {
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
     testImplementation 'org.springframework.security:spring-security-test'
     testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+
+    testImplementation "org.testcontainers:testcontainers"
+    testImplementation "org.testcontainers:junit-jupiter"
+    testImplementation "org.testcontainers:mysql"
+    testCompileOnly 'org.projectlombok:lombok'
+    testAnnotationProcessor 'org.projectlombok:lombok'
 }
 
 tasks.named('test') {
-    doFirst {
-        systemProperty 'spring.profiles.active', 'test'
-    }
     useJUnitPlatform()
+
+    doFirst {
+        if (project.hasProperty('profile')) {
+            systemProperty 'spring.profiles.active', project.getProperty('profile')
+        } else {
+            systemProperty 'spring.profiles.active', 'test'
+        }
+    }
+}
+
+tasks.withType(Test) {
+    testLogging {
+        events "passed", "failed", "skipped"
+        showStandardStreams = false
+        exceptionFormat "full"
+    }
 }
 
 tasks.withType(Test).configureEach {
@@ -99,3 +118,38 @@ tasks.withType(Test).configureEach {
     }
 }
 
+def testEnvKeys = [
+    "REFRESH_TOKEN_EXPIRED_SECOND",
+    "REDIS_HOST",
+    "AWS_REGION",
+    "CLIENT_REDIRECT_AUTH_SUCCESS_PATH",
+    "CLIENT_URL",
+    "SECURITY_PERMITTED_URLS",
+    "AWS_S3_BUCKET_NAME",
+    "TEST_DB_URL",
+    "JWT_SECRET_KEY",
+    "AWS_S3_ACCESS_KEY",
+    "ACCESS_TOKEN_EXPIRED_SECOND",
+    "AWS_S3_SECRET_KEY",
+    "DEV_SERVER_URL",
+    "REDIS_PORT",
+    "SWAGGER_API_PATH",
+    "AUTH_TOKEN_EXPIRED_SECOND",
+    "REDIS_PASSWORD",
+    "TEST_DB_PASSWORD",
+    "CLOUDFRONT_URL",
+    "REDIS_USERNAME",
+    "TEST_DB_USERNAME",
+    "SWAGGER_UI_PATH"
+]
+
+test {
+
+    doFirst {
+        if (project.findProperty("profile") == "test") {
+            testEnvKeys.each { key ->
+                environment key, project.findProperty(key)
+            }
+        }
+    }
+}

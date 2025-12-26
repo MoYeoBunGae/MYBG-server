@@ -12,9 +12,19 @@ import java.time.LocalTime;
 
 public class BungaeFixture {
 
-    // DATE_VOTING
+    /**
+     * DATE_VOTING 상태, 기본 참석자 수 설정(3~10)
+     */
     public static Bungae createWithDateVoting(Group group, GroupMember host) {
         return bungaeBaseBuilder(group, host)
+                .status(BungaeStatus.DATE_VOTING)
+                .dateVoteClosedAt(LocalDateTime.now().plusDays(1))
+                .build();
+    }
+
+    // DATE_VOTING WITH ATTENDEES
+    public static Bungae createWithDateVoting(Group group, GroupMember host, int minAttendees, int maxAttendees) {
+        return bungaeBaseBuilder(group, host, minAttendees, maxAttendees)
                 .status(BungaeStatus.DATE_VOTING)
                 .dateVoteClosedAt(LocalDateTime.now().plusDays(1))
                 .build();
@@ -28,11 +38,32 @@ public class BungaeFixture {
                 .build();
     }
 
+    public static Bungae createWithRecruiting(Group group, GroupMember host, LocalDate date) {
+        return bungaeBaseBuilder(group, host)
+                .status(BungaeStatus.RECRUITING)
+                .bungaeDateTime(new BungaeDateTime(date))
+                .build();
+    }
+
+    public static Bungae createWithRecruiting(Group group, GroupMember host, LocalDate date, int minAttendees, int maxAttendees) {
+        return bungaeBaseBuilder(group, host, minAttendees, maxAttendees)
+                .status(BungaeStatus.RECRUITING)
+                .bungaeDateTime(new BungaeDateTime(date))
+                .build();
+    }
+
     // RECRUITING_CLOSED
     public static Bungae createWithRecruitingClosed(Group group, GroupMember host) {
         return bungaeBaseBuilder(group, host)
                 .status(BungaeStatus.RECRUITING_CLOSED)
                 .bungaeDateTime(new BungaeDateTime(LocalDate.now().plusDays(2)))
+                .build();
+    }
+
+    public static Bungae createWithRecruitingClosed(Group group, GroupMember host, LocalDate date, int minAttendees, int maxAttendees) {
+        return bungaeBaseBuilder(group, host, minAttendees, maxAttendees)
+                .status(BungaeStatus.RECRUITING_CLOSED)
+                .bungaeDateTime(new BungaeDateTime(date))
                 .build();
     }
 
@@ -54,11 +85,15 @@ public class BungaeFixture {
 
 
     private static Bungae.BungaeBuilder bungaeBaseBuilder(Group group, GroupMember host) {
+        return bungaeBaseBuilder(group, host, 3, 10);
+    }
+
+    private static Bungae.BungaeBuilder bungaeBaseBuilder(Group group, GroupMember host, int minAttendees, int maxAttendees) {
         return Bungae.builder()
                      .name("테스트 번개")
                      .description("테스트용 번개 설명")
-                     .minAttendees(2)
-                     .maxAttendees(10)
+                     .minAttendees(minAttendees)
+                     .maxAttendees(maxAttendees)
                      .isOnline(false)
                      .location("서울 강남구")
                      .deleted(false)
@@ -76,6 +111,38 @@ public class BungaeFixture {
                      .location("서울 강남구")
                      .bungaeDateTime(new BungaeDateTime(LocalDate.now().plusDays(1), LocalTime.of(18, 0)))
                      .status(status)
+                     .deleted(false)
+                     .group(group)
+                     .host(host)
+                     .build();
+    }
+
+    public static Bungae createWithMinAttendees(Group group, GroupMember host, int minAttendees) {
+        return Bungae.builder()
+                     .name("테스트 번개")
+                     .description("테스트용 번개 설명")
+                     .minAttendees(minAttendees)
+                     .maxAttendees(minAttendees + 10)
+                     .isOnline(false)
+                     .location("서울 강남구")
+                     .bungaeDateTime(new BungaeDateTime(LocalDate.now().plusDays(1), LocalTime.of(18, 0)))
+                     .status(BungaeStatus.RECRUITING)
+                     .deleted(false)
+                     .group(group)
+                     .host(host)
+                     .build();
+    }
+
+    public static Bungae createWithBungaeDateTime(Group group, GroupMember host, BungaeDateTime bungaeDateTime) {
+        return Bungae.builder()
+                     .name("테스트 번개")
+                     .description("테스트용 번개 설명")
+                     .minAttendees(2)
+                     .maxAttendees(10)
+                     .isOnline(false)
+                     .location("서울 강남구")
+                     .bungaeDateTime(bungaeDateTime)
+                     .status(BungaeStatus.RECRUITING)
                      .deleted(false)
                      .group(group)
                      .host(host)

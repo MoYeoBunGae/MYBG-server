@@ -1,9 +1,13 @@
 package com.midasdev.mybg.group.domain;
 
+import org.hibernate.annotations.ColumnDefault;
+import org.springframework.data.jpa.domain.support.AuditingEntityListener;
+
 import com.midasdev.mybg.global.audit.Audit;
 import com.midasdev.mybg.global.exception.ApplicationException;
 import com.midasdev.mybg.global.exception.ApplicationExceptionType;
 import com.midasdev.mybg.member.domain.Member;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.Embedded;
 import jakarta.persistence.Entity;
@@ -14,7 +18,6 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
-import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
 import jakarta.persistence.UniqueConstraint;
 import lombok.AccessLevel;
@@ -23,8 +26,6 @@ import lombok.Builder;
 import lombok.Builder.Default;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import org.hibernate.annotations.ColumnDefault;
-import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 @Entity
 @Getter
@@ -32,12 +33,9 @@ import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 @AllArgsConstructor
 @EntityListeners(AuditingEntityListener.class)
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-@Table(name = "\"group\"",
-        uniqueConstraints = {
-                @UniqueConstraint(
-                        name = "uq_invitation_code",
-                        columnNames = { "invitation_code" })
-        })
+@Table(name = "\"group\"", uniqueConstraints = {
+        @UniqueConstraint(name = "uq_invitation_code", columnNames = { "invitation_code" })
+})
 public class Group {
 
     @Id
@@ -92,8 +90,7 @@ public class Group {
         if (newMaxCount < this.totalMemberCount) {
             throw new ApplicationException(
                     ApplicationExceptionType.GROUP_MAX_COUNT_BELOW_CURRENT,
-                    newMaxCount, this.totalMemberCount
-            );
+                    newMaxCount, this.totalMemberCount);
         }
         this.maxMemberCount = newMaxCount;
     }

@@ -35,7 +35,7 @@ class BungaeFinderUnitTest {
 
     @Test
     @DisplayName("BF-1-SU-1: 존재하는 번개 ID로 조회 시 번개 반환")
-    void findById_ShouldReturnBungae_WhenBungaeExists() {
+    void BF_1_SU_1() {
         // given
         Long bungaeId = 1L;
         Member member = MemberFixture.create();
@@ -54,7 +54,7 @@ class BungaeFinderUnitTest {
 
     @Test
     @DisplayName("BF-1-SU-2: 존재하지 않는 번개 ID로 조회 시 예외 발생")
-    void findById_ShouldThrowException_WhenBungaeNotExists() {
+    void BF_1_SU_2() {
         // given
         Long nonExistentBungaeId = 999L;
         given(bungaeRepository.findByIdAndDeletedIsFalse(nonExistentBungaeId))

@@ -1,10 +1,18 @@
 HELP.md
 .gradle
 build/
+problems
+gradle.properties
+debug/
+instructions/
+scripts/
 
 # Prompt files
 prompt/
+prompts/
 prompt-*.md
+copilot-instructions.md
+CLAUDE.md
 
 
 !gradle/wrapper/gradle-wrapper.jar
@@ -44,7 +52,7 @@ out/
 
 ### Custom ###
 ## profiles
-application-local.yml
+application-local.yml*
 application-localtest.yml
 data.sql
 TempJwtGenerator.java

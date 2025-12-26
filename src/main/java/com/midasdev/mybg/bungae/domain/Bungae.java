@@ -1,6 +1,8 @@
 package com.midasdev.mybg.bungae.domain;
 
 import com.midasdev.mybg.global.audit.Audit;
+import com.midasdev.mybg.global.exception.ApplicationException;
+import com.midasdev.mybg.global.exception.ApplicationExceptionType;
 import com.midasdev.mybg.global.util.cursor_page.LongIdentifiable;
 import com.midasdev.mybg.group.domain.Group;
 import com.midasdev.mybg.group_member.domain.GroupMember;
@@ -19,6 +21,7 @@ import jakarta.persistence.ManyToOne;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
+import java.util.Objects;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -101,8 +104,44 @@ public class Bungae implements LongIdentifiable {
         return audit != null ? audit.getModifiedAt() : null;
     }
 
-    public boolean canVote() {
+    public boolean isVotableStatus() {
         return this.status == BungaeStatus.DATE_VOTING;
+    }
+
+    // 최소 인원까지 한자리가 남았는지 여부
+    public boolean isOneLeftToMinAttendees(int currentAttendeeCount) {
+        return currentAttendeeCount == (this.minAttendees - 1);
+    }
+
+    public void confirmDate(LocalDate date) {
+        if (this.status != BungaeStatus.DATE_VOTING) {
+            throw new ApplicationException(ApplicationExceptionType.INVALID_BUNGAE_STATUS_FOR_DATE_CONFIRMATION, this.id, this.status);
+        }
+
+
+        // 확정된 날짜로 번개 날짜 업데이트
+        if (this.bungaeDateTime == null) {
+            this.bungaeDateTime = new BungaeDateTime(date, null);
+        } else {
+            this.bungaeDateTime.updateDate(date);
+        }
+
+        // 상태 변경
+        if (Objects.equals(minAttendees, maxAttendees)) {
+            this.status = BungaeStatus.RECRUITING_CLOSED;
+        } else if (minAttendees < maxAttendees) {
+            this.status = BungaeStatus.RECRUITING;
+        } else {
+            throw new ApplicationException(ApplicationExceptionType.INVALID_ATTENDEE_LIMITS, this.id, this.minAttendees, this.maxAttendees);
+        }
+    }
+
+    public boolean isDateFixed() {
+        return this.bungaeDateTime != null && this.bungaeDateTime.isDateSet();
+    }
+
+    public boolean canJoin() {
+        return this.status == BungaeStatus.RECRUITING;
     }
 
 }

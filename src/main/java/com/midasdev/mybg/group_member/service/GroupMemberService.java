@@ -37,7 +37,6 @@ public class GroupMemberService {
         }
 
         // 이미 가입된 그룹인지 검증
-        // TODO: soft delete 반영하도록 수정
         if (isAlreadyGroupMember(member, group)) {
             throw new ApplicationException(ApplicationExceptionType.ALREADY_JOINED_GROUP, member.getId(), group.getId());
         }

@@ -119,6 +119,11 @@ public enum ApplicationExceptionType {
      * - {0} : bungaeId
      */
     BUNGAE_VOTE_UNAVAILABLE(HttpStatus.BAD_REQUEST, "ERR_BUNGAE_002", "번개({0})에 대한 투표가 불가능합니다."),
+    BUNGAE_VOTE_CONCURRENCY_LOCK_FAILED(HttpStatus.INTERNAL_SERVER_ERROR, "ERR_BUNGAE_003", "번개 날짜 투표 동시성 락 획득에 실패했습니다."),
+    BUNGAE_DATE_OPTION_NOT_FOUND(HttpStatus.BAD_REQUEST, "ERR_BUNGAE_004", "번개({0})의 해당 날짜 후보({1})를 찾을 수 없습니다."),
+    ALREADY_VOTED_FOR_BUNGAE_DATE(HttpStatus.BAD_REQUEST, "ERR_BUNGAE_005", "이미 해당 날짜({1})에 투표했습니다. (번개 ID: {0})"),
+    INVALID_BUNGAE_STATUS_FOR_DATE_CONFIRMATION(HttpStatus.BAD_REQUEST, "ERR_BUNGAE_006", "번개({0})의 상태({1})로 인해 날짜 확정이 불가능합니다."),
+    INVALID_ATTENDEE_LIMITS(HttpStatus.BAD_REQUEST, "ERR_BUNGAE_007", "번개({0})의 최소 인원({1})은 최대 인원({2})보다 클 수 없습니다."),
 
     // authentication
     TOKEN_AUTHENTICATION_EXCEPTION(HttpStatus.FORBIDDEN, "ERR_AUTH_001", "토큰 인증에 실패했습니다. : {0}"),
