@@ -26,7 +26,7 @@ public record BungaeDateVoteResponse(
 
         @Schema(
 description = "확정된 날짜에 추가로 참여 가능한지 여부. <br/>" +
-                        "true: 참여 가능(RECRUITING 상태, 현재 참가자 수 &lt; 최대 인원). <br/>" +
+                        "true: 참여 가능(RECRUITING 상태, 현재 참가자 수 < 최대 인원). <br/>" +
                         "false: 참여 불가(RECRUITING_CLOSED 상태, 현재 참가자 수 = 최대 인원). <br/>" +
                         "null: 날짜가 아직 확정되지 않은 경우.",
                 example = "true",
