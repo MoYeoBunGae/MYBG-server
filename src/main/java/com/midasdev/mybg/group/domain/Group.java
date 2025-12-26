@@ -33,12 +33,9 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @EntityListeners(AuditingEntityListener.class)
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-@Table(name = "\"group\"",
-        uniqueConstraints = {
-                @UniqueConstraint(
-                        name = "uq_invitation_code",
-                        columnNames = { "invitation_code" })
-        })
+@Table(name = "\"group\"", uniqueConstraints = {
+        @UniqueConstraint(name = "uq_invitation_code", columnNames = { "invitation_code" })
+})
 public class Group {
 
     @Id
@@ -93,8 +90,7 @@ public class Group {
         if (newMaxCount < this.totalMemberCount) {
             throw new ApplicationException(
                     ApplicationExceptionType.GROUP_MAX_COUNT_BELOW_CURRENT,
-                    newMaxCount, this.totalMemberCount
-            );
+                    newMaxCount, this.totalMemberCount);
         }
         this.maxMemberCount = newMaxCount;
     }
