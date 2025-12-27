@@ -87,18 +87,19 @@ class BungaeServiceTest extends DatabaseTestSupport {
     @DisplayName("B-1-S-1: 날짜 후보가 1개일 때 Bungae 생성")
     void B_1_S_1() {
         // given
-        BungaeCreateRequest request = new BungaeCreateRequest(
-                "테스트 번개",
-                "설명",
-                2,
-                10,
-                false,
-                "서울",
-                LocalTime.of(18, 0),
-                List.of(LocalDate.now().plusDays(1)),
-                null,
-                group.getId()
-        );
+        BungaeCreateRequest request = BungaeCreateRequest.builder()
+                .name("테스트 번개")
+                .description("설명")
+                .minAttendees(2)
+                .maxAttendees(10)
+                .isOnline(false)
+                .location("서울")
+                .bungaeTime(LocalTime.of(18, 0))
+                .dateCandidates(List.of(LocalDate.now().plusDays(1)))
+                .dateVoteClosedAt(null)
+                .groupId(group.getId())
+                .build();
+        
 
         // when
         Bungae bungae = bungaeService.createBungae(member, request);
@@ -122,18 +123,18 @@ class BungaeServiceTest extends DatabaseTestSupport {
         LocalTime bungaeTime = LocalTime.of(19, 0);
         LocalDateTime voteClosedAt = LocalDateTime.now().plusDays(1);
 
-        BungaeCreateRequest request = new BungaeCreateRequest(
-                "테스트 번개2",
-                "설명2",
-                2,
-                10,
-                false,
-                "서울",
-                bungaeTime,
-                dateCandidates,
-                voteClosedAt,
-                group.getId()
-        );
+        BungaeCreateRequest request = BungaeCreateRequest.builder()
+                .name("테스트 번개2")
+                .description("설명2")
+                .minAttendees(2)
+                .maxAttendees(10)
+                .isOnline(false)
+                .location("서울")
+                .bungaeTime(bungaeTime)
+                .dateCandidates(dateCandidates)
+                .dateVoteClosedAt(voteClosedAt)
+                .groupId(group.getId())
+                .build();
 
         // when
         Bungae bungae = bungaeService.createBungae(member, request);
@@ -157,18 +158,18 @@ class BungaeServiceTest extends DatabaseTestSupport {
         LocalTime bungaeTime = LocalTime.of(19, 0);
         LocalDateTime voteClosedAt = LocalDateTime.now().plusDays(1);
 
-        BungaeCreateRequest request = new BungaeCreateRequest(
-                "테스트 번개2",
-                "설명2",
-                2,
-                10,
-                false,
-                "서울",
-                bungaeTime,
-                dateCandidates,
-                voteClosedAt,
-                group.getId()
-        );
+        BungaeCreateRequest request = BungaeCreateRequest.builder()
+                .name("테스트 번개2")
+                .description("설명2")
+                .minAttendees(2)
+                .maxAttendees(10)
+                .isOnline(false)
+                .location("서울")
+                .bungaeTime(bungaeTime)
+                .dateCandidates(dateCandidates)
+                .dateVoteClosedAt(voteClosedAt)
+                .groupId(group.getId())
+                .build();
 
         // when
         bungaeService.createBungae(member, request);
@@ -179,6 +180,82 @@ class BungaeServiceTest extends DatabaseTestSupport {
         assertThat(options)
                 .extracting(BungaeRecruitDateOption::getDateOption)
                 .containsExactlyInAnyOrderElementsOf(dateCandidates);
+    }
+
+    @Test
+    @DisplayName("B-1-S-4: 생성된 번개가 날짜 투표를 필요로 할 경우, 각 날짜 후보마다 번개 주최자의 투표가 저장")
+    void B_1_S_4() {
+        // given
+        List<LocalDate> dateCandidates = List.of(
+                LocalDate.now().plusDays(1),
+                LocalDate.now().plusDays(2),
+                LocalDate.now().plusDays(3)
+        );
+        LocalTime bungaeTime = LocalTime.of(19, 0);
+        LocalDateTime voteClosedAt = LocalDateTime.now().plusDays(1);
+
+        BungaeCreateRequest request = BungaeCreateRequest.builder()
+                .name("테스트 번개")
+                .description("설명")
+                .minAttendees(2)
+                .maxAttendees(10)
+                .isOnline(false)
+                .location("서울")
+                .bungaeTime(bungaeTime)
+                .dateCandidates(dateCandidates)
+                .dateVoteClosedAt(voteClosedAt)
+                .groupId(group.getId())
+                .build();
+
+        // when
+        Bungae bungae = bungaeService.createBungae(member, request);
+
+        // then
+        List<BungaeDateVote> hostVotes = bungaeDateVoteTestRepository.findByBungaeIdAndVoterId(
+                bungae.getId(),
+                hostGroupMember.getId()
+        );
+
+        List<LocalDate> votedDates = hostVotes.stream()
+                .map(vote -> vote.getDateOption().getDateOption())
+                .toList();
+
+        SoftAssertions.assertSoftly(softly -> {
+            softly.assertThat(hostVotes).hasSize(dateCandidates.size());
+            softly.assertThat(votedDates).containsExactlyInAnyOrderElementsOf(dateCandidates);
+            softly.assertThat(hostVotes).allMatch(vote -> vote.getVoter().getId().equals(hostGroupMember.getId()));
+        });
+    }
+
+    @Test
+    @DisplayName("B-1-S-5: 생성된 번개가 날짜 투표를 필요로 하지 않을 경우, 번개 주최자가 자동으로 참가자로 저장")
+    void B_1_S_5() {
+        // given
+        BungaeCreateRequest request = BungaeCreateRequest.builder()
+                .name("테스트 번개")
+                .description("설명")
+                .minAttendees(2)
+                .maxAttendees(10)
+                .isOnline(false)
+                .location("서울")
+                .bungaeTime(LocalTime.of(18, 0))
+                .dateCandidates(List.of(LocalDate.now().plusDays(1)))
+                .dateVoteClosedAt(null)
+                .groupId(group.getId())
+                .build();
+
+        // when
+        Bungae bungae = bungaeService.createBungae(member, request);
+
+        // then
+        List<BungaeAttendee> attendees = bungaeAttendeeRepository.findByBungaeIdAndDeletedFalse(bungae.getId());
+
+        SoftAssertions.assertSoftly(softly -> {
+            softly.assertThat(attendees).hasSize(1);
+            softly.assertThat(attendees.get(0).getGroupMember().getId()).isEqualTo(hostGroupMember.getId());
+            softly.assertThat(attendees.get(0).getBungae().getId()).isEqualTo(bungae.getId());
+            softly.assertThat(attendees.get(0).getDeleted()).isFalse();
+        });
     }
 
     @Test
