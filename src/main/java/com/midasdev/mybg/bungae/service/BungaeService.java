@@ -294,11 +294,11 @@ public class BungaeService {
 
     @Transactional
     public BungaeDto joinBungae(Member member, Long bungaeId) {
-        // 1. 번개 조회 및 존재 여부 검증 (BungaeFinder 사용)
-        Bungae bungae = bungaeFinder.findById(bungaeId);
-
-        // 2. 동시성 제어: 번개 ID 기반 락 획득
+        // 1. 동시성 제어: 번개 ID 기반 락 획득
         acquireLockByBungae(bungaeId);
+
+        // 2. 번개 조회 및 존재 여부 검증 (BungaeFinder 사용)
+        Bungae bungae = bungaeFinder.findById(bungaeId);
 
         // 3. 번개 상태 검증 (RECRUITING 상태만 참여 가능)
         if (!bungae.canJoin()) {
@@ -339,11 +339,16 @@ public class BungaeService {
                                                 ApplicationExceptionType.BUNGAE_NOT_FOUND_BY_ID,
                                                 bungaeId));
 
-        // 8. 최대 인원 도달 시 상태 변경
+        // 8. 최대 인원 도달 시 상태 변경 (도메인 로직 위임)
         bungae.closeRecruitingIfFull(bungaeDto.attendeeCount());
 
-        // 9. 번개 정보 반환
-        return bungaeDto;
+        // 9. 상태 변경 후 최신 번개 정보를 다시 조회하여 반환
+        return bungaeRepository
+                .findBungaeDtoById(bungaeId)
+                .orElseThrow(
+                        () ->
+                                new ApplicationException(
+                                        ApplicationExceptionType.BUNGAE_NOT_FOUND_BY_ID, bungaeId));
     }
 
     private void acquireLockByBungae(Long bungaeId) {
@@ -361,13 +366,15 @@ public class BungaeService {
                     Thread.sleep(50);
                 } catch (InterruptedException e) {
                     Thread.currentThread().interrupt();
-                    throw new ApplicationException(ApplicationExceptionType.BUNGAE_CONCURRENCY_LOCK_FAILED, bungaeId);
+                    throw new ApplicationException(
+                            ApplicationExceptionType.BUNGAE_CONCURRENCY_LOCK_FAILED, bungaeId);
                 }
             }
         }
 
         if (!lockAcquired) {
-            throw new ApplicationException(ApplicationExceptionType.BUNGAE_CONCURRENCY_LOCK_FAILED, bungaeId);
+            throw new ApplicationException(
+                    ApplicationExceptionType.BUNGAE_CONCURRENCY_LOCK_FAILED, bungaeId);
         }
     }
 }
