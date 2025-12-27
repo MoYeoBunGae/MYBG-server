@@ -103,7 +103,7 @@ public class BungaeService {
                 savedDateOptions.add(bungaeRecruitDateOptionRepository.save(option));
             });
 
-            // 6. DATE_VOTING인 경우, 날짜 후보에 대해 번개 생성자의 투표를 저장
+            // 6. 날짜 투표가 필요한 경우, 날짜 후보에 대해 번개 생성자의 투표를 저장
             List<BungaeDateVote> hostVotes = savedDateOptions.stream()
                     .map(dateOption -> BungaeDateVote.builder()
                             .voter(hostGroupMember)
@@ -115,7 +115,7 @@ public class BungaeService {
             eventPublisher.publishEvent(new BungaeVoteCreatedEvent(savedBungae.getId()));
             // TODO: 투표 생성 이벤트 처리 (필요한가? - 처리할 리스트 정리부터)
         } else {
-            // 7. RECRUITING인 경우, Bungae 참여자에 host GroupMember 추가
+            // 7. 날짜가 확정된 경우, Bungae 참여자에 host GroupMember 추가
             BungaeAttendee attendee = BungaeAttendee.builder()
                                                     .bungae(savedBungae)
                                                     .groupMember(hostGroupMember)
