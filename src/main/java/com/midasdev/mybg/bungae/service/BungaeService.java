@@ -124,7 +124,7 @@ public class BungaeService {
             bungaeAttendeeRepository.save(attendee);
         }
 
-        // TODO: 7. 알림 전송 (번개 생성 알림)
+        // TODO: 알림 전송 (번개 생성 알림)
 
         // 필요하다면 반환
         return savedBungae;
