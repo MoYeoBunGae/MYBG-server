@@ -92,32 +92,39 @@ public class BungaeService {
         // 4. Bungae 엔티티 저장
         Bungae savedBungae = bungaeRepository.save(bungae);
 
-        // 5. 날짜 후보가 여러개라면 날짜 후보 저장 (BungaeRecruitDateOption)
         if (!request.hasSingleDateCandidate()) {
+            // 5. 날짜 후보가 여러개라면 날짜 후보 저장 (BungaeRecruitDateOption)
+            List<BungaeRecruitDateOption> savedDateOptions = new ArrayList<>();
             request.dateCandidates().forEach(date -> {
                 BungaeRecruitDateOption option = BungaeRecruitDateOption.builder()
                                                                         .dateOption(date)
                                                                         .bungae(savedBungae)
                                                                         .build();
-                bungaeRecruitDateOptionRepository.save(option);
+                savedDateOptions.add(bungaeRecruitDateOptionRepository.save(option));
             });
+
+            // 6. 날짜 투표가 필요한 경우, 날짜 후보에 대해 번개 생성자의 투표를 저장
+            List<BungaeDateVote> hostVotes = savedDateOptions.stream()
+                    .map(dateOption -> BungaeDateVote.builder()
+                            .voter(hostGroupMember)
+                            .dateOption(dateOption)
+                            .build())
+                    .toList();
+            bungaeDateVoteRepository.saveAll(hostVotes);
+
+            eventPublisher.publishEvent(new BungaeVoteCreatedEvent(savedBungae.getId()));
+            // TODO: 투표 생성 이벤트 처리 (필요한가? - 처리할 리스트 정리부터)
+        } else {
+            // 7. 날짜가 확정된 경우, Bungae 참여자에 host GroupMember 추가
+            BungaeAttendee attendee = BungaeAttendee.builder()
+                                                    .bungae(savedBungae)
+                                                    .groupMember(hostGroupMember)
+                                                    .deleted(false)
+                                                    .build();
+            bungaeAttendeeRepository.save(attendee);
         }
 
-        // TODO: 날짜 후보에 대해 번개 생성자의 투표를 저장
-
-        // TODO: 삭제
-        // 6. Bungae 참여자에 host GroupMember 추가
-        BungaeAttendee attendee = BungaeAttendee.builder()
-                                                .bungae(savedBungae)
-                                                .groupMember(hostGroupMember)
-                                                .deleted(false)
-                                                .build();
-        bungaeAttendeeRepository.save(attendee);
-
-        eventPublisher.publishEvent(new BungaeVoteCreatedEvent(savedBungae.getId()));
-        // TODO: 투표 생성 이벤트 처리 (필요한가? - 처리할 리스트 정리부터)
-
-        // TODO: 7. 알림 전송 (번개 생성 알림)
+        // TODO: 알림 전송 (번개 생성 알림)
 
         // 필요하다면 반환
         return savedBungae;

@@ -8,6 +8,7 @@ import static org.mockito.Mockito.when;
 import com.midasdev.mybg.bungae.controller.dto.request.BungaeCreateRequest;
 import com.midasdev.mybg.bungae.domain.Bungae;
 import com.midasdev.mybg.bungae.repository.BungaeAttendeeRepository;
+import com.midasdev.mybg.bungae.repository.BungaeDateVoteRepository;
 import com.midasdev.mybg.bungae.repository.BungaeRecruitDateOptionRepository;
 import com.midasdev.mybg.bungae.repository.BungaeRepository;
 import com.midasdev.mybg.bungae.service.event.BungaeVoteCreatedEvent;
@@ -42,6 +43,8 @@ class BungaeServiceEventTest {
     @Mock
     private BungaeAttendeeRepository bungaeAttendeeRepository;
     @Mock
+    private BungaeDateVoteRepository bungaeDateVoteRepository;
+    @Mock
     private ApplicationEventPublisher eventPublisher;
     @Mock
     private GroupFinder groupFinder;
@@ -66,8 +69,8 @@ class BungaeServiceEventTest {
     }
 
     @Test
-    @DisplayName("날짜 후보가 1개일 때 번개 생성 시 BungaeVoteCreatedEvent가 발행된다")
-    void createBungae_withSingleDateCandidate_shouldPublishEvent() {
+    @DisplayName("B-1-SU-1: 날짜 후보가 1개일 때 번개 생성 시 BungaeVoteCreatedEvent가 발행되지 않는다.")
+    void B_1_SU_1() {
         // given
         BungaeCreateRequest request = new BungaeCreateRequest(
                 "이벤트 테스트 번개1",
@@ -86,13 +89,13 @@ class BungaeServiceEventTest {
         bungaeService.createBungae(member, request);
 
         // then
-        verify(eventPublisher, times(1))
+        verify(eventPublisher, times(0))
                 .publishEvent(any(BungaeVoteCreatedEvent.class));
     }
 
     @Test
-    @DisplayName("날짜 후보가 2개 이상일 때 번개 생성 시 BungaeVoteCreatedEvent가 발행된다")
-    void createBungae_withMultipleDateCandidates_shouldPublishEvent() {
+    @DisplayName("B-1-SU-2: 날짜 후보가 2개 이상일 때 번개 생성 시 BungaeVoteCreatedEvent가 발행된다")
+    void B_1_SU_2() {
         // given
         List<LocalDate> dateCandidates = List.of(
                 LocalDate.now().plusDays(1),
