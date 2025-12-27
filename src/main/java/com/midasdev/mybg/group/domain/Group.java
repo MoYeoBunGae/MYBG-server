@@ -1,13 +1,9 @@
 package com.midasdev.mybg.group.domain;
 
-import org.hibernate.annotations.ColumnDefault;
-import org.springframework.data.jpa.domain.support.AuditingEntityListener;
-
 import com.midasdev.mybg.global.audit.Audit;
 import com.midasdev.mybg.global.exception.ApplicationException;
 import com.midasdev.mybg.global.exception.ApplicationExceptionType;
 import com.midasdev.mybg.member.domain.Member;
-
 import jakarta.persistence.Column;
 import jakarta.persistence.Embedded;
 import jakarta.persistence.Entity;
@@ -26,6 +22,8 @@ import lombok.Builder;
 import lombok.Builder.Default;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.ColumnDefault;
+import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 @Entity
 @Getter
@@ -33,9 +31,13 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @EntityListeners(AuditingEntityListener.class)
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-@Table(name = "\"group\"", uniqueConstraints = {
-        @UniqueConstraint(name = "uq_invitation_code", columnNames = { "invitation_code" })
-})
+@Table(
+        name = "\"group\"",
+        uniqueConstraints = {
+            @UniqueConstraint(
+                    name = "uq_invitation_code",
+                    columnNames = {"invitation_code"})
+        })
 public class Group {
 
     @Id
@@ -63,9 +65,7 @@ public class Group {
     @ColumnDefault("false")
     private Boolean deleted;
 
-    @Embedded
-    @Default
-    private Audit audit = new Audit();
+    @Embedded @Default private Audit audit = new Audit();
 
     @Column(nullable = false)
     private Integer totalMemberCount;
@@ -90,7 +90,8 @@ public class Group {
         if (newMaxCount < this.totalMemberCount) {
             throw new ApplicationException(
                     ApplicationExceptionType.GROUP_MAX_COUNT_BELOW_CURRENT,
-                    newMaxCount, this.totalMemberCount);
+                    newMaxCount,
+                    this.totalMemberCount);
         }
         this.maxMemberCount = newMaxCount;
     }
@@ -106,5 +107,4 @@ public class Group {
     public void removeMember() {
         this.totalMemberCount -= 1;
     }
-
 }

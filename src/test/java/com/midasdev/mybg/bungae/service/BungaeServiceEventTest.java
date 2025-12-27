@@ -36,23 +36,15 @@ import org.springframework.context.ApplicationEventPublisher;
 @ExtendWith(MockitoExtension.class)
 class BungaeServiceEventTest {
 
-    @Mock
-    private BungaeRepository bungaeRepository;
-    @Mock
-    private BungaeRecruitDateOptionRepository bungaeRecruitDateOptionRepository;
-    @Mock
-    private BungaeAttendeeRepository bungaeAttendeeRepository;
-    @Mock
-    private BungaeDateVoteRepository bungaeDateVoteRepository;
-    @Mock
-    private ApplicationEventPublisher eventPublisher;
-    @Mock
-    private GroupFinder groupFinder;
-    @Mock
-    private GroupMemberFinder groupMemberFinder;
+    @Mock private BungaeRepository bungaeRepository;
+    @Mock private BungaeRecruitDateOptionRepository bungaeRecruitDateOptionRepository;
+    @Mock private BungaeAttendeeRepository bungaeAttendeeRepository;
+    @Mock private BungaeDateVoteRepository bungaeDateVoteRepository;
+    @Mock private ApplicationEventPublisher eventPublisher;
+    @Mock private GroupFinder groupFinder;
+    @Mock private GroupMemberFinder groupMemberFinder;
 
-    @InjectMocks
-    private BungaeService bungaeService;
+    @InjectMocks private BungaeService bungaeService;
 
     private Group group;
     private Member member;
@@ -72,56 +64,52 @@ class BungaeServiceEventTest {
     @DisplayName("B-1-SU-1: 날짜 후보가 1개일 때 번개 생성 시 BungaeVoteCreatedEvent가 발행되지 않는다.")
     void B_1_SU_1() {
         // given
-        BungaeCreateRequest request = new BungaeCreateRequest(
-                "이벤트 테스트 번개1",
-                "설명",
-                2,
-                10,
-                false,
-                "서울",
-                LocalTime.of(18, 0),
-                List.of(LocalDate.now().plusDays(1)),
-                null,
-                group.getId()
-        );
+        BungaeCreateRequest request =
+                new BungaeCreateRequest(
+                        "이벤트 테스트 번개1",
+                        "설명",
+                        2,
+                        10,
+                        false,
+                        "서울",
+                        LocalTime.of(18, 0),
+                        List.of(LocalDate.now().plusDays(1)),
+                        null,
+                        group.getId());
 
         // when
         bungaeService.createBungae(member, request);
 
         // then
-        verify(eventPublisher, times(0))
-                .publishEvent(any(BungaeVoteCreatedEvent.class));
+        verify(eventPublisher, times(0)).publishEvent(any(BungaeVoteCreatedEvent.class));
     }
 
     @Test
     @DisplayName("B-1-SU-2: 날짜 후보가 2개 이상일 때 번개 생성 시 BungaeVoteCreatedEvent가 발행된다")
     void B_1_SU_2() {
         // given
-        List<LocalDate> dateCandidates = List.of(
-                LocalDate.now().plusDays(1),
-                LocalDate.now().plusDays(2)
-        );
+        List<LocalDate> dateCandidates =
+                List.of(LocalDate.now().plusDays(1), LocalDate.now().plusDays(2));
         LocalTime bungaeTime = LocalTime.of(19, 0);
         LocalDateTime voteClosedAt = LocalDateTime.now().plusDays(1);
 
-        BungaeCreateRequest request = new BungaeCreateRequest(
-                "이벤트 테스트 번개2",
-                "설명2",
-                2,
-                10,
-                false,
-                "서울",
-                bungaeTime,
-                dateCandidates,
-                voteClosedAt,
-                group.getId()
-        );
+        BungaeCreateRequest request =
+                new BungaeCreateRequest(
+                        "이벤트 테스트 번개2",
+                        "설명2",
+                        2,
+                        10,
+                        false,
+                        "서울",
+                        bungaeTime,
+                        dateCandidates,
+                        voteClosedAt,
+                        group.getId());
 
         // when
         bungaeService.createBungae(member, request);
 
         // then
-        verify(eventPublisher, times(1))
-                .publishEvent(any(BungaeVoteCreatedEvent.class));
+        verify(eventPublisher, times(1)).publishEvent(any(BungaeVoteCreatedEvent.class));
     }
 }

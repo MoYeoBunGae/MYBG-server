@@ -24,14 +24,15 @@ public class InvitationCodeGenerator {
     private char generateRandomSingleCode() {
         int random = generateRandomNumber(2);
         return switch (random) {
-            case NUMBER -> (char)('0' + generateRandomNumber(10));
-            case ALPHABET -> (char)('A' + generateRandomNumber(26));
-            default -> throw new ApplicationException(ApplicationExceptionType.GLOBAL_INTERNAL_SERVER_ERROR, String.format("random(%d)은 0과 1중 하나여야 합니다.", random));
+            case NUMBER -> (char) ('0' + generateRandomNumber(10));
+            case ALPHABET -> (char) ('A' + generateRandomNumber(26));
+            default -> throw new ApplicationException(
+                    ApplicationExceptionType.GLOBAL_INTERNAL_SERVER_ERROR,
+                    String.format("random(%d)은 0과 1중 하나여야 합니다.", random));
         };
     }
 
     private int generateRandomNumber(int max) {
         return (int) (Math.random() * max);
     }
-
 }

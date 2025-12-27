@@ -14,8 +14,11 @@ public class GroupFinder {
     private final GroupRepository groupRepository;
 
     public Group findById(Long groupId) {
-        return groupRepository.findByIdAndDeletedIsFalse(groupId)
-                              .orElseThrow(() -> new ApplicationException(ApplicationExceptionType.GROUP_NOT_FOUND_BY_ID, groupId));
+        return groupRepository
+                .findByIdAndDeletedIsFalse(groupId)
+                .orElseThrow(
+                        () ->
+                                new ApplicationException(
+                                        ApplicationExceptionType.GROUP_NOT_FOUND_BY_ID, groupId));
     }
-
 }

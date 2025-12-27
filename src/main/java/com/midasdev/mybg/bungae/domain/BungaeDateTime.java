@@ -36,5 +36,4 @@ public class BungaeDateTime {
     public boolean isDateSet() {
         return this.date != null;
     }
-
 }

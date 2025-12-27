@@ -20,8 +20,7 @@ public class Assertion<T> {
         return this;
     }
 
-    public <X extends Throwable> void validateOrThrow(Supplier<X> exceptionSupplier)
-            throws X {
+    public <X extends Throwable> void validateOrThrow(Supplier<X> exceptionSupplier) throws X {
         if (predicate == null) {
             throw new IllegalStateException("검증 로직이 없습니다.");
         }

@@ -21,42 +21,43 @@ public class GroupMemberRepositoryImpl implements GroupMemberRepositoryCustom {
 
     @Override
     public List<GroupMember> findAllActiveGroupMembersExceptOwner(Long groupId) {
-        return queryFactory.selectFrom(groupMember)
-                           .where(
-                                   groupMember.group.id.eq(groupId),
-                                   groupMember.deleted.isFalse()
-                           )
-                           .orderBy(groupMember.audit.createdAt.asc())
-                           .fetch();
+        return queryFactory
+                .selectFrom(groupMember)
+                .where(groupMember.group.id.eq(groupId), groupMember.deleted.isFalse())
+                .orderBy(groupMember.audit.createdAt.asc())
+                .fetch();
     }
 
     @Override
     public Optional<GroupMember> findByMemberAndGroup(Member member, Group group) {
-        GroupMember result = queryFactory.selectFrom(groupMember)
-                .leftJoin(groupMember.member, this.member).fetchJoin()
-                .leftJoin(groupMember.group, this.group).fetchJoin()
-                .where(
-                        groupMember.member.eq(member),
-                        groupMember.group.eq(group),
-                        groupMember.deleted.isFalse()
-                )
-                .fetchOne();
+        GroupMember result =
+                queryFactory
+                        .selectFrom(groupMember)
+                        .leftJoin(groupMember.member, this.member)
+                        .fetchJoin()
+                        .leftJoin(groupMember.group, this.group)
+                        .fetchJoin()
+                        .where(
+                                groupMember.member.eq(member),
+                                groupMember.group.eq(group),
+                                groupMember.deleted.isFalse())
+                        .fetchOne();
 
         return Optional.ofNullable(result);
     }
 
     @Override
     public Optional<GroupMember> findEntityById(Long groupMemberId) {
-        GroupMember result = queryFactory.selectFrom(groupMember)
-                .leftJoin(groupMember.member, this.member).fetchJoin()
-                .leftJoin(groupMember.group, this.group).fetchJoin()
-                .where(
-                        groupMember.id.eq(groupMemberId),
-                        groupMember.deleted.isFalse()
-                )
-                .fetchOne();
+        GroupMember result =
+                queryFactory
+                        .selectFrom(groupMember)
+                        .leftJoin(groupMember.member, this.member)
+                        .fetchJoin()
+                        .leftJoin(groupMember.group, this.group)
+                        .fetchJoin()
+                        .where(groupMember.id.eq(groupMemberId), groupMember.deleted.isFalse())
+                        .fetchOne();
 
         return Optional.ofNullable(result);
     }
-
 }

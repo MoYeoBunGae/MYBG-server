@@ -7,42 +7,39 @@ public class GroupFixture {
 
     public static Group create(Member owner) {
         return Group.builder()
-                    .name("테스트 그룹")
-                    .profileImageUrl("http://test.com/group.png")
-                    .invitationCode("INVITE123")
-                    .maxMemberCount(100)
-                    .owner(owner)
-                    .totalMemberCount(1)
-                    .deleted(false)
-                    .build();
+                .name("테스트 그룹")
+                .profileImageUrl("http://test.com/group.png")
+                .invitationCode("INVITE123")
+                .maxMemberCount(100)
+                .owner(owner)
+                .totalMemberCount(1)
+                .deleted(false)
+                .build();
     }
 
-    /**
-     * Unit Test 용도
-     */
+    /** Unit Test 용도 */
     public static Group createWithId(Member owner) {
         return Group.builder()
-                    .id(1L)
-                    .name("테스트 그룹")
-                    .profileImageUrl("http://test.com/group.png")
-                    .invitationCode("INVITE123")
-                    .maxMemberCount(100)
-                    .owner(owner)
-                    .totalMemberCount(1)
-                    .deleted(false)
-                    .build();
+                .id(1L)
+                .name("테스트 그룹")
+                .profileImageUrl("http://test.com/group.png")
+                .invitationCode("INVITE123")
+                .maxMemberCount(100)
+                .owner(owner)
+                .totalMemberCount(1)
+                .deleted(false)
+                .build();
     }
 
     public static Group create(Member owner, String name, String invitationCode) {
         return Group.builder()
-                    .name(name)
-                    .profileImageUrl("http://test.com/group.png")
-                    .invitationCode(invitationCode)
-                    .maxMemberCount(100)
-                    .owner(owner)
-                    .totalMemberCount(1)
-                    .deleted(false)
-                    .build();
+                .name(name)
+                .profileImageUrl("http://test.com/group.png")
+                .invitationCode(invitationCode)
+                .maxMemberCount(100)
+                .owner(owner)
+                .totalMemberCount(1)
+                .deleted(false)
+                .build();
     }
-
 }

@@ -37,34 +37,25 @@ import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.context.annotation.Import;
 
 /**
- * 공통 given
- * - Member: member, otherMember
- * - Group: group, otherGroup
- * - GroupMember:
- * * group : groupMember (member가 group에 참여자로 등록된 상태)
- * * otherGroup : otherGroupMember(otherMember), memberInOtherGroup(member)
- * - Bungae: savedBungaes (group에서 member가 참여자로 등록된, 각각의 상태를 가지는 번개들), otherMemberSavedBungaes (otherGroup에서 otherMember가 참여자로 등록된, 각각의 상태를 가지는 번개들)
- * + member가 otherGroup의 RECRUITING, CLOSED 번개에도 참여
+ * 공통 given - Member: member, otherMember - Group: group, otherGroup - GroupMember: * group :
+ * groupMember (member가 group에 참여자로 등록된 상태) * otherGroup : otherGroupMember(otherMember),
+ * memberInOtherGroup(member) - Bungae: savedBungaes (group에서 member가 참여자로 등록된, 각각의 상태를 가지는 번개들),
+ * otherMemberSavedBungaes (otherGroup에서 otherMember가 참여자로 등록된, 각각의 상태를 가지는 번개들) + member가
+ * otherGroup의 RECRUITING, CLOSED 번개에도 참여
  */
-
 @DataJpaTest
 @Import({QueryDslConfig.class, AuditingTestConfig.class})
 class CustomBungaeRepositoryTest {
 
-    @Autowired
-    private BungaeRepository bungaeRepository;
+    @Autowired private BungaeRepository bungaeRepository;
 
-    @Autowired
-    private BungaeAttendeeRepository bungaeAttendeeRepository;
+    @Autowired private BungaeAttendeeRepository bungaeAttendeeRepository;
 
-    @Autowired
-    private GroupRepository groupRepository;
+    @Autowired private GroupRepository groupRepository;
 
-    @Autowired
-    private GroupMemberRepository groupMemberRepository;
+    @Autowired private GroupMemberRepository groupMemberRepository;
 
-    @Autowired
-    private MemberRepository memberRepository;
+    @Autowired private MemberRepository memberRepository;
 
     private Member member, otherMember;
     private Group group, otherGroup;
@@ -80,10 +71,14 @@ class CustomBungaeRepositoryTest {
         member = memberRepository.save(MemberFixture.create());
         otherMember = memberRepository.save(MemberFixture.createSecondMember());
         group = groupRepository.save(GroupFixture.create(member));
-        otherGroup = groupRepository.save(GroupFixture.create(otherMember, "다른 그룹", "other-group-invitation-code"));
+        otherGroup =
+                groupRepository.save(
+                        GroupFixture.create(otherMember, "다른 그룹", "other-group-invitation-code"));
         groupMember = groupMemberRepository.save(GroupMemberFixture.create(group, member));
-        otherGroupMember = groupMemberRepository.save(GroupMemberFixture.create(otherGroup, otherMember));
-        memberInOtherGroup = groupMemberRepository.save(GroupMemberFixture.create(otherGroup, member));
+        otherGroupMember =
+                groupMemberRepository.save(GroupMemberFixture.create(otherGroup, otherMember));
+        memberInOtherGroup =
+                groupMemberRepository.save(GroupMemberFixture.create(otherGroup, member));
         otherGroup.addMember();
 
         // 각 BungaeStatus별로 Bungae 생성 및 저장
@@ -98,22 +93,27 @@ class CustomBungaeRepositoryTest {
         createBungaeAndSaveAttendee(BungaeFixture::createWithCancelled, group, groupMember);
 
         //  각 상태별 번개 생성 및 참여자 등록 - otherGroup
-        createBungaeAndSaveAttendee(BungaeFixture::createWithDateVoting, otherGroup, otherGroupMember);
-        createBungaeAndSaveAttendee(BungaeFixture::createWithRecruiting, otherGroup, otherGroupMember, memberInOtherGroup);
-        createBungaeAndSaveAttendee(BungaeFixture::createWithRecruitingClosed, otherGroup, otherGroupMember);
-        createBungaeAndSaveAttendee(BungaeFixture::createWithClosed, otherGroup, otherGroupMember, memberInOtherGroup);
-        createBungaeAndSaveAttendee(BungaeFixture::createWithCancelled, otherGroup, otherGroupMember);
+        createBungaeAndSaveAttendee(
+                BungaeFixture::createWithDateVoting, otherGroup, otherGroupMember);
+        createBungaeAndSaveAttendee(
+                BungaeFixture::createWithRecruiting,
+                otherGroup,
+                otherGroupMember,
+                memberInOtherGroup);
+        createBungaeAndSaveAttendee(
+                BungaeFixture::createWithRecruitingClosed, otherGroup, otherGroupMember);
+        createBungaeAndSaveAttendee(
+                BungaeFixture::createWithClosed, otherGroup, otherGroupMember, memberInOtherGroup);
+        createBungaeAndSaveAttendee(
+                BungaeFixture::createWithCancelled, otherGroup, otherGroupMember);
     }
 
-    /**
-     * 번개 생성과 참여자 저장을 통합한 헬퍼 메서드
-     */
+    /** 번개 생성과 참여자 저장을 통합한 헬퍼 메서드 */
     private void createBungaeAndSaveAttendee(
             BiFunction<Group, GroupMember, Bungae> bungaeCreator,
             Group group,
             GroupMember host,
-            GroupMember... additionalAttendees
-    ) {
+            GroupMember... additionalAttendees) {
         Bungae bungae = bungaeRepository.save(bungaeCreator.apply(group, host));
 
         if (group.getId().equals(this.group.getId())) {
@@ -135,15 +135,15 @@ class CustomBungaeRepositoryTest {
                 memberJoinedBungaeIds.add(bungae.getId());
             }
         }
-
     }
 
     private void saveAttendee(Bungae bungae, GroupMember groupMember) {
-        BungaeAttendee attendee = BungaeAttendee.builder()
-                                                .bungae(bungae)
-                                                .groupMember(groupMember)
-                                                .deleted(false)
-                                                .build();
+        BungaeAttendee attendee =
+                BungaeAttendee.builder()
+                        .bungae(bungae)
+                        .groupMember(groupMember)
+                        .deleted(false)
+                        .build();
         bungaeAttendeeRepository.save(attendee);
     }
 
@@ -156,11 +156,9 @@ class CustomBungaeRepositoryTest {
         CursorPageable cursorPageable = new CursorPageable(lastCursorId, pageSize);
 
         // when
-        CursorPage<BungaeDto> result = bungaeRepository.findAllByAttendeeMemberIdAndStatusIn(
-                member.getId(),
-                null,
-                cursorPageable
-        );
+        CursorPage<BungaeDto> result =
+                bungaeRepository.findAllByAttendeeMemberIdAndStatusIn(
+                        member.getId(), null, cursorPageable);
 
         // then
         assertThat(result.getContent()).hasSize(pageSize);
@@ -174,15 +172,14 @@ class CustomBungaeRepositoryTest {
     @DisplayName("B-2-R-2: 조건에 맞는 올바른 나의 번개 조회 - status")
     void B_2_R_2() {
         // given
-        List<BungaeStatus> targetStatuses = List.of(BungaeStatus.DATE_VOTING, BungaeStatus.RECRUITING);
+        List<BungaeStatus> targetStatuses =
+                List.of(BungaeStatus.DATE_VOTING, BungaeStatus.RECRUITING);
         CursorPageable cursorPageable = new CursorPageable(null, 10);
 
         // when
-        CursorPage<BungaeDto> result = bungaeRepository.findAllByAttendeeMemberIdAndStatusIn(
-                member.getId(),
-                targetStatuses,
-                cursorPageable
-        );
+        CursorPage<BungaeDto> result =
+                bungaeRepository.findAllByAttendeeMemberIdAndStatusIn(
+                        member.getId(), targetStatuses, cursorPageable);
 
         // then
         assertThat(result.getContent()).hasSize(3); // DATE_VOTING 1개 + RECRUITING 2개
@@ -191,7 +188,10 @@ class CustomBungaeRepositoryTest {
                 .allMatch(memberJoinedBungaeIds::contains);
         assertThat(result.getContent())
                 .extracting(BungaeDto::status)
-                .doesNotContain(BungaeStatus.RECRUITING_CLOSED, BungaeStatus.CLOSED, BungaeStatus.CANCELLED);
+                .doesNotContain(
+                        BungaeStatus.RECRUITING_CLOSED,
+                        BungaeStatus.CLOSED,
+                        BungaeStatus.CANCELLED);
     }
 
     @Test
@@ -201,17 +201,17 @@ class CustomBungaeRepositoryTest {
         CursorPageable cursorPageable = new CursorPageable(null, 10);
 
         // when
-        CursorPage<BungaeDto> result = bungaeRepository.findAllByAttendeeMemberIdAndStatusIn(
-                member.getId(),
-                null,
-                cursorPageable
-        );
+        CursorPage<BungaeDto> result =
+                bungaeRepository.findAllByAttendeeMemberIdAndStatusIn(
+                        member.getId(), null, cursorPageable);
 
         // then
-        assertThat(result.getContent()).hasSize(memberJoinedBungaeIds.size()); // member가 참여한 모든 번개 수와 일치
+        assertThat(result.getContent())
+                .hasSize(memberJoinedBungaeIds.size()); // member가 참여한 모든 번개 수와 일치
         assertThat(result.getContent())
                 .extracting(BungaeDto::id)
-                .containsExactlyInAnyOrderElementsOf(memberJoinedBungaeIds); // member가 참여한 모든 번개 ID와 정확히 일치
+                .containsExactlyInAnyOrderElementsOf(
+                        memberJoinedBungaeIds); // member가 참여한 모든 번개 ID와 정확히 일치
         assertThat(result.getContent())
                 .extracting(BungaeDto::status)
                 .contains(
@@ -219,8 +219,7 @@ class CustomBungaeRepositoryTest {
                         BungaeStatus.RECRUITING,
                         BungaeStatus.RECRUITING_CLOSED,
                         BungaeStatus.CLOSED,
-                        BungaeStatus.CANCELLED
-                );
+                        BungaeStatus.CANCELLED);
     }
 
     @Test
@@ -230,25 +229,22 @@ class CustomBungaeRepositoryTest {
         CursorPageable cursorPageable = new CursorPageable(null, 3);
 
         // when
-        CursorPage<BungaeDto> result = bungaeRepository.findAllByAttendeeMemberIdAndStatusIn(
-                member.getId(),
-                null,
-                cursorPageable
-        );
+        CursorPage<BungaeDto> result =
+                bungaeRepository.findAllByAttendeeMemberIdAndStatusIn(
+                        member.getId(), null, cursorPageable);
 
         // then
         assertThat(result.getContent()).hasSize(3);
 
         // ID 기준 내림차순 정렬 확인 (최신순)
-        List<Long> resultIds = result.getContent().stream()
-                                     .map(BungaeDto::id)
-                                     .toList();
+        List<Long> resultIds = result.getContent().stream().map(BungaeDto::id).toList();
 
         // member가 참여한 번개 ID들을 내림차순으로 정렬하여 상위 3개와 비교
-        List<Long> expectedSortedIds = memberJoinedBungaeIds.stream()
-                                                            .sorted((a, b) -> Long.compare(b, a))
-                                                            .limit(3)
-                                                            .toList();
+        List<Long> expectedSortedIds =
+                memberJoinedBungaeIds.stream()
+                        .sorted((a, b) -> Long.compare(b, a))
+                        .limit(3)
+                        .toList();
 
         assertThat(resultIds).isEqualTo(expectedSortedIds);
     }
@@ -263,20 +259,13 @@ class CustomBungaeRepositoryTest {
         List<BungaeStatus> statuses = List.of(BungaeStatus.RECRUITING, BungaeStatus.DATE_VOTING);
 
         // when
-        CursorPage<BungaeDto> result = bungaeRepository.findByGroupIdAndStatusIn(
-                group.getId(),
-                statuses,
-                cursorPageable
-        );
+        CursorPage<BungaeDto> result =
+                bungaeRepository.findByGroupIdAndStatusIn(group.getId(), statuses, cursorPageable);
 
         // then
         assertThat(result.getContent()).hasSize(pageSize);
-        assertThat(result.getContent())
-                .extracting(BungaeDto::id)
-                .allMatch(id -> id < lastCursorId);
-        assertThat(result.getContent())
-                .extracting(BungaeDto::groupId)
-                .containsOnly(group.getId());
+        assertThat(result.getContent()).extracting(BungaeDto::id).allMatch(id -> id < lastCursorId);
+        assertThat(result.getContent()).extracting(BungaeDto::groupId).containsOnly(group.getId());
     }
 
     @Test
@@ -287,20 +276,19 @@ class CustomBungaeRepositoryTest {
         CursorPageable cursorPageable = new CursorPageable(null, 10);
 
         // when
-        CursorPage<BungaeDto> result = bungaeRepository.findByGroupIdAndStatusIn(
-                group.getId(),
-                targetStatuses,
-                cursorPageable
-        );
+        CursorPage<BungaeDto> result =
+                bungaeRepository.findByGroupIdAndStatusIn(
+                        group.getId(), targetStatuses, cursorPageable);
 
         // then
         assertThat(result.getContent()).hasSize(2);
         assertThat(result.getContent())
                 .extracting(BungaeDto::status)
-                .doesNotContain(BungaeStatus.DATE_VOTING, BungaeStatus.RECRUITING_CLOSED, BungaeStatus.CANCELLED);
-        assertThat(result.getContent())
-                .extracting(BungaeDto::groupId)
-                .containsOnly(group.getId());
+                .doesNotContain(
+                        BungaeStatus.DATE_VOTING,
+                        BungaeStatus.RECRUITING_CLOSED,
+                        BungaeStatus.CANCELLED);
+        assertThat(result.getContent()).extracting(BungaeDto::groupId).containsOnly(group.getId());
     }
 
     @Test
@@ -310,17 +298,12 @@ class CustomBungaeRepositoryTest {
         CursorPageable cursorPageable = new CursorPageable(null, 10);
 
         // when
-        CursorPage<BungaeDto> result = bungaeRepository.findByGroupIdAndStatusIn(
-                group.getId(),
-                null,
-                cursorPageable
-        );
+        CursorPage<BungaeDto> result =
+                bungaeRepository.findByGroupIdAndStatusIn(group.getId(), null, cursorPageable);
 
         // then
         assertThat(result.getContent()).hasSize(5);
-        assertThat(result.getContent())
-                .extracting(BungaeDto::groupId)
-                .containsOnly(group.getId());
+        assertThat(result.getContent()).extracting(BungaeDto::groupId).containsOnly(group.getId());
     }
 
     @Test
@@ -330,23 +313,19 @@ class CustomBungaeRepositoryTest {
         CursorPageable cursorPageable = new CursorPageable(null, 3);
 
         // when
-        CursorPage<BungaeDto> result = bungaeRepository.findByGroupIdAndStatusIn(
-                group.getId(),
-                null,
-                cursorPageable
-        );
+        CursorPage<BungaeDto> result =
+                bungaeRepository.findByGroupIdAndStatusIn(group.getId(), null, cursorPageable);
 
         // then
         // ID 기준 내림차순 정렬 확인 (최신순)
-        List<Long> resultIds = result.getContent().stream()
-                                     .map(BungaeDto::id)
-                                     .toList();
+        List<Long> resultIds = result.getContent().stream().map(BungaeDto::id).toList();
 
-        List<Long> sortedIds = groupSavedBungaes.stream()
-                                                .map(Bungae::getId)
-                                                .sorted((a, b) -> Long.compare(b, a)) //  내림차순 정렬
-                                                .limit(3)
-                                                .toList();
+        List<Long> sortedIds =
+                groupSavedBungaes.stream()
+                        .map(Bungae::getId)
+                        .sorted((a, b) -> Long.compare(b, a)) //  내림차순 정렬
+                        .limit(3)
+                        .toList();
 
         assertThat(resultIds).isEqualTo(sortedIds);
     }
@@ -356,77 +335,94 @@ class CustomBungaeRepositoryTest {
     void B_2_R_5() {
         // given
         Member testMember = memberRepository.save(MemberFixture.create("B-2-R-5"));
-        Group testGroup = groupRepository.save(GroupFixture.create(testMember, "B-2-R-5 그룹", "B-2-R-5-invitation-code"));
-        GroupMember testGroupMember = groupMemberRepository.save(GroupMemberFixture.create(testGroup, testMember));
-        GroupMember testGroupMember2 = groupMemberRepository.save(GroupMemberFixture.create(testGroup, otherMember));
+        Group testGroup =
+                groupRepository.save(
+                        GroupFixture.create(testMember, "B-2-R-5 그룹", "B-2-R-5-invitation-code"));
+        GroupMember testGroupMember =
+                groupMemberRepository.save(GroupMemberFixture.create(testGroup, testMember));
+        GroupMember testGroupMember2 =
+                groupMemberRepository.save(GroupMemberFixture.create(testGroup, otherMember));
 
         String bungaeName = "UniqueInTestBungae";
-        Bungae testBungae = Bungae.builder()
-                                  .name(bungaeName)
-                                  .description("테스트 설명")
-                                  .minAttendees(2)
-                                  .maxAttendees(10)
-                                  .isOnline(false)
-                                  .location("서울")
-                                  .bungaeDateTime(new BungaeDateTime(LocalDate.now().plusDays(1), LocalTime.of(18, 0)))
-                                  .status(BungaeStatus.RECRUITING)
-                                  .deleted(false)
-                                  .group(testGroup)
-                                  .host(testGroupMember)
-                                  .build();
+        Bungae testBungae =
+                Bungae.builder()
+                        .name(bungaeName)
+                        .description("테스트 설명")
+                        .minAttendees(2)
+                        .maxAttendees(10)
+                        .isOnline(false)
+                        .location("서울")
+                        .bungaeDateTime(
+                                new BungaeDateTime(
+                                        LocalDate.now().plusDays(1), LocalTime.of(18, 0)))
+                        .status(BungaeStatus.RECRUITING)
+                        .deleted(false)
+                        .group(testGroup)
+                        .host(testGroupMember)
+                        .build();
         Bungae savedTestBungae = bungaeRepository.save(testBungae);
 
-        BungaeAttendee testAttendee = BungaeAttendee.builder()
-                                                   .bungae(savedTestBungae)
-                                                   .groupMember(testGroupMember)
-                                                   .deleted(false)
-                                                   .build();
-        BungaeAttendee testAttendee2 = BungaeAttendee.builder()
-                                                    .bungae(savedTestBungae)
-                                                    .groupMember(testGroupMember2)
-                                                    .deleted(false)
-                                                    .build();
+        BungaeAttendee testAttendee =
+                BungaeAttendee.builder()
+                        .bungae(savedTestBungae)
+                        .groupMember(testGroupMember)
+                        .deleted(false)
+                        .build();
+        BungaeAttendee testAttendee2 =
+                BungaeAttendee.builder()
+                        .bungae(savedTestBungae)
+                        .groupMember(testGroupMember2)
+                        .deleted(false)
+                        .build();
         bungaeAttendeeRepository.save(testAttendee);
         bungaeAttendeeRepository.save(testAttendee2);
 
         CursorPageable cursorPageable = new CursorPageable(null, 10);
 
         // when
-        CursorPage<BungaeDto> result = bungaeRepository.findAllByAttendeeMemberIdAndStatusIn(
-                testMember.getId(),
-                null,
-                cursorPageable
-        );
+        CursorPage<BungaeDto> result =
+                bungaeRepository.findAllByAttendeeMemberIdAndStatusIn(
+                        testMember.getId(), null, cursorPageable);
 
         // then
         assertThat(result.getContent()).isNotEmpty();
 
         // setUp으로 인해 여러 결과과 있기 때문에 given에서 저장한 번개를 찾아서 검증
-        List<BungaeDto> target = result.getContent().stream()
-                                       .filter(dto -> dto.name().equals(bungaeName))
-                                       .toList();
+        List<BungaeDto> target =
+                result.getContent().stream().filter(dto -> dto.name().equals(bungaeName)).toList();
         if (target.size() != 1) {
-            throw new IllegalStateException(String.format("Bungae with name %s not found or multiple found (found : %d)", bungaeName, target.size()));
+            throw new IllegalStateException(
+                    String.format(
+                            "Bungae with name %s not found or multiple found (found : %d)",
+                            bungaeName, target.size()));
         }
 
         BungaeDto targetBungae = target.get(0);
 
-        assertSoftly(softly -> {
-            softly.assertThat(targetBungae.name()).isEqualTo(testBungae.getName());
-            softly.assertThat(targetBungae.description()).isEqualTo(testBungae.getDescription());
-            softly.assertThat(targetBungae.minAttendees()).isEqualTo(testBungae.getMinAttendees());
-            softly.assertThat(targetBungae.maxAttendees()).isEqualTo(testBungae.getMaxAttendees());
-            softly.assertThat(targetBungae.isOnline()).isEqualTo(testBungae.getIsOnline());
-            softly.assertThat(targetBungae.location()).isEqualTo(testBungae.getLocation());
-            softly.assertThat(targetBungae.bungaeDate()).isEqualTo(testBungae.getBungaeDateTime().getDate());
-            softly.assertThat(targetBungae.bungaeTime()).isEqualTo(testBungae.getBungaeDateTime().getTime());
-            softly.assertThat(targetBungae.status()).isEqualTo(testBungae.getStatus());
-            softly.assertThat(targetBungae.createdAt()).isCloseTo(testBungae.getCreatedAt(), within(1, ChronoUnit.MICROS));
-            softly.assertThat(targetBungae.deleted()).isEqualTo(testBungae.getDeleted());
-            softly.assertThat(targetBungae.groupId()).isEqualTo(testGroup.getId());
-            softly.assertThat(targetBungae.hostGroupMemberId()).isEqualTo(testGroupMember.getId());
-            softly.assertThat(targetBungae.attendeeCount()).isEqualTo(2);
-        });
+        assertSoftly(
+                softly -> {
+                    softly.assertThat(targetBungae.name()).isEqualTo(testBungae.getName());
+                    softly.assertThat(targetBungae.description())
+                            .isEqualTo(testBungae.getDescription());
+                    softly.assertThat(targetBungae.minAttendees())
+                            .isEqualTo(testBungae.getMinAttendees());
+                    softly.assertThat(targetBungae.maxAttendees())
+                            .isEqualTo(testBungae.getMaxAttendees());
+                    softly.assertThat(targetBungae.isOnline()).isEqualTo(testBungae.getIsOnline());
+                    softly.assertThat(targetBungae.location()).isEqualTo(testBungae.getLocation());
+                    softly.assertThat(targetBungae.bungaeDate())
+                            .isEqualTo(testBungae.getBungaeDateTime().getDate());
+                    softly.assertThat(targetBungae.bungaeTime())
+                            .isEqualTo(testBungae.getBungaeDateTime().getTime());
+                    softly.assertThat(targetBungae.status()).isEqualTo(testBungae.getStatus());
+                    softly.assertThat(targetBungae.createdAt())
+                            .isCloseTo(testBungae.getCreatedAt(), within(1, ChronoUnit.MICROS));
+                    softly.assertThat(targetBungae.deleted()).isEqualTo(testBungae.getDeleted());
+                    softly.assertThat(targetBungae.groupId()).isEqualTo(testGroup.getId());
+                    softly.assertThat(targetBungae.hostGroupMemberId())
+                            .isEqualTo(testGroupMember.getId());
+                    softly.assertThat(targetBungae.attendeeCount()).isEqualTo(2);
+                });
     }
 
     @Test
@@ -434,77 +430,92 @@ class CustomBungaeRepositoryTest {
     void B_3_R_5() {
         // given
         Member testMember = memberRepository.save(MemberFixture.create("B-3-R-5"));
-        Group testGroup = groupRepository.save(GroupFixture.create(testMember, "B-3-R-5 그룹", "B-3-R-5-invitation-code"));
-        GroupMember testGroupMember = groupMemberRepository.save(GroupMemberFixture.create(testGroup, testMember));
-        GroupMember testGroupMember2 = groupMemberRepository.save(GroupMemberFixture.create(testGroup, otherMember));
+        Group testGroup =
+                groupRepository.save(
+                        GroupFixture.create(testMember, "B-3-R-5 그룹", "B-3-R-5-invitation-code"));
+        GroupMember testGroupMember =
+                groupMemberRepository.save(GroupMemberFixture.create(testGroup, testMember));
+        GroupMember testGroupMember2 =
+                groupMemberRepository.save(GroupMemberFixture.create(testGroup, otherMember));
 
         String bungaeName = "UniqueGroupTestBungae";
-        Bungae testBungae = Bungae.builder()
-                                  .name(bungaeName)
-                                  .description("그룹 테스트 설명")
-                                  .minAttendees(3)
-                                  .maxAttendees(15)
-                                  .isOnline(true)
-                                  .location("온라인")
-                                  .bungaeDateTime(new BungaeDateTime(LocalDate.now().plusDays(3), LocalTime.of(20, 0)))
-                                  .status(BungaeStatus.RECRUITING)
-                                  .deleted(false)
-                                  .group(testGroup)
-                                  .host(testGroupMember)
-                                  .build();
+        Bungae testBungae =
+                Bungae.builder()
+                        .name(bungaeName)
+                        .description("그룹 테스트 설명")
+                        .minAttendees(3)
+                        .maxAttendees(15)
+                        .isOnline(true)
+                        .location("온라인")
+                        .bungaeDateTime(
+                                new BungaeDateTime(
+                                        LocalDate.now().plusDays(3), LocalTime.of(20, 0)))
+                        .status(BungaeStatus.RECRUITING)
+                        .deleted(false)
+                        .group(testGroup)
+                        .host(testGroupMember)
+                        .build();
         Bungae savedTestBungae = bungaeRepository.save(testBungae);
 
-        BungaeAttendee testAttendee = BungaeAttendee.builder()
-                                                   .bungae(savedTestBungae)
-                                                   .groupMember(testGroupMember)
-                                                   .deleted(false)
-                                                   .build();
-        BungaeAttendee testAttendee2 = BungaeAttendee.builder()
-                                                    .bungae(savedTestBungae)
-                                                    .groupMember(testGroupMember2)
-                                                    .deleted(false)
-                                                    .build();
+        BungaeAttendee testAttendee =
+                BungaeAttendee.builder()
+                        .bungae(savedTestBungae)
+                        .groupMember(testGroupMember)
+                        .deleted(false)
+                        .build();
+        BungaeAttendee testAttendee2 =
+                BungaeAttendee.builder()
+                        .bungae(savedTestBungae)
+                        .groupMember(testGroupMember2)
+                        .deleted(false)
+                        .build();
         bungaeAttendeeRepository.save(testAttendee);
         bungaeAttendeeRepository.save(testAttendee2);
 
         CursorPageable cursorPageable = new CursorPageable(null, 10);
 
         // when
-        CursorPage<BungaeDto> result = bungaeRepository.findByGroupIdAndStatusIn(
-                testGroup.getId(),
-                null,
-                cursorPageable
-        );
+        CursorPage<BungaeDto> result =
+                bungaeRepository.findByGroupIdAndStatusIn(testGroup.getId(), null, cursorPageable);
 
         // then
         assertThat(result.getContent()).isNotEmpty();
 
         // setUp으로 인해 여러 결과과 있기 때문에 given에서 저장한 번개를 찾아서 검증
-        List<BungaeDto> target = result.getContent().stream()
-                                       .filter(dto -> dto.name().equals(bungaeName))
-                                       .toList();
+        List<BungaeDto> target =
+                result.getContent().stream().filter(dto -> dto.name().equals(bungaeName)).toList();
         if (target.size() != 1) {
-            throw new IllegalStateException(String.format("Bungae with name %s not found or multiple found (found : %d)", bungaeName, target.size()));
+            throw new IllegalStateException(
+                    String.format(
+                            "Bungae with name %s not found or multiple found (found : %d)",
+                            bungaeName, target.size()));
         }
 
         BungaeDto targetBungae = target.get(0);
 
-        assertSoftly(softly -> {
-            softly.assertThat(targetBungae.name()).isEqualTo(testBungae.getName());
-            softly.assertThat(targetBungae.description()).isEqualTo(testBungae.getDescription());
-            softly.assertThat(targetBungae.minAttendees()).isEqualTo(testBungae.getMinAttendees());
-            softly.assertThat(targetBungae.maxAttendees()).isEqualTo(testBungae.getMaxAttendees());
-            softly.assertThat(targetBungae.isOnline()).isEqualTo(testBungae.getIsOnline());
-            softly.assertThat(targetBungae.location()).isEqualTo(testBungae.getLocation());
-            softly.assertThat(targetBungae.bungaeDate()).isEqualTo(testBungae.getBungaeDateTime().getDate());
-            softly.assertThat(targetBungae.bungaeTime()).isEqualTo(testBungae.getBungaeDateTime().getTime());
-            softly.assertThat(targetBungae.status()).isEqualTo(testBungae.getStatus());
-            softly.assertThat(targetBungae.createdAt()).isCloseTo(testBungae.getCreatedAt(), within(1, ChronoUnit.MICROS));
-            softly.assertThat(targetBungae.deleted()).isEqualTo(testBungae.getDeleted());
-            softly.assertThat(targetBungae.groupId()).isEqualTo(testGroup.getId());
-            softly.assertThat(targetBungae.hostGroupMemberId()).isEqualTo(testGroupMember.getId());
-            softly.assertThat(targetBungae.attendeeCount()).isEqualTo(2);
-        });
+        assertSoftly(
+                softly -> {
+                    softly.assertThat(targetBungae.name()).isEqualTo(testBungae.getName());
+                    softly.assertThat(targetBungae.description())
+                            .isEqualTo(testBungae.getDescription());
+                    softly.assertThat(targetBungae.minAttendees())
+                            .isEqualTo(testBungae.getMinAttendees());
+                    softly.assertThat(targetBungae.maxAttendees())
+                            .isEqualTo(testBungae.getMaxAttendees());
+                    softly.assertThat(targetBungae.isOnline()).isEqualTo(testBungae.getIsOnline());
+                    softly.assertThat(targetBungae.location()).isEqualTo(testBungae.getLocation());
+                    softly.assertThat(targetBungae.bungaeDate())
+                            .isEqualTo(testBungae.getBungaeDateTime().getDate());
+                    softly.assertThat(targetBungae.bungaeTime())
+                            .isEqualTo(testBungae.getBungaeDateTime().getTime());
+                    softly.assertThat(targetBungae.status()).isEqualTo(testBungae.getStatus());
+                    softly.assertThat(targetBungae.createdAt())
+                            .isCloseTo(testBungae.getCreatedAt(), within(1, ChronoUnit.MICROS));
+                    softly.assertThat(targetBungae.deleted()).isEqualTo(testBungae.getDeleted());
+                    softly.assertThat(targetBungae.groupId()).isEqualTo(testGroup.getId());
+                    softly.assertThat(targetBungae.hostGroupMemberId())
+                            .isEqualTo(testGroupMember.getId());
+                    softly.assertThat(targetBungae.attendeeCount()).isEqualTo(2);
+                });
     }
-
 }

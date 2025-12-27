@@ -4,17 +4,16 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import com.midasdev.mybg.TestConstant;
-import java.time.LocalDate;
-
+import com.midasdev.mybg.bungae.fixture.BungaeFixture;
 import com.midasdev.mybg.global.exception.ApplicationException;
 import com.midasdev.mybg.global.exception.ApplicationExceptionType;
-import com.midasdev.mybg.bungae.fixture.BungaeFixture;
 import com.midasdev.mybg.group.domain.Group;
 import com.midasdev.mybg.group.fixture.GroupFixture;
 import com.midasdev.mybg.group_member.domain.GroupMember;
 import com.midasdev.mybg.group_member.fixture.GroupMemberFixture;
 import com.midasdev.mybg.member.domain.Member;
 import com.midasdev.mybg.member.fixture.MemberFixture;
+import java.time.LocalDate;
 import java.time.LocalTime;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -50,7 +49,10 @@ class BungaeDomainTest {
     }
 
     @ParameterizedTest
-    @EnumSource(value = BungaeStatus.class, mode = EnumSource.Mode.EXCLUDE, names = { "DATE_VOTING" })
+    @EnumSource(
+            value = BungaeStatus.class,
+            mode = EnumSource.Mode.EXCLUDE,
+            names = {"DATE_VOTING"})
     @DisplayName("BD-1-D-2: canVote - 번개 상태가 DATE_VOTING이 아닐 때 false 반환 - ParameterizedTest")
     void BD_1_D_2(BungaeStatus status) {
         // given
@@ -80,8 +82,9 @@ class BungaeDomainTest {
     }
 
     @ParameterizedTest
-    @DisplayName("BD-2-D-2: isOneLeftToMinAttendees - 현재 인원수가 (최소 인원 - 1)이 아닐 때 false 반환 - ParameterizedTest")
-    @ValueSource(ints = { 0, 2, 6, 10 })
+    @DisplayName(
+            "BD-2-D-2: isOneLeftToMinAttendees - 현재 인원수가 (최소 인원 - 1)이 아닐 때 false 반환 - ParameterizedTest")
+    @ValueSource(ints = {0, 2, 6, 10})
     void BD_2_D_2(int currentAttendeeCount) {
         // given
         int minAttendees = 5;
@@ -95,7 +98,10 @@ class BungaeDomainTest {
     }
 
     @ParameterizedTest
-    @EnumSource(value = BungaeStatus.class, mode = EnumSource.Mode.EXCLUDE, names = { "DATE_VOTING" })
+    @EnumSource(
+            value = BungaeStatus.class,
+            mode = EnumSource.Mode.EXCLUDE,
+            names = {"DATE_VOTING"})
     @DisplayName("BD-3-D-1: confirmDate - 날짜 확정시 번개 상태가 DATE_VOTING이 아닐 때 예외 발생")
     void BD_3_D_1(BungaeStatus status) {
         // given
@@ -104,24 +110,28 @@ class BungaeDomainTest {
         // when & then
         assertThatThrownBy(() -> bungae.confirmDate(LocalDate.now()))
                 .isInstanceOf(ApplicationException.class)
-                .hasFieldOrPropertyWithValue(TestConstant.EXCEPTION_TYPE_FIELD, ApplicationExceptionType.INVALID_BUNGAE_STATUS_FOR_DATE_CONFIRMATION);
+                .hasFieldOrPropertyWithValue(
+                        TestConstant.EXCEPTION_TYPE_FIELD,
+                        ApplicationExceptionType.INVALID_BUNGAE_STATUS_FOR_DATE_CONFIRMATION);
     }
 
     @Test
-    @DisplayName("BD-3-D-2: confirmDate - 번개 상태가 DATE_VOTING이고 min==max일 때 상태가 RECRUITING_CLOSED로 변경")
+    @DisplayName(
+            "BD-3-D-2: confirmDate - 번개 상태가 DATE_VOTING이고 min==max일 때 상태가 RECRUITING_CLOSED로 변경")
     void BD_3_D_2() {
         // given
         int min = 5;
         int max = 5;
-        Bungae bungae = Bungae.builder()
-                              .name("테스트 번개")
-                              .description("테스트용 번개 설명")
-                              .minAttendees(min)
-                              .maxAttendees(max)
-                              .status(BungaeStatus.DATE_VOTING)
-                              .host(host)
-                              .group(group)
-                              .build();
+        Bungae bungae =
+                Bungae.builder()
+                        .name("테스트 번개")
+                        .description("테스트용 번개 설명")
+                        .minAttendees(min)
+                        .maxAttendees(max)
+                        .status(BungaeStatus.DATE_VOTING)
+                        .host(host)
+                        .group(group)
+                        .build();
 
         // when
         bungae.confirmDate(LocalDate.now().plusDays(1));
@@ -136,15 +146,16 @@ class BungaeDomainTest {
         // given
         int min = 3;
         int max = 5;
-        Bungae bungae = Bungae.builder()
-                              .name("테스트 번개")
-                              .description("테스트용 번개 설명")
-                              .minAttendees(min)
-                              .maxAttendees(max)
-                              .host(host)
-                              .group(group)
-                              .status(BungaeStatus.DATE_VOTING)
-                              .build();
+        Bungae bungae =
+                Bungae.builder()
+                        .name("테스트 번개")
+                        .description("테스트용 번개 설명")
+                        .minAttendees(min)
+                        .maxAttendees(max)
+                        .host(host)
+                        .group(group)
+                        .status(BungaeStatus.DATE_VOTING)
+                        .build();
 
         // when
         bungae.confirmDate(LocalDate.now().plusDays(1));
@@ -159,35 +170,39 @@ class BungaeDomainTest {
         // given
         int min = 6;
         int max = 5;
-        Bungae bungae = Bungae.builder()
-                              .name("테스트 번개")
-                              .description("테스트용 번개 설명")
-                              .minAttendees(min)
-                              .maxAttendees(max)
-                              .host(host)
-                              .group(group)
-                              .status(BungaeStatus.DATE_VOTING)
-                              .build();
+        Bungae bungae =
+                Bungae.builder()
+                        .name("테스트 번개")
+                        .description("테스트용 번개 설명")
+                        .minAttendees(min)
+                        .maxAttendees(max)
+                        .host(host)
+                        .group(group)
+                        .status(BungaeStatus.DATE_VOTING)
+                        .build();
 
         // when & then
         assertThatThrownBy(() -> bungae.confirmDate(LocalDate.now().plusDays(1)))
                 .isInstanceOf(ApplicationException.class)
-                .hasFieldOrPropertyWithValue(TestConstant.EXCEPTION_TYPE_FIELD, ApplicationExceptionType.INVALID_ATTENDEE_LIMITS);
+                .hasFieldOrPropertyWithValue(
+                        TestConstant.EXCEPTION_TYPE_FIELD,
+                        ApplicationExceptionType.INVALID_ATTENDEE_LIMITS);
     }
 
     @Test
     @DisplayName("BD-3-D-5: confirmDate - 번개 날짜가 null일 때 bungaeDateTime이 새로 생성되어 날짜가 설정됨")
     void BD_3_D_5() {
         // given
-        Bungae bungae = Bungae.builder().
-                              name("테스트 번개")
-                              .description("테스트용 번개 설명")
-                              .minAttendees(2)
-                              .maxAttendees(10)
-                              .status(BungaeStatus.DATE_VOTING)
-                              .host(host)
-                              .group(group)
-                              .build();
+        Bungae bungae =
+                Bungae.builder()
+                        .name("테스트 번개")
+                        .description("테스트용 번개 설명")
+                        .minAttendees(2)
+                        .maxAttendees(10)
+                        .status(BungaeStatus.DATE_VOTING)
+                        .host(host)
+                        .group(group)
+                        .build();
 
         // when
         bungae.confirmDate(LocalDate.now().plusDays(1));
@@ -200,16 +215,17 @@ class BungaeDomainTest {
     @DisplayName("BD-3-D-6: confirmDate - 번개 시간 정보가 이미 있을 때 날짜가 업데이트 됨")
     void BD_3_D_6() {
         // given
-        Bungae bungae = Bungae.builder().
-                              name("테스트 번개")
-                              .description("테스트용 번개 설명")
-                              .minAttendees(2)
-                              .maxAttendees(10)
-                              .status(BungaeStatus.DATE_VOTING)
-                              .host(host)
-                              .group(group)
-                              .bungaeDateTime(new BungaeDateTime(LocalTime.of(18, 0)))
-                              .build();
+        Bungae bungae =
+                Bungae.builder()
+                        .name("테스트 번개")
+                        .description("테스트용 번개 설명")
+                        .minAttendees(2)
+                        .maxAttendees(10)
+                        .status(BungaeStatus.DATE_VOTING)
+                        .host(host)
+                        .group(group)
+                        .bungaeDateTime(new BungaeDateTime(LocalTime.of(18, 0)))
+                        .build();
         // when
         bungae.confirmDate(LocalDate.now().plusDays(1));
 
@@ -221,8 +237,11 @@ class BungaeDomainTest {
     @DisplayName("BD-4-D-1: isDateFixed - bungaeDateTime에 날짜가 설정되어 있으면 true 반환")
     void BD_4_D_1() {
         // given
-        Bungae bungae = BungaeFixture.createWithBungaeDateTime(group, host,
-                new BungaeDateTime(LocalDate.now().plusDays(1), LocalTime.of(18, 0)));
+        Bungae bungae =
+                BungaeFixture.createWithBungaeDateTime(
+                        group,
+                        host,
+                        new BungaeDateTime(LocalDate.now().plusDays(1), LocalTime.of(18, 0)));
         // when
         boolean result = bungae.isDateFixed();
 
@@ -234,8 +253,9 @@ class BungaeDomainTest {
     @DisplayName("BD-4-D-2: isDateFixed - bungaeDateTime에 날짜가 설정되어 있지 않으면 false 반환")
     void BD_4_D_2() {
         // given
-        Bungae bungae = BungaeFixture.createWithBungaeDateTime(group, host,
-                new BungaeDateTime(LocalTime.of(18, 0)));
+        Bungae bungae =
+                BungaeFixture.createWithBungaeDateTime(
+                        group, host, new BungaeDateTime(LocalTime.of(18, 0)));
 
         // when
         boolean result = bungae.isDateFixed();
@@ -271,7 +291,10 @@ class BungaeDomainTest {
     }
 
     @ParameterizedTest
-    @EnumSource(value = BungaeStatus.class, mode = EnumSource.Mode.EXCLUDE, names = { "RECRUITING" })
+    @EnumSource(
+            value = BungaeStatus.class,
+            mode = EnumSource.Mode.EXCLUDE,
+            names = {"RECRUITING"})
     @DisplayName("BD-5-D-2: canJoin - 번개 상태가 RECRUITING이 아닐 때 false 반환 - ParameterizedTest")
     void BD_5_D_2(BungaeStatus status) {
         // given
@@ -283,5 +306,4 @@ class BungaeDomainTest {
         // then
         assertThat(result).isFalse();
     }
-
 }

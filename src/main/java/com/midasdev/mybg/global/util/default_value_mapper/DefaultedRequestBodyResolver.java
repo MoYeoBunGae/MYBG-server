@@ -23,10 +23,12 @@ public class DefaultedRequestBodyResolver implements HandlerMethodArgumentResolv
     }
 
     @Override
-    public Object resolveArgument(MethodParameter parameter,
-                                  ModelAndViewContainer mavContainer,
-                                  NativeWebRequest webRequest,
-                                  WebDataBinderFactory binderFactory) throws Exception {
+    public Object resolveArgument(
+            MethodParameter parameter,
+            ModelAndViewContainer mavContainer,
+            NativeWebRequest webRequest,
+            WebDataBinderFactory binderFactory)
+            throws Exception {
 
         HttpServletRequest servletRequest = webRequest.getNativeRequest(HttpServletRequest.class);
         String json = servletRequest.getReader().lines().collect(Collectors.joining());

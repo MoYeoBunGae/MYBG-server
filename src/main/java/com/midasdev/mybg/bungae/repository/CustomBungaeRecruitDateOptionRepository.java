@@ -6,5 +6,6 @@ import java.util.List;
 
 public interface CustomBungaeRecruitDateOptionRepository {
 
-    List<BungaeDateVoteInfoDto> findVoteInfoByDates(Long bungaeId, List<LocalDate> dateOptions, Long groupMemberId);
+    List<BungaeDateVoteInfoDto> findVoteInfoByDates(
+            Long bungaeId, List<LocalDate> dateOptions, Long groupMemberId);
 }

@@ -1,6 +1,5 @@
 package com.midasdev.mybg.group.controller.dto.response;
 
-
 import com.midasdev.mybg.group.domain.Group;
 import lombok.Builder;
 
@@ -11,18 +10,16 @@ public record GroupResponse(
         String profileImageUrl,
         String invitationCode,
         int totalMemberCount,
-        int maxMemberCount
-) {
+        int maxMemberCount) {
 
     public static GroupResponse from(Group group) {
         return GroupResponse.builder()
-                            .groupId(group.getId())
-                            .name(group.getName())
-                            .profileImageUrl(group.getProfileImageUrl())
-                            .invitationCode(group.getInvitationCode())
-                            .totalMemberCount(group.getTotalMemberCount())
-                            .maxMemberCount(group.getMaxMemberCount())
-                            .build();
+                .groupId(group.getId())
+                .name(group.getName())
+                .profileImageUrl(group.getProfileImageUrl())
+                .invitationCode(group.getInvitationCode())
+                .totalMemberCount(group.getTotalMemberCount())
+                .maxMemberCount(group.getMaxMemberCount())
+                .build();
     }
-
 }

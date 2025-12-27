@@ -37,14 +37,20 @@ public class AuthService {
     public TokenRequestUser extractUserInfo(AuthRequest authRequest) {
 
         OauthProvider oauthProvider = authRequest.oauthProvider();
-        String idTokenFromRequest = jwtClaimResolver.extractValue(authRequest.authToken(), TokenType.AUTH, TokenAttribute.ID_TOKEN.getAttribute());
+        String idTokenFromRequest =
+                jwtClaimResolver.extractValue(
+                        authRequest.authToken(),
+                        TokenType.AUTH,
+                        TokenAttribute.ID_TOKEN.getAttribute());
         IdTokenValidator validator = idTokenValidatorFactory.getValidator(oauthProvider);
         IdToken idToken = validator.validate(idTokenFromRequest, oauthProvider);
-        return new TokenRequestUser(new OauthAccount(oauthProvider, idToken.sub()), idToken.nickname());
+        return new TokenRequestUser(
+                new OauthAccount(oauthProvider, idToken.sub()), idToken.nickname());
     }
 
     public AuthorizationToken issueAuthorizationToken(Member member) {
-        AuthorizationToken authorizationToken = jwtProvider.createAuthorizationToken(member.getId());
+        AuthorizationToken authorizationToken =
+                jwtProvider.createAuthorizationToken(member.getId());
         refreshTokenRedisRepository.save(RefreshToken.from(member.getId(), authorizationToken));
         return authorizationToken;
     }
@@ -58,17 +64,24 @@ public class AuthService {
     public void verifyRefreshToken(Long memberId, String refreshToken) {
         // TEST: 저장된 refreshToken 여부에 대한 테스트
         // TEST: refreshToken 일치 여부에 대한 테스트
-        RefreshToken refreshTokenFromRedis = refreshTokenRedisRepository.findById(memberId)
-                                                                        .orElseThrow(() -> new ApplicationException(
-                                                                                ApplicationExceptionType.REFRESH_TOKEN_NOT_FOUND, memberId));
+        RefreshToken refreshTokenFromRedis =
+                refreshTokenRedisRepository
+                        .findById(memberId)
+                        .orElseThrow(
+                                () ->
+                                        new ApplicationException(
+                                                ApplicationExceptionType.REFRESH_TOKEN_NOT_FOUND,
+                                                memberId));
         Assertion.with(refreshToken)
-                 .setValidation(refreshTokenFromRedis::isSameToken)
-                 .validateOrThrow(() -> new ApplicationException(ApplicationExceptionType.REFRESH_TOKEN_MISMATCH, memberId));
+                .setValidation(refreshTokenFromRedis::isSameToken)
+                .validateOrThrow(
+                        () ->
+                                new ApplicationException(
+                                        ApplicationExceptionType.REFRESH_TOKEN_MISMATCH, memberId));
     }
 
     public void logoutMember(Long memberId) {
         Member member = memberService.findMemberById(memberId);
         refreshTokenRedisRepository.deleteById(member.getId());
     }
-
 }

@@ -26,7 +26,6 @@ import jakarta.persistence.PersistenceContext;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.concurrent.CountDownLatch;
-
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -35,34 +34,25 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
 @SpringBootTest
-class BungaeServiceConcurrencyTest extends DatabaseTestSupport{
+class BungaeServiceConcurrencyTest extends DatabaseTestSupport {
 
-    @Autowired
-    private BungaeService bungaeService;
+    @Autowired private BungaeService bungaeService;
 
-    @Autowired
-    private BungaeRepository bungaeRepository;
+    @Autowired private BungaeRepository bungaeRepository;
 
-    @Autowired
-    private GroupRepository groupRepository;
+    @Autowired private GroupRepository groupRepository;
 
-    @Autowired
-    private GroupMemberRepository groupMemberRepository;
+    @Autowired private GroupMemberRepository groupMemberRepository;
 
-    @Autowired
-    private MemberRepository memberRepository;
+    @Autowired private MemberRepository memberRepository;
 
-    @Autowired
-    private BungaeRecruitDateOptionRepository bungaeRecruitDateOptionRepository;
+    @Autowired private BungaeRecruitDateOptionRepository bungaeRecruitDateOptionRepository;
 
-    @Autowired
-    private BungaeDateVoteRepository bungaeDateVoteRepository;
+    @Autowired private BungaeDateVoteRepository bungaeDateVoteRepository;
 
-    @Autowired
-    private BungaeAttendeeRepository bungaeAttendeeRepository;
+    @Autowired private BungaeAttendeeRepository bungaeAttendeeRepository;
 
-    @PersistenceContext
-    private EntityManager entityManager;
+    @PersistenceContext private EntityManager entityManager;
 
     private Group group;
     private Member member;
@@ -94,22 +84,20 @@ class BungaeServiceConcurrencyTest extends DatabaseTestSupport{
     @DisplayName("B-5-S-7: 최소모집인원까지 1명의 투표가 남은 상황에서 100명이 동시에 투표를 할 경우 한 명만 성공합니다.")
     void B_5_S_7() throws Exception {
         // given
-        Bungae bungae = bungaeRepository.save(BungaeFixture.createWithDateVoting(group, hostGroupMember, 2, 5));
+        Bungae bungae =
+                bungaeRepository.save(
+                        BungaeFixture.createWithDateVoting(group, hostGroupMember, 2, 5));
         LocalDate voteDate = LocalDate.now().plusDays(1);
-        BungaeRecruitDateOption dateOption = bungaeRecruitDateOptionRepository.save(
-                BungaeRecruitDateOption.builder()
-                        .dateOption(voteDate)
-                        .bungae(bungae)
-                        .build()
-        );
+        BungaeRecruitDateOption dateOption =
+                bungaeRecruitDateOptionRepository.save(
+                        BungaeRecruitDateOption.builder()
+                                .dateOption(voteDate)
+                                .bungae(bungae)
+                                .build());
 
         // 이미 한 명이 투표한 상태로 만듦 (minAttendees=2, 현재 1명 투표)
         bungaeDateVoteRepository.save(
-                BungaeDateVote.builder()
-                        .voter(hostGroupMember)
-                        .dateOption(dateOption)
-                        .build()
-        );
+                BungaeDateVote.builder().voter(hostGroupMember).dateOption(dateOption).build());
 
         // 100명의 멤버/그룹멤버 생성
         Member[] members = new Member[100];
@@ -126,16 +114,19 @@ class BungaeServiceConcurrencyTest extends DatabaseTestSupport{
 
         for (int i = 0; i < 100; i++) {
             final int idx = i;
-            threads[i] = new Thread(() -> {
-                try {
-                    startLatch.await(); // 모든 스레드가 준비될 때까지 대기
-                    bungaeService.voteBungaeDates(members[idx], bungae.getId(), List.of(voteDate));
-                } catch (InterruptedException e) {
-                    Thread.currentThread().interrupt();
-                } finally {
-                    doneLatch.countDown(); // 작업 완료 신호
-                }
-            });
+            threads[i] =
+                    new Thread(
+                            () -> {
+                                try {
+                                    startLatch.await(); // 모든 스레드가 준비될 때까지 대기
+                                    bungaeService.voteBungaeDates(
+                                            members[idx], bungae.getId(), List.of(voteDate));
+                                } catch (InterruptedException e) {
+                                    Thread.currentThread().interrupt();
+                                } finally {
+                                    doneLatch.countDown(); // 작업 완료 신호
+                                }
+                            });
         }
 
         for (Thread thread : threads) thread.start();
@@ -143,11 +134,13 @@ class BungaeServiceConcurrencyTest extends DatabaseTestSupport{
         doneLatch.await(); // 모든 스레드 완료 대기
 
         // then: 투표 성공자는 1명, 실패자는 99명이어야 함
-        long voteCount = bungaeDateVoteRepository.findBungaeDateVotesByDateOption(dateOption).size();
+        long voteCount =
+                bungaeDateVoteRepository.findBungaeDateVotesByDateOption(dateOption).size();
         assertThat(voteCount).isEqualTo(2);
 
         // 참여자로 등록된 인원도 2명이어야 함
-        List<BungaeAttendee> attendees = bungaeAttendeeRepository.findByBungaeIdAndDeletedFalse(bungae.getId());
+        List<BungaeAttendee> attendees =
+                bungaeAttendeeRepository.findByBungaeIdAndDeletedFalse(bungae.getId());
 
         assertThat(attendees).hasSize(2);
     }

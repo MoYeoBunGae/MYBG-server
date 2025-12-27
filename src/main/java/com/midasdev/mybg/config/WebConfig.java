@@ -21,4 +21,3 @@ public class WebConfig implements WebMvcConfigurer {
         resolvers.add(new DefaultedRequestBodyResolver(objectMapper));
     }
 }
-

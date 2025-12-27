@@ -4,7 +4,11 @@ import lombok.Getter;
 
 @Getter
 public enum TokenAttribute {
-    TYPE("type"), ID_TOKEN("idToken"), SUB("sub"), NICKNAME("nickname"), KID("kid");
+    TYPE("type"),
+    ID_TOKEN("idToken"),
+    SUB("sub"),
+    NICKNAME("nickname"),
+    KID("kid");
 
     private final String attribute;
 

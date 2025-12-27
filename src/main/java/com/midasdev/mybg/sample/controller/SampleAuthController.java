@@ -23,12 +23,14 @@ public class SampleAuthController {
 
     private final SampleSpringDataRepository sampleSpringDataRepository;
 
-    @Operation(summary = "Sample API", description = "Sample API", security = @SecurityRequirement(name = SECURITY_SCHEME_NAME))
+    @Operation(
+            summary = "Sample API",
+            description = "Sample API",
+            security = @SecurityRequirement(name = SECURITY_SCHEME_NAME))
     @GetMapping
     public ResponseEntity<List<SampleEntity>> findSample(@AuthenticationPrincipal Member member) {
         log.info("member: {}", member.getId());
         List<SampleEntity> all = sampleSpringDataRepository.findAll();
         return new ResponseEntity<>(all, HttpStatus.OK);
     }
-
 }

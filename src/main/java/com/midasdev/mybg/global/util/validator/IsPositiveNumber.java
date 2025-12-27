@@ -6,9 +6,7 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
-/**
- * 0보다 큰 양의 정수인지 체크합니다.
- */
+/** 0보다 큰 양의 정수인지 체크합니다. */
 @Target({ElementType.FIELD, ElementType.PARAMETER})
 @Retention(RetentionPolicy.RUNTIME)
 @Constraint(validatedBy = IsPositiveNumberValidator.class)
@@ -18,5 +16,4 @@ public @interface IsPositiveNumber {
     Class<?>[] groups() default {};
 
     Class<?>[] payload() default {};
-
 }

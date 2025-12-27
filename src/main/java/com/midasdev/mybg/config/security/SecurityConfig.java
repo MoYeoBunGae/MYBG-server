@@ -2,13 +2,10 @@ package com.midasdev.mybg.config.security;
 
 import com.midasdev.mybg.config.security.filter.ExceptionHandlerFilter;
 import com.midasdev.mybg.config.security.filter.JwtAuthenticationFilter;
-import io.micrometer.observation.ObservationRegistry;
-import io.micrometer.observation.ObservationTextPublisher;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.boot.actuate.autoconfigure.observation.ObservationRegistryCustomizer;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -49,25 +46,32 @@ public class SecurityConfig {
     public SecurityFilterChain oidcLoginFilterChain(HttpSecurity httpSecurity) throws Exception {
         log.info("SecurityFilterChain -> OidcLoginFilterChain");
         return httpSecurity
-                .exceptionHandling(config ->
-                                           config.authenticationEntryPoint(authenticationEntryPoint))
-//                .securityMatcher("/api/**", "")
+                .exceptionHandling(
+                        config -> config.authenticationEntryPoint(authenticationEntryPoint))
+                //                .securityMatcher("/api/**", "")
                 .authorizeHttpRequests(
                         request ->
                                 request.requestMatchers(permitUrlPatterns)
-                                       .permitAll()
-                                       .anyRequest().authenticated())
+                                        .permitAll()
+                                        .anyRequest()
+                                        .authenticated())
                 .csrf(CsrfConfigurer::disable)
                 .cors(config -> config.configurationSource(corsConfigurationSource()))
-                .oauth2Login(oauth2 -> oauth2
-                        .authorizationEndpoint(authorizationEndpoint -> authorizationEndpoint
-                                .baseUri("/security/oauth2/authorization"))
-                        .userInfoEndpoint(config -> config.oidcUserService(oidcUserService()))
-                        .successHandler(authenticationSuccessHandler)
-                )
-                .sessionManagement(config -> config.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+                .oauth2Login(
+                        oauth2 ->
+                                oauth2.authorizationEndpoint(
+                                                authorizationEndpoint ->
+                                                        authorizationEndpoint.baseUri(
+                                                                "/security/oauth2/authorization"))
+                                        .userInfoEndpoint(
+                                                config -> config.oidcUserService(oidcUserService()))
+                                        .successHandler(authenticationSuccessHandler))
+                .sessionManagement(
+                        config -> config.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .addFilterBefore(exceptionHandlerFilter, OAuth2LoginAuthenticationFilter.class)
-                .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class) // TODO 필터체인 분리
+                .addFilterBefore(
+                        jwtAuthenticationFilter,
+                        UsernamePasswordAuthenticationFilter.class) // TODO 필터체인 분리
                 .build();
     }
 
@@ -89,10 +93,10 @@ public class SecurityConfig {
         return source;
     }
 
-//    @Bean
-//    ObservationRegistryCustomizer<ObservationRegistry> addTextHandler() {
-//        return registry -> registry.observationConfig().observationHandler(new ObservationTextPublisher());
-//    }
-
+    //    @Bean
+    //    ObservationRegistryCustomizer<ObservationRegistry> addTextHandler() {
+    //        return registry -> registry.observationConfig().observationHandler(new
+    // ObservationTextPublisher());
+    //    }
 
 }

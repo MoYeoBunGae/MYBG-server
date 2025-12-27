@@ -14,9 +14,7 @@ import org.springframework.security.oauth2.core.oidc.user.OidcUser;
 import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.stereotype.Component;
 
-/**
- * Authentication 이후 어플리케이션 서버 토큰을 발행합니다.
- */
+/** Authentication 이후 어플리케이션 서버 토큰을 발행합니다. */
 @Component
 @RequiredArgsConstructor
 public class JwtProvider {
@@ -32,22 +30,23 @@ public class JwtProvider {
 
     public String creatAuthTokenForOidcUser(OidcUser oidcUser) {
         Map<String, Object> attributes = new HashMap<>();
-        attributes.put(TokenAttribute.ID_TOKEN.getAttribute(), oidcUser.getIdToken().getTokenValue());
+        attributes.put(
+                TokenAttribute.ID_TOKEN.getAttribute(), oidcUser.getIdToken().getTokenValue());
         attributes.put(TokenAttribute.TYPE.getAttribute(), TokenType.AUTH);
         Claims claims = new DefaultClaims(attributes);
-        return generateToken(oidcUser.getSubject(), claims, jwtProperty.getAuthTokenExpiredSecond());
+        return generateToken(
+                oidcUser.getSubject(), claims, jwtProperty.getAuthTokenExpiredSecond());
     }
 
     public String generateToken(String subject, Claims claims, Integer validationSecond) {
         Instant expiredTime = Instant.now().plus(validationSecond, ChronoUnit.SECONDS);
         return Jwts.builder()
-                   .setSubject(subject)
-                   .addClaims(claims)
-                   .signWith(jwtProperty.getKey(), SignatureAlgorithm.HS512)
-                   .setExpiration(Date.from(expiredTime))
-                   .compact();
+                .setSubject(subject)
+                .addClaims(claims)
+                .signWith(jwtProperty.getKey(), SignatureAlgorithm.HS512)
+                .setExpiration(Date.from(expiredTime))
+                .compact();
     }
-
 
     public AuthorizationToken createAuthorizationToken(Long memberId) {
         String accessToken = generateToken(memberId, TokenType.ACCESS);
@@ -58,7 +57,7 @@ public class JwtProvider {
     private String generateToken(Long memberId, TokenType tokenType) {
         Claims claims = new DefaultClaims();
         claims.put(TokenAttribute.TYPE.getAttribute(), tokenType);
-        return generateToken(String.valueOf(memberId), claims, jwtProperty.getAccessTokenExpiredSecond());
+        return generateToken(
+                String.valueOf(memberId), claims, jwtProperty.getAccessTokenExpiredSecond());
     }
-
 }

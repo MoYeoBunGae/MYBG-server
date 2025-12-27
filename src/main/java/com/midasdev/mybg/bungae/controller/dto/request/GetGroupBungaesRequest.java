@@ -22,28 +22,19 @@ import org.springdoc.core.annotations.ParameterObject;
 @AllArgsConstructor
 public class GetGroupBungaesRequest extends CursorPageRequest {
 
-    @Parameter(
-            description = "조회할 그룹 ID",
-            required = true,
-            example = "1"
-    )
+    @Parameter(description = "조회할 그룹 ID", required = true, example = "1")
     @NotNull
     @Positive
     private Long groupId;
 
     @Parameter(
-            description = """
+            description =
+                    """
                     조회할 번개 상태 목록 (default: 모든 상태)
                     - null인 경우, 모든 상태의 번개를 조회합니다.
                     - 여러 상태를 지정할 수 있습니다.
                     """,
             example = "[\"RECRUITING\", \"CLOSED\"]",
-            array = @ArraySchema(
-                    schema = @Schema(
-                            implementation = BungaeStatus.class
-                    )
-            )
-    )
+            array = @ArraySchema(schema = @Schema(implementation = BungaeStatus.class)))
     private List<BungaeStatus> statuses;
-
 }

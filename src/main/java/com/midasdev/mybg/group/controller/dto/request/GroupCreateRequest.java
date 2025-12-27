@@ -9,13 +9,11 @@ import jakarta.validation.constraints.NotBlank;
 @Schema(description = "그룹 생성 요청")
 public record GroupCreateRequest(
         @Schema(description = "그룹 이름", example = "test group", requiredMode = RequiredMode.REQUIRED)
-        @NotBlank String name,
-
+                @NotBlank
+                String name,
         @Schema(description = "그룹 프로필 이미지 URL", example = "https://example.com/image.jpg")
-        String profileImageUrl,
-
+                String profileImageUrl,
         @Schema(title = "그룹 최대 인원", example = "100", requiredMode = RequiredMode.REQUIRED)
-        @Min(1) @Max(500)
-        int maxMemberCount
-) {
-}
+                @Min(1)
+                @Max(500)
+                int maxMemberCount) {}

@@ -26,11 +26,9 @@ import org.mockito.junit.jupiter.MockitoExtension;
 @ExtendWith(MockitoExtension.class)
 class GroupMemberFinderUnitTest {
 
-    @Mock
-    private GroupMemberRepository groupMemberRepository;
+    @Mock private GroupMemberRepository groupMemberRepository;
 
-    @InjectMocks
-    private GroupMemberFinder groupMemberFinder;
+    @InjectMocks private GroupMemberFinder groupMemberFinder;
 
     private Member member;
     private Group group;
@@ -67,7 +65,8 @@ class GroupMemberFinderUnitTest {
         // when & then
         assertThatThrownBy(() -> groupMemberFinder.findByMemberAndGroup(member, group))
                 .isInstanceOf(ApplicationException.class)
-                .hasFieldOrPropertyWithValue(TestConstant.EXCEPTION_TYPE_FIELD, ApplicationExceptionType.GROUP_MEMBER_NOT_FOUND_BY_GROUP_ID);
+                .hasFieldOrPropertyWithValue(
+                        TestConstant.EXCEPTION_TYPE_FIELD,
+                        ApplicationExceptionType.GROUP_MEMBER_NOT_FOUND_BY_GROUP_ID);
     }
 }
-

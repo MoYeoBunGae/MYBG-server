@@ -25,5 +25,4 @@ public class JwtProperty {
         String keyBase64Encoded = Base64.getEncoder().encodeToString(secretKey.getBytes());
         return Keys.hmacShaKeyFor(keyBase64Encoded.getBytes());
     }
-
 }

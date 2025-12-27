@@ -17,7 +17,8 @@ import org.springframework.web.filter.OncePerRequestFilter;
 public class ExceptionHandlerFilter extends OncePerRequestFilter {
 
     @Override
-    protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
+    protected void doFilterInternal(
+            HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
             throws ServletException, IOException {
         try {
             filterChain.doFilter(request, response);
@@ -26,8 +27,8 @@ public class ExceptionHandlerFilter extends OncePerRequestFilter {
             ExceptionResponseWriter.writeException(response, e);
         } catch (Exception e) {
             log.error("before Controller Exception occur!", e);
-            ExceptionResponseWriter.writeException(response, ApplicationExceptionType.FILTER_OR_API_EXCEPTION, e.getMessage());
+            ExceptionResponseWriter.writeException(
+                    response, ApplicationExceptionType.FILTER_OR_API_EXCEPTION, e.getMessage());
         }
     }
-
 }

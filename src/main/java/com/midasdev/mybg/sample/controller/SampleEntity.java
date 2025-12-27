@@ -34,5 +34,4 @@ public class SampleEntity extends BaseEntity {
     public static SampleEntity getSample() {
         return SampleEntity.builder().name("stark").age(30).build();
     }
-
 }

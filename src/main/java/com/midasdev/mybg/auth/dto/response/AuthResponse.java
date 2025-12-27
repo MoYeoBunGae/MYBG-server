@@ -10,17 +10,16 @@ public record AuthResponse(
         String accessToken,
         String refreshToken,
         Long memberId,
-        String memberName
-) {
+        String memberName) {
 
-    public static AuthResponse from(Member member, AuthorizationToken authorizationToken, boolean isNewMember) {
+    public static AuthResponse from(
+            Member member, AuthorizationToken authorizationToken, boolean isNewMember) {
         return AuthResponse.builder()
-                           .isNewMember(isNewMember)
-                           .accessToken(authorizationToken.getAccessToken())
-                           .refreshToken(authorizationToken.getRefreshToken())
-                           .memberId(member.getId())
-                           .memberName(member.getName())
-                           .build();
+                .isNewMember(isNewMember)
+                .accessToken(authorizationToken.getAccessToken())
+                .refreshToken(authorizationToken.getRefreshToken())
+                .memberId(member.getId())
+                .memberName(member.getName())
+                .build();
     }
-
 }

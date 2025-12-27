@@ -9,5 +9,4 @@ public class MybgApplication {
     public static void main(String[] args) {
         SpringApplication.run(MybgApplication.class, args);
     }
-
 }

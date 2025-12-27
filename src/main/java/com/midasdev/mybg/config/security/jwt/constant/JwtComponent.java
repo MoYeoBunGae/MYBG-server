@@ -4,7 +4,8 @@ import lombok.Getter;
 
 @Getter
 public enum JwtComponent {
-    HEADER(0, "HEADER"), BODY(1, "BODY");
+    HEADER(0, "HEADER"),
+    BODY(1, "BODY");
 
     int index;
     String name;

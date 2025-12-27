@@ -25,4 +25,3 @@ public class WithinWeeksValidator implements ConstraintValidator<WithinWeeks, Lo
         return !date.isAfter(maxDate);
     }
 }
-

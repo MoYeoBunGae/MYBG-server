@@ -13,7 +13,9 @@ import org.springframework.http.MediaType;
 
 public class ExceptionResponseWriter {
 
-    public static void writeException(HttpServletResponse response, ApplicationExceptionType exceptionType, Object... args) throws IOException {
+    public static void writeException(
+            HttpServletResponse response, ApplicationExceptionType exceptionType, Object... args)
+            throws IOException {
         setResponseInfo(response, exceptionType.getHttpStatus());
         PrintWriter writer = response.getWriter();
         ObjectMapper mapper = new ObjectMapper();
@@ -21,7 +23,8 @@ public class ExceptionResponseWriter {
         writer.flush();
     }
 
-    public static void writeException(HttpServletResponse response, ApplicationException exception) throws IOException {
+    public static void writeException(HttpServletResponse response, ApplicationException exception)
+            throws IOException {
         setResponseInfo(response, exception.getExceptionType().getHttpStatus());
         PrintWriter writer = response.getWriter();
         ObjectMapper mapper = new ObjectMapper();
@@ -34,5 +37,4 @@ public class ExceptionResponseWriter {
         response.setContentType(MediaType.APPLICATION_JSON_VALUE);
         response.setCharacterEncoding(StandardCharsets.UTF_8.name());
     }
-
 }

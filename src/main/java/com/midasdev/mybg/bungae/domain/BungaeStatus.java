@@ -6,5 +6,4 @@ public enum BungaeStatus {
     RECRUITING_CLOSED,
     CLOSED,
     CANCELLED
-
 }

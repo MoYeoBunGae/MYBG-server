@@ -21,14 +21,11 @@ public class BungaeFinder {
      * @throws ApplicationException 번개가 존재하지 않는 경우
      */
     public Bungae findById(Long bungaeId) {
-        return bungaeRepository.findByIdAndDeletedIsFalse(bungaeId)
-                               .orElseThrow(() -> new ApplicationException(ApplicationExceptionType.BUNGAE_NOT_FOUND_BY_ID, bungaeId));
+        return bungaeRepository
+                .findByIdAndDeletedIsFalse(bungaeId)
+                .orElseThrow(
+                        () ->
+                                new ApplicationException(
+                                        ApplicationExceptionType.BUNGAE_NOT_FOUND_BY_ID, bungaeId));
     }
-
 }
-
-
-
-
-
-

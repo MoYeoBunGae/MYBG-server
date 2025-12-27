@@ -1,6 +1,5 @@
 package com.midasdev.mybg.config.security.handler;
 
-
 import com.midasdev.mybg.config.security.jwt.JwtProvider;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -30,7 +29,8 @@ public class Oauth2SuccessHandler extends SimpleUrlAuthenticationSuccessHandler 
     private String redirectUrl;
 
     @Override
-    public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response, Authentication authentication)
+    public void onAuthenticationSuccess(
+            HttpServletRequest request, HttpServletResponse response, Authentication authentication)
             throws IOException, ServletException {
         log.info("Authentication Success! Redirect with authToken...");
 
@@ -44,12 +44,12 @@ public class Oauth2SuccessHandler extends SimpleUrlAuthenticationSuccessHandler 
         OAuth2User principal = token.getPrincipal();
         String authToken = jwtProvider.createAuthToken(principal);
         String provider = token.getAuthorizedClientRegistrationId().toUpperCase();
-        String clientRedirectUrl = UriComponentsBuilder.fromHttpUrl(clientUrl)
-                                                       .path(redirectUrl)
-                                                       .queryParam("token", authToken)
-                                                       .queryParam("provider", provider)
-                                                       .toUriString();
+        String clientRedirectUrl =
+                UriComponentsBuilder.fromHttpUrl(clientUrl)
+                        .path(redirectUrl)
+                        .queryParam("token", authToken)
+                        .queryParam("provider", provider)
+                        .toUriString();
         getRedirectStrategy().sendRedirect(request, response, clientRedirectUrl);
     }
-
 }

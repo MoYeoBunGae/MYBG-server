@@ -9,6 +9,4 @@ public interface GroupRepositoryCustom {
     List<Group> findGroupsByMemberId(Long memberId);
 
     Optional<Group> findByInvitationCode(String invitationCode);
-
-
 }

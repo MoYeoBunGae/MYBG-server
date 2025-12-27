@@ -17,6 +17,4 @@ public class BungaeDateVoteRequest {
     @NotNull
     @Size(min = 1)
     private List<@NotNull @Valid LocalDate> voteDates;
-
 }
-

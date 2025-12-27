@@ -39,8 +39,9 @@ public class GroupMemberController {
 
     @Operation(summary = "그룹 참여 API", security = @SecurityRequirement(name = SECURITY_SCHEME_NAME))
     @PostMapping
-    public ResponseEntity<ActiveGroupMemberResponse> joinGroup(@AuthenticationPrincipal Member member,
-                                                               @Valid @RequestBody GroupJoinRequest groupJoinRequest) {
+    public ResponseEntity<ActiveGroupMemberResponse> joinGroup(
+            @AuthenticationPrincipal Member member,
+            @Valid @RequestBody GroupJoinRequest groupJoinRequest) {
         GroupMember groupMember = groupMemberService.joinGroup(member, groupJoinRequest);
         return ResponseEntity.ok(ActiveGroupMemberResponse.from(groupMember));
     }
@@ -48,35 +49,32 @@ public class GroupMemberController {
     @Operation(
             summary = "그룹 멤버 프로필 수정 API",
             description = "그룹에 참여 중인 사용자의 닉네임과 프로필 이미지를 수정합니다.",
-            security = @SecurityRequirement(name = SECURITY_SCHEME_NAME)
-    )
-    @PatchMapping(value = "/{groupMemberId}/profile", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+            security = @SecurityRequirement(name = SECURITY_SCHEME_NAME))
+    @PatchMapping(
+            value = "/{groupMemberId}/profile",
+            consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<TOBE_ActiveGroupMemberResponse> updateGroupMemberProfile(
             @PathVariable Long groupMemberId,
             @AuthenticationPrincipal Member member,
-            @Valid @ModelAttribute GroupMemberProfileUpdateRequest request
-    ) {
-        GroupMember updatedMember = groupMemberService.updateProfile(groupMemberId, member, request);
+            @Valid @ModelAttribute GroupMemberProfileUpdateRequest request) {
+        GroupMember updatedMember =
+                groupMemberService.updateProfile(groupMemberId, member, request);
         return ResponseEntity.ok(TOBE_ActiveGroupMemberResponse.from(updatedMember));
     }
 
     @Operation(
             summary = "그룹 나가기 API",
-            description = """
+            description =
+                    """
                 사용자가 참여한 그룹에서 나갑니다.
                 - 세부사항:
                     1. 그룹의 소유자는 나갈 수 없습니다.
                 """,
-            security = @SecurityRequirement(name = SECURITY_SCHEME_NAME)
-    )
+            security = @SecurityRequirement(name = SECURITY_SCHEME_NAME))
     @DeleteMapping("/{groupMemberId}")
     public ResponseEntity<MessageResponse> leaveGroup(
-            @PathVariable Long groupMemberId,
-            @AuthenticationPrincipal Member loginMember
-    ) {
+            @PathVariable Long groupMemberId, @AuthenticationPrincipal Member loginMember) {
         groupMemberService.leaveGroup(groupMemberId, loginMember);
         return ResponseEntity.ok(new MessageResponse("Leave group succeeded"));
-
     }
-
 }

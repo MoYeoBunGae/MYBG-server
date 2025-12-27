@@ -17,7 +17,5 @@ public class Audit {
     @Column(updatable = false)
     private LocalDateTime createdAt;
 
-    @LastModifiedDate
-    private LocalDateTime modifiedAt;
-
+    @LastModifiedDate private LocalDateTime modifiedAt;
 }

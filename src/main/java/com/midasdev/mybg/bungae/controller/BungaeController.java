@@ -44,7 +44,8 @@ public class BungaeController {
 
     @Operation(
             summary = "번개 생성 API",
-            description = """
+            description =
+                    """
                     번개를 생성합니다.
                     - Request DTO : BungaeCreateRequest
                     - Response DTO : BungaeResponse
@@ -52,20 +53,19 @@ public class BungaeController {
                         1. 날짜 후보가 한 개라면 상태는 RECRUITING으로 설정됩니다.
                         2. 날짜 후보가 여러 개라면 상태는 DATE_VOTING으로 설정됩니다.
                     """,
-            security = @SecurityRequirement(name = SECURITY_SCHEME_NAME)
-    )
+            security = @SecurityRequirement(name = SECURITY_SCHEME_NAME))
     @PostMapping()
     public ResponseEntity<BungaeResponse> createBungae(
             @AuthenticationPrincipal Member member,
-            @Valid @RequestBody BungaeCreateRequest request
-    ) {
+            @Valid @RequestBody BungaeCreateRequest request) {
         Bungae bungae = bungaeService.createBungae(member, request);
         return ResponseEntity.ok(BungaeResponse.from(bungae));
     }
 
     @Operation(
             summary = "내 번개모임 목록 조회 API",
-            description = """
+            description =
+                    """
                     로그인한 사용자가 참여한 번개모임 목록을 조회합니다.
                     커서 페이지네이션을 지원합니다.
                     - Request DTO : GetMyBungaesRequest
@@ -73,23 +73,21 @@ public class BungaeController {
                     - 세부사항:
                         1. 가장 마지막 번개가 포함되어 있을 경우, nextCursorId가 null이고 hasNext가 false로 반환됩니다.
                     """,
-            security = @SecurityRequirement(name = SECURITY_SCHEME_NAME)
-    )
+            security = @SecurityRequirement(name = SECURITY_SCHEME_NAME))
     @GetMapping(value = "/me")
     public ResponseEntity<CursorPage<BungaeResponse>> getMyBungaes(
-            @AuthenticationPrincipal Member member,
-            @Valid GetMyBungaesRequest request
-    ) {
-        CursorPage<BungaeDto> bungaes = bungaeService.findBungaesByMemberIdAndStatuses(
-                member, request.getStatuses(), request.toPageable()
-        );
+            @AuthenticationPrincipal Member member, @Valid GetMyBungaesRequest request) {
+        CursorPage<BungaeDto> bungaes =
+                bungaeService.findBungaesByMemberIdAndStatuses(
+                        member, request.getStatuses(), request.toPageable());
         CursorPage<BungaeResponse> responses = bungaes.map(BungaeResponse::from);
         return ResponseEntity.ok(responses);
     }
 
     @Operation(
             summary = "그룹별 번개모임 목록 조회 API",
-            description = """
+            description =
+                    """
                     특정 그룹의 번개모임 목록을 조회합니다.
                     커서 페이지네이션을 지원합니다.
                     - Request DTO : GetGroupBungaesRequest
@@ -99,56 +97,48 @@ public class BungaeController {
                         2. statuses가 null인 경우, 모든 상태의 번개를 조회합니다.
                         3. 가장 마지막 번개가 포함되어 있을 경우, nextCursorId가 null이고 hasNext가 false로 반환됩니다.
                     """,
-            security = @SecurityRequirement(name = SECURITY_SCHEME_NAME)
-    )
+            security = @SecurityRequirement(name = SECURITY_SCHEME_NAME))
     @GetMapping(value = "/group")
     public ResponseEntity<CursorPage<BungaeResponse>> getGroupBungaes(
-            @AuthenticationPrincipal Member member,
-            @Valid GetGroupBungaesRequest request
-    ) {
-        CursorPage<BungaeDto> bungaes = bungaeService.findBungaesByGroupIdAndStatuses(
-                member, request.getGroupId(), request.getStatuses(), request.toPageable()
-        );
+            @AuthenticationPrincipal Member member, @Valid GetGroupBungaesRequest request) {
+        CursorPage<BungaeDto> bungaes =
+                bungaeService.findBungaesByGroupIdAndStatuses(
+                        member, request.getGroupId(), request.getStatuses(), request.toPageable());
         CursorPage<BungaeResponse> responses = bungaes.map(BungaeResponse::from);
         return ResponseEntity.ok(responses);
     }
 
     @Operation(
             summary = "번개 투표 가능한 날짜들 조회 API",
-            description = """
+            description =
+                    """
                     번개의 투표 가능한 날짜들을 조회합니다.
                     - Request Parameter : bungaeId (Path Variable)
                     - Response DTO : BungaeDateVoteOptionResponse
                     """,
-            security = @SecurityRequirement(name = SECURITY_SCHEME_NAME)
-    )
+            security = @SecurityRequirement(name = SECURITY_SCHEME_NAME))
     @GetMapping(value = "/{bungaeId}/date-vote-options")
     public ResponseEntity<BungaeDateVoteOptionResponse> getBungaeDateVoteOptions(
-            @AuthenticationPrincipal Member member,
-            @PathVariable Long bungaeId
-    ) {
-        List<LocalDate> dateOptions = bungaeService.getBungaeDateVoteOptions(
-                member, bungaeId
-        );
+            @AuthenticationPrincipal Member member, @PathVariable Long bungaeId) {
+        List<LocalDate> dateOptions = bungaeService.getBungaeDateVoteOptions(member, bungaeId);
         return ResponseEntity.ok(new BungaeDateVoteOptionResponse(dateOptions));
     }
 
     @Operation(
             summary = "번개 날짜 투표 API",
-            description = """
+            description =
+                    """
                     번개 날짜에 투표합니다.
                     - Response : BungaeDateVoteResponse (전체적인 투표 결과)
                     """,
-            security = @SecurityRequirement(name = SECURITY_SCHEME_NAME)
-    )
+            security = @SecurityRequirement(name = SECURITY_SCHEME_NAME))
     @PostMapping(value = "/{bungaeId}/date-vote")
     public ResponseEntity<BungaeDateVoteResponse> voteBungaeDate(
             @AuthenticationPrincipal Member member,
             @PathVariable Long bungaeId,
-            @Valid @RequestBody BungaeDateVoteRequest request
-    ) {
-        BungaeDateVoteResponse response = bungaeService.voteBungaeDates(member, bungaeId, request.getVoteDates());
+            @Valid @RequestBody BungaeDateVoteRequest request) {
+        BungaeDateVoteResponse response =
+                bungaeService.voteBungaeDates(member, bungaeId, request.getVoteDates());
         return ResponseEntity.ok(response);
     }
-
 }

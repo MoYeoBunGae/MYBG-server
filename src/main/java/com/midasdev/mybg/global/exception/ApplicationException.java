@@ -14,7 +14,8 @@ public class ApplicationException extends RuntimeException {
         this.messageArguments = args;
     }
 
-    public ApplicationException(ApplicationExceptionType exceptionType, Throwable cause, Object... args) {
+    public ApplicationException(
+            ApplicationExceptionType exceptionType, Throwable cause, Object... args) {
         super(exceptionType.getErrorMessage(args), cause);
         this.exceptionType = exceptionType;
         this.messageArguments = args;
@@ -23,5 +24,4 @@ public class ApplicationException extends RuntimeException {
     public String getMessage() {
         return exceptionType.getErrorMessage(messageArguments);
     }
-
 }

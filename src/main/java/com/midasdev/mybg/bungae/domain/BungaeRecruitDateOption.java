@@ -1,6 +1,5 @@
 package com.midasdev.mybg.bungae.domain;
 
-
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
@@ -33,5 +32,4 @@ public class BungaeRecruitDateOption {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "bungae_id", nullable = false)
     private Bungae bungae;
-
 }
