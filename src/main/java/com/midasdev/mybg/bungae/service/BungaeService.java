@@ -329,18 +329,11 @@ public class BungaeService {
                         .build();
         bungaeAttendeeRepository.save(attendee);
 
-        // 7. 번개를 BungaeDto로 조회 (현재 참석자 수 포함)
-        BungaeDto bungaeDto =
-                bungaeRepository
-                        .findBungaeDtoById(bungaeId)
-                        .orElseThrow(
-                                () ->
-                                        new ApplicationException(
-                                                ApplicationExceptionType.BUNGAE_NOT_FOUND_BY_ID,
-                                                bungaeId));
+        // 7. 현재 참석자 수 조회
+        long currentAttendeeCount = bungaeAttendeeRepository.countByBungaeIdAndDeletedFalse(bungaeId);
 
         // 8. 최대 인원 도달 시 상태 변경 (도메인 로직 위임)
-        bungae.closeRecruitingIfFull(bungaeDto.attendeeCount());
+        bungae.closeRecruitingIfFull((int) currentAttendeeCount);
 
         // 9. 상태 변경 후 최신 번개 정보를 다시 조회하여 반환
         return bungaeRepository

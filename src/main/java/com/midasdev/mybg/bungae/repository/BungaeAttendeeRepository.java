@@ -13,4 +13,6 @@ public interface BungaeAttendeeRepository extends JpaRepository<BungaeAttendee, 
 
     Optional<BungaeAttendee> findByBungaeAndGroupMemberAndDeletedFalse(
             Bungae bungae, GroupMember groupMember);
+
+    long countByBungaeIdAndDeletedFalse(Long bungaeId);
 }
