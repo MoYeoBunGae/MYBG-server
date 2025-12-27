@@ -141,4 +141,24 @@ public class BungaeController {
                 bungaeService.voteBungaeDates(member, bungaeId, request.getVoteDates());
         return ResponseEntity.ok(response);
     }
+
+    @Operation(
+            summary = "번개 참여 API",
+            description =
+                    """
+                    번개에 참여합니다.
+                    - Response DTO : BungaeResponse (updated with current attendeeCount and status)
+                    - 세부사항:
+                        1. 번개 상태가 RECRUITING일 때만 참여 가능합니다.
+                        2. 번개가 속한 그룹의 멤버만 참여 가능합니다.
+                        3. 이미 참여한 번개에는 중복 참여가 불가능합니다.
+                        4. 참여로 인해 최대 인원에 도달하면 자동으로 RECRUITING_CLOSED로 상태가 변경됩니다.
+                    """,
+            security = @SecurityRequirement(name = SECURITY_SCHEME_NAME))
+    @PostMapping("/{bungaeId}/join")
+    public ResponseEntity<BungaeResponse> joinBungae(
+            @AuthenticationPrincipal Member member, @PathVariable Long bungaeId) {
+        BungaeDto bungaeDto = bungaeService.joinBungae(member, bungaeId);
+        return ResponseEntity.ok(BungaeResponse.from(bungaeDto));
+    }
 }

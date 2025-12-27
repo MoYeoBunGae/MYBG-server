@@ -292,6 +292,60 @@ public class BungaeService {
                 .build();
     }
 
+    @Transactional
+    public BungaeDto joinBungae(Member member, Long bungaeId) {
+        // 1. 번개 조회 및 존재 여부 검증 (BungaeFinder 사용)
+        Bungae bungae = bungaeFinder.findById(bungaeId);
+
+        // 2. 동시성 제어: 번개 ID 기반 락 획득
+        acquireLockByBungae(bungaeId);
+
+        // 3. 번개 상태 검증 (RECRUITING 상태만 참여 가능)
+        if (!bungae.canJoin()) {
+            throw new ApplicationException(
+                    ApplicationExceptionType.BUNGAE_NOT_JOINABLE_STATUS, bungaeId);
+        }
+
+        // 4. 그룹 멤버 검증 (멤버가 번개의 그룹에 속하는지)
+        GroupMember groupMember = groupMemberFinder.findByMemberAndGroup(member, bungae.getGroup());
+
+        // 5. 이미 참여했는지 검증
+        bungaeAttendeeRepository
+                .findByBungaeAndGroupMemberAndDeletedFalse(bungae, groupMember)
+                .ifPresent(
+                        existingAttendee -> {
+                            throw new ApplicationException(
+                                    ApplicationExceptionType.BUNGAE_ALREADY_JOINED,
+                                    bungaeId,
+                                    groupMember.getId());
+                        });
+
+        // 6. BungaeAttendee 생성 및 저장
+        BungaeAttendee attendee =
+                BungaeAttendee.builder()
+                        .bungae(bungae)
+                        .groupMember(groupMember)
+                        .deleted(false)
+                        .build();
+        bungaeAttendeeRepository.save(attendee);
+
+        // 7. 번개를 BungaeDto로 조회 (현재 참석자 수 포함)
+        BungaeDto bungaeDto =
+                bungaeRepository
+                        .findBungaeDtoById(bungaeId)
+                        .orElseThrow(
+                                () ->
+                                        new ApplicationException(
+                                                ApplicationExceptionType.BUNGAE_NOT_FOUND_BY_ID,
+                                                bungaeId));
+
+        // 8. 최대 인원 도달 시 상태 변경
+        bungae.closeRecruitingIfFull(bungaeDto.attendeeCount());
+
+        // 9. 번개 정보 반환
+        return bungaeDto;
+    }
+
     private void acquireLockByBungae(Long bungaeId) {
         String lockKey = "bungae:" + bungaeId;
         boolean lockAcquired = false;
@@ -307,15 +361,13 @@ public class BungaeService {
                     Thread.sleep(50);
                 } catch (InterruptedException e) {
                     Thread.currentThread().interrupt();
-                    throw new ApplicationException(
-                            ApplicationExceptionType.BUNGAE_VOTE_CONCURRENCY_LOCK_FAILED, bungaeId);
+                    throw new ApplicationException(ApplicationExceptionType.BUNGAE_CONCURRENCY_LOCK_FAILED, bungaeId);
                 }
             }
         }
 
         if (!lockAcquired) {
-            throw new ApplicationException(
-                    ApplicationExceptionType.BUNGAE_VOTE_CONCURRENCY_LOCK_FAILED, bungaeId);
+            throw new ApplicationException(ApplicationExceptionType.BUNGAE_CONCURRENCY_LOCK_FAILED, bungaeId);
         }
     }
 }

@@ -143,4 +143,16 @@ public class Bungae implements LongIdentifiable {
     public boolean canJoin() {
         return this.status == BungaeStatus.RECRUITING;
     }
+
+    public void closeRecruitingIfFull(int currentAttendeeCount) {
+        if (!this.canJoin()) {
+            throw new ApplicationException(
+                    ApplicationExceptionType.BUNGAE_NOT_JOINABLE_STATUS, this.id);
+        }
+
+        // 참여 후 인원이 최대 인원에 도달하면 모집 마감
+        if (currentAttendeeCount >= this.maxAttendees) {
+            this.status = BungaeStatus.RECRUITING_CLOSED;
+        }
+    }
 }
