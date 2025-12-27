@@ -10,6 +10,8 @@ import java.lang.annotation.*;
 @Retention(RetentionPolicy.RUNTIME)
 public @interface VoteRequiredIfHasMultipleDateCandidates {
     String message() default "날짜 후보가 2개 이상일 경우 투표 마감 시각(dateVoteClosedAt)은 필수입니다.";
+
     Class<?>[] groups() default {};
+
     Class<? extends Payload>[] payload() default {};
 }

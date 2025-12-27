@@ -36,29 +36,21 @@ import org.springframework.context.ApplicationEventPublisher;
 @ExtendWith(MockitoExtension.class)
 public class BungaeServiceUnitTest {
 
-    @Mock
-    private BungaeRepository bungaeRepository;
+    @Mock private BungaeRepository bungaeRepository;
 
-    @Mock
-    private BungaeRecruitDateOptionRepository bungaeRecruitDateOptionRepository;
+    @Mock private BungaeRecruitDateOptionRepository bungaeRecruitDateOptionRepository;
 
-    @Mock
-    private BungaeAttendeeRepository bungaeAttendeeRepository;
+    @Mock private BungaeAttendeeRepository bungaeAttendeeRepository;
 
-    @Mock
-    private ApplicationEventPublisher eventPublisher;
+    @Mock private ApplicationEventPublisher eventPublisher;
 
-    @Mock
-    private BungaeFinder bungaeFinder;
+    @Mock private BungaeFinder bungaeFinder;
 
-    @Mock
-    private GroupMemberFinder groupMemberFinder;
+    @Mock private GroupMemberFinder groupMemberFinder;
 
-    @Mock
-    private GroupFinder groupFinder;
+    @Mock private GroupFinder groupFinder;
 
-    @InjectMocks
-    private BungaeService bungaeService;
+    @InjectMocks private BungaeService bungaeService;
 
     @Test
     @DisplayName("B-3-SU-1: 멤버가 그룹에 속하는지 검증 기능 호출")
@@ -72,7 +64,8 @@ public class BungaeServiceUnitTest {
 
         // when
         when(groupFinder.findById(any(Long.class))).thenReturn(group);
-        bungaeService.findBungaesByGroupIdAndStatuses(member, group.getId(), statuses, cursorPageable);
+        bungaeService.findBungaesByGroupIdAndStatuses(
+                member, group.getId(), statuses, cursorPageable);
 
         // then
         verify(groupMemberFinder).findByMemberAndGroup(member, group);
@@ -94,7 +87,8 @@ public class BungaeServiceUnitTest {
         // when & then
         assertThatThrownBy(() -> bungaeService.getBungaeDateVoteOptions(member, bungaeId))
                 .isInstanceOf(ApplicationException.class)
-                .hasFieldOrPropertyWithValue(TestConstant.EXCEPTION_TYPE_FIELD, ApplicationExceptionType.BUNGAE_VOTE_UNAVAILABLE);
-
+                .hasFieldOrPropertyWithValue(
+                        TestConstant.EXCEPTION_TYPE_FIELD,
+                        ApplicationExceptionType.BUNGAE_VOTE_UNAVAILABLE);
     }
 }

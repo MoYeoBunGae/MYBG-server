@@ -25,51 +25,50 @@ public record BungaeResponse(
         BungaeStatus status,
         Long groupId,
         Long hostGroupMemberId,
-        LocalDateTime createdAt
-) implements LongIdentifiable {
+        LocalDateTime createdAt)
+        implements LongIdentifiable {
 
     public static BungaeResponse from(Bungae bungae) {
         return BungaeResponse.builder()
-                             .id(bungae.getId())
-                             .name(bungae.getName())
-                             .description(bungae.getDescription())
-                             .minAttendees(bungae.getMinAttendees())
-                             .maxAttendees(bungae.getMaxAttendees())
-                             .isOnline(bungae.getIsOnline())
-                             .location(bungae.getLocation())
-                             .bungaeDate(bungae.getBungaeDate())
-                             .bungaeTime(bungae.getBungaeTime())
-                             .dateVoteClosedAt(bungae.getDateVoteClosedAt())
-                             .status(bungae.getStatus())
-                             .groupId(bungae.getGroup().getId())
-                             .hostGroupMemberId(bungae.getHost().getId())
-                             .createdAt(bungae.getCreatedAt())
-                             .build();
+                .id(bungae.getId())
+                .name(bungae.getName())
+                .description(bungae.getDescription())
+                .minAttendees(bungae.getMinAttendees())
+                .maxAttendees(bungae.getMaxAttendees())
+                .isOnline(bungae.getIsOnline())
+                .location(bungae.getLocation())
+                .bungaeDate(bungae.getBungaeDate())
+                .bungaeTime(bungae.getBungaeTime())
+                .dateVoteClosedAt(bungae.getDateVoteClosedAt())
+                .status(bungae.getStatus())
+                .groupId(bungae.getGroup().getId())
+                .hostGroupMemberId(bungae.getHost().getId())
+                .createdAt(bungae.getCreatedAt())
+                .build();
     }
 
     public static BungaeResponse from(BungaeDto bungaeDto) {
         return BungaeResponse.builder()
-                             .id(bungaeDto.id())
-                             .name(bungaeDto.name())
-                             .description(bungaeDto.description())
-                             .minAttendees(bungaeDto.minAttendees())
-                             .maxAttendees(bungaeDto.maxAttendees())
-                             .attendeeCount(bungaeDto.attendeeCount())
-                             .isOnline(bungaeDto.isOnline())
-                             .location(bungaeDto.location())
-                             .bungaeDate(bungaeDto.bungaeDate())
-                             .bungaeTime(bungaeDto.bungaeTime())
-                             .dateVoteClosedAt(bungaeDto.dateVoteClosedAt())
-                             .status(bungaeDto.status())
-                             .groupId(bungaeDto.groupId())
-                             .hostGroupMemberId(bungaeDto.hostGroupMemberId())
-                             .createdAt(bungaeDto.createdAt())
-                             .build();
+                .id(bungaeDto.id())
+                .name(bungaeDto.name())
+                .description(bungaeDto.description())
+                .minAttendees(bungaeDto.minAttendees())
+                .maxAttendees(bungaeDto.maxAttendees())
+                .attendeeCount(bungaeDto.attendeeCount())
+                .isOnline(bungaeDto.isOnline())
+                .location(bungaeDto.location())
+                .bungaeDate(bungaeDto.bungaeDate())
+                .bungaeTime(bungaeDto.bungaeTime())
+                .dateVoteClosedAt(bungaeDto.dateVoteClosedAt())
+                .status(bungaeDto.status())
+                .groupId(bungaeDto.groupId())
+                .hostGroupMemberId(bungaeDto.hostGroupMemberId())
+                .createdAt(bungaeDto.createdAt())
+                .build();
     }
 
     @Override
     public Long getId() {
         return id;
     }
-
 }

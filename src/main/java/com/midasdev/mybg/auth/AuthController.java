@@ -37,7 +37,9 @@ public class AuthController {
     private final MemberService memberService;
     private final JwtClaimResolver jwtClaimResolver;
 
-    @Operation(summary = "로그인 API", description = "Social 인증 후 서버에서 발급한 authToken을 통해 accessToken, refreshToken을 발급합니다.")
+    @Operation(
+            summary = "로그인 API",
+            description = "Social 인증 후 서버에서 발급한 authToken을 통해 accessToken, refreshToken을 발급합니다.")
     @PostMapping
     public ResponseEntity<AuthResponse> generateToken(@RequestBody @Valid AuthRequest authRequest) {
 
@@ -53,35 +55,44 @@ public class AuthController {
         // 4. accessToken, refreshToken 발급
         AuthorizationToken generatedToken = authService.issueAuthorizationToken(member);
 
-        return ResponseEntity.ok(AuthResponse.from(member, generatedToken, memberOptional.isEmpty()));
-
+        return ResponseEntity.ok(
+                AuthResponse.from(member, generatedToken, memberOptional.isEmpty()));
     }
 
-    @Operation(summary = "access token 재발급 API", description = "refresh token을 통해 새로운 accessToken, refreshToken을 발급합니다.")
+    @Operation(
+            summary = "access token 재발급 API",
+            description = "refresh token을 통해 새로운 accessToken, refreshToken을 발급합니다.")
     @PostMapping("/reissue")
-    public ResponseEntity<TokenReIssueResponse> reIssueToken(@RequestBody TokenReIssueRequest tokenReIssueRequest) {
-        Long memberId = Long.valueOf(
-                jwtClaimResolver.extractValueWithoutValidation(tokenReIssueRequest.refreshToken(), TokenAttribute.SUB.getAttribute(),
-                                                               JwtComponent.BODY));
+    public ResponseEntity<TokenReIssueResponse> reIssueToken(
+            @RequestBody TokenReIssueRequest tokenReIssueRequest) {
+        Long memberId =
+                Long.valueOf(
+                        jwtClaimResolver.extractValueWithoutValidation(
+                                tokenReIssueRequest.refreshToken(),
+                                TokenAttribute.SUB.getAttribute(),
+                                JwtComponent.BODY));
 
         // 1. Body의 refreshToken이 member의 refreshToken과 일치하는지 확인
         authService.verifyRefreshToken(memberId, tokenReIssueRequest.refreshToken());
         // 2. 일치한다면 새로운 accessToken, refreshToken 발급
         AuthorizationToken generatedToken = authService.issueAuthorizationToken(memberId);
-        TokenReIssueResponse tokenReIssueResponse = TokenReIssueResponse.builder()
-                                                                        .memberId(memberId)
-                                                                        .accessToken(generatedToken.getAccessToken())
-                                                                        .refreshToken(generatedToken.getRefreshToken())
-                                                                        .build();
+        TokenReIssueResponse tokenReIssueResponse =
+                TokenReIssueResponse.builder()
+                        .memberId(memberId)
+                        .accessToken(generatedToken.getAccessToken())
+                        .refreshToken(generatedToken.getRefreshToken())
+                        .build();
         return ResponseEntity.ok(tokenReIssueResponse);
     }
 
     // Refactor: SecurityRequirement name 상수 관리에 대해 생각
-    @Operation(summary = "로그아웃 API", description = "사용자의 refresh token을 삭제하여 로그아웃합니다.", security = @SecurityRequirement(name = "BearerAuth"))
+    @Operation(
+            summary = "로그아웃 API",
+            description = "사용자의 refresh token을 삭제하여 로그아웃합니다.",
+            security = @SecurityRequirement(name = "BearerAuth"))
     @PostMapping("/logout")
     public ResponseEntity<String> logout(@AuthenticationPrincipal Member member) {
         authService.logoutMember(member.getId());
         return ResponseEntity.ok(String.format("Member %d is logged out", member.getId()));
     }
-
 }

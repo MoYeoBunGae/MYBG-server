@@ -21,23 +21,30 @@ public class MemberService {
 
     @Transactional(readOnly = true)
     public Optional<Member> findMemberByOauthAccount(TokenRequestUser tokenRequestUser) {
-        return memberRepository.findMemberByOauthAccountAndDeletedIsFalse(tokenRequestUser.oauthAccount());
+        return memberRepository.findMemberByOauthAccountAndDeletedIsFalse(
+                tokenRequestUser.oauthAccount());
     }
 
     public Member findMemberById(Long memberId) {
-        return memberRepository.findById(memberId).orElseThrow(() -> new ApplicationException(
-                ApplicationExceptionType.MEMBER_NOT_FOUND_BY_ID, memberId));
+        return memberRepository
+                .findById(memberId)
+                .orElseThrow(
+                        () ->
+                                new ApplicationException(
+                                        ApplicationExceptionType.MEMBER_NOT_FOUND_BY_ID, memberId));
     }
 
     @Transactional
     public Member register(TokenRequestUser tokenRequestUser) {
-        Member member = Member.builder()
-                              .oauthAccount(tokenRequestUser.oauthAccount())
-                              .name(tokenRequestUser.nickname())
-                              .profileImageUrl(defaultProfileImageService.createRandomProfileImageUrl(DefaultProfileImageType.MEMBER))
-                              .build();
+        Member member =
+                Member.builder()
+                        .oauthAccount(tokenRequestUser.oauthAccount())
+                        .name(tokenRequestUser.nickname())
+                        .profileImageUrl(
+                                defaultProfileImageService.createRandomProfileImageUrl(
+                                        DefaultProfileImageType.MEMBER))
+                        .build();
 
         return memberRepository.save(member);
     }
-
 }

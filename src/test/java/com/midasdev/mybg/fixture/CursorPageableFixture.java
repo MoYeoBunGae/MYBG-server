@@ -11,5 +11,4 @@ public class CursorPageableFixture {
                 .sortOrder(SortOrder.ASC)
                 .build();
     }
-
 }

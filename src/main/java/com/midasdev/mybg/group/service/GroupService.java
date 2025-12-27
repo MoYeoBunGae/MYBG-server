@@ -40,18 +40,21 @@ public class GroupService {
 
     @Transactional
     public Group createGroup(Member member, GroupCreateRequest groupCreateRequest) {
-        String profileImageUrl = StringUtils.hasText(groupCreateRequest.profileImageUrl())
-                ? groupCreateRequest.profileImageUrl()
-                : defaultProfileImageService.createRandomProfileImageUrl(DefaultProfileImageType.GROUP);
+        String profileImageUrl =
+                StringUtils.hasText(groupCreateRequest.profileImageUrl())
+                        ? groupCreateRequest.profileImageUrl()
+                        : defaultProfileImageService.createRandomProfileImageUrl(
+                                DefaultProfileImageType.GROUP);
 
-        Group group = Group.builder()
-                           .owner(member)
-                           .name(groupCreateRequest.name())
-                           .profileImageUrl(profileImageUrl)
-                           .maxMemberCount(groupCreateRequest.maxMemberCount())
-                           .totalMemberCount(1) // 그룹 생성 시점에 방장 포함 1명
-                           .deleted(false)
-                           .build();
+        Group group =
+                Group.builder()
+                        .owner(member)
+                        .name(groupCreateRequest.name())
+                        .profileImageUrl(profileImageUrl)
+                        .maxMemberCount(groupCreateRequest.maxMemberCount())
+                        .totalMemberCount(1) // 그룹 생성 시점에 방장 포함 1명
+                        .deleted(false)
+                        .build();
 
         String invitationCode = generateUniqueRandomInvitationCode();
 
@@ -65,13 +68,14 @@ public class GroupService {
     }
 
     private void addOwnerToGroupMember(Member member, Group savedGroup) {
-        GroupMember owner = GroupMember.builder()
-                                       .nickname(member.getName())
-                                       .group(savedGroup)
-                                       // TODO: 그룹 생성 시 그룹 내의 방장 프로필 이미지 설정 여부 검토
-                                       .memberProfileImageUrl(member.getProfileImageUrl())
-                                       .member(member)
-                                       .build();
+        GroupMember owner =
+                GroupMember.builder()
+                        .nickname(member.getName())
+                        .group(savedGroup)
+                        // TODO: 그룹 생성 시 그룹 내의 방장 프로필 이미지 설정 여부 검토
+                        .memberProfileImageUrl(member.getProfileImageUrl())
+                        .member(member)
+                        .build();
         groupMemberRepository.save(owner);
     }
 
@@ -86,15 +90,23 @@ public class GroupService {
     @Transactional(readOnly = true)
     public Group findGroupByInvitationCode(String invitationCode) {
         validateInvitationCode(invitationCode);
-        return groupRepository.findByInvitationCode(invitationCode)
-                              .orElseThrow(() -> new ApplicationException(ApplicationExceptionType.GROUP_NOT_FOUND_BY_INVITATION_CODE,
-                                                                          invitationCode));
+        return groupRepository
+                .findByInvitationCode(invitationCode)
+                .orElseThrow(
+                        () ->
+                                new ApplicationException(
+                                        ApplicationExceptionType.GROUP_NOT_FOUND_BY_INVITATION_CODE,
+                                        invitationCode));
     }
 
     private void validateInvitationCode(String invitationCode) {
         Assertion.with(invitationCode)
-                 .setValidation(code -> code.length() == CODE_LENGTH)
-                 .validateOrThrow(() -> new ApplicationException(ApplicationExceptionType.INVALID_INVITATION_CODE, invitationCode));
+                .setValidation(code -> code.length() == CODE_LENGTH)
+                .validateOrThrow(
+                        () ->
+                                new ApplicationException(
+                                        ApplicationExceptionType.INVALID_INVITATION_CODE,
+                                        invitationCode));
     }
 
     public List<Group> findGroupsByMember(Member member) {
@@ -106,11 +118,7 @@ public class GroupService {
         return group.getTotalMemberCount();
     }
 
-    /**
-     * 그룹 정보 수정
-     * - 그룹 이름, 최대 인원 수, 프로필 이미지를 수정할 수 있다
-     * - 그룹 오너만 수정 가능하며, 각 필드가 null이 아닌 경우에만 변경
-     */
+    /** 그룹 정보 수정 - 그룹 이름, 최대 인원 수, 프로필 이미지를 수정할 수 있다 - 그룹 오너만 수정 가능하며, 각 필드가 null이 아닌 경우에만 변경 */
     @Transactional
     public Group updateGroup(Long groupId, Member member, GroupUpdateRequest request) {
         // 1. 그룹 조회
@@ -119,9 +127,7 @@ public class GroupService {
         // 2. 그룹 소유자인지 검증
         if (!group.isOwnedBy(member)) {
             throw new ApplicationException(
-                    ApplicationExceptionType.GROUP_UPDATE_FORBIDDEN,
-                    member.getId(), groupId
-            );
+                    ApplicationExceptionType.GROUP_UPDATE_FORBIDDEN, member.getId(), groupId);
         }
 
         // 3. 그룹 이름 변경
@@ -149,19 +155,20 @@ public class GroupService {
         Group group = groupFinder.findById(groupId);
 
         // 요청자 검증 - 소속 여부 확인
-        boolean isMember = groupMemberRepository.existsByGroupIdAndMemberIdAndDeletedFalse(groupId, loginMember.getId());
+        boolean isMember =
+                groupMemberRepository.existsByGroupIdAndMemberIdAndDeletedFalse(
+                        groupId, loginMember.getId());
         if (!isMember) {
             throw new ApplicationException(
                     ApplicationExceptionType.GROUP_MEMBER_DOES_NOT_BELONG_TO_MEMBER,
-                    groupId, loginMember.getId()
-            );
+                    groupId,
+                    loginMember.getId());
         }
 
         // GroupMember 목록 조회
-        List<GroupMember> groupMembers = groupMemberRepository.findAllActiveGroupMembersExceptOwner(groupId);
+        List<GroupMember> groupMembers =
+                groupMemberRepository.findAllActiveGroupMembersExceptOwner(groupId);
 
         return Pair.of(group, groupMembers);
     }
-
-
 }

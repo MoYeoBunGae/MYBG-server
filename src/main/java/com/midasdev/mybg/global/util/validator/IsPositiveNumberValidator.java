@@ -9,5 +9,4 @@ public class IsPositiveNumberValidator implements ConstraintValidator<IsPositive
     public boolean isValid(Number value, ConstraintValidatorContext context) {
         return value != null && value.longValue() > 0;
     }
-
 }

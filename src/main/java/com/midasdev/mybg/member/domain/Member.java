@@ -28,11 +28,12 @@ import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 @AllArgsConstructor
 @DynamicInsert
 @EntityListeners(AuditingEntityListener.class)
-@Table(uniqueConstraints = {
-        @UniqueConstraint(
-                name = "uq_oauth_provider_oauth_sub",
-                columnNames = { "oauth_provider", "oauth_sub" })
-})
+@Table(
+        uniqueConstraints = {
+            @UniqueConstraint(
+                    name = "uq_oauth_provider_oauth_sub",
+                    columnNames = {"oauth_provider", "oauth_sub"})
+        })
 public class Member {
 
     @Id
@@ -40,12 +41,9 @@ public class Member {
     @Column(name = "member_id")
     private Long id;
 
-    @Embedded
-    @Default
-    private Audit audit = new Audit();
+    @Embedded @Default private Audit audit = new Audit();
 
-    @Embedded
-    private OauthAccount oauthAccount;
+    @Embedded private OauthAccount oauthAccount;
 
     @Column(nullable = false)
     private String name;
@@ -56,5 +54,4 @@ public class Member {
     @Column(nullable = false)
     @ColumnDefault("false")
     private Boolean deleted;
-
 }

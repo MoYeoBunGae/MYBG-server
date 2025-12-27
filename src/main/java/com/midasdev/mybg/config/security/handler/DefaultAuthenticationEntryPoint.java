@@ -17,9 +17,11 @@ import org.springframework.stereotype.Component;
 public class DefaultAuthenticationEntryPoint extends Http403ForbiddenEntryPoint {
 
     @Override
-    public void commence(HttpServletRequest request, HttpServletResponse response, AuthenticationException e) throws IOException {
+    public void commence(
+            HttpServletRequest request, HttpServletResponse response, AuthenticationException e)
+            throws IOException {
         log.error("Authentication Fail...", e);
-        ExceptionResponseWriter.writeException(response, ApplicationExceptionType.TOKEN_AUTHENTICATION_EXCEPTION, e.getMessage());
+        ExceptionResponseWriter.writeException(
+                response, ApplicationExceptionType.TOKEN_AUTHENTICATION_EXCEPTION, e.getMessage());
     }
-
 }

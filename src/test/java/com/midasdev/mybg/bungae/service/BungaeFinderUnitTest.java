@@ -27,11 +27,9 @@ import org.mockito.junit.jupiter.MockitoExtension;
 @ExtendWith(MockitoExtension.class)
 class BungaeFinderUnitTest {
 
-    @Mock
-    private BungaeRepository bungaeRepository;
+    @Mock private BungaeRepository bungaeRepository;
 
-    @InjectMocks
-    private BungaeFinder bungaeFinder;
+    @InjectMocks private BungaeFinder bungaeFinder;
 
     @Test
     @DisplayName("BF-1-SU-1: 존재하는 번개 ID로 조회 시 번개 반환")
@@ -63,9 +61,8 @@ class BungaeFinderUnitTest {
         // when & then
         assertThatThrownBy(() -> bungaeFinder.findById(nonExistentBungaeId))
                 .isInstanceOf(ApplicationException.class)
-                .hasFieldOrPropertyWithValue(TestConstant.EXCEPTION_TYPE_FIELD, ApplicationExceptionType.BUNGAE_NOT_FOUND_BY_ID);
+                .hasFieldOrPropertyWithValue(
+                        TestConstant.EXCEPTION_TYPE_FIELD,
+                        ApplicationExceptionType.BUNGAE_NOT_FOUND_BY_ID);
     }
-
-
 }
-

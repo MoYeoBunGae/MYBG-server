@@ -10,5 +10,4 @@ public class AuthorizationToken {
     private GrantType grantType;
     private String accessToken;
     private String refreshToken;
-
 }

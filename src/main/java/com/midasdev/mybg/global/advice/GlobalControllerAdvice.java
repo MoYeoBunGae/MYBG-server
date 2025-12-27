@@ -20,15 +20,18 @@ public class GlobalControllerAdvice {
      */
 
     @ExceptionHandler(ApplicationException.class)
-    public ResponseEntity<ExceptionResponse> handleApplicationException(ApplicationException exception) {
-        return ResponseEntity.status(exception.getExceptionType().getHttpStatus()).body(ExceptionResponse.from(exception));
+    public ResponseEntity<ExceptionResponse> handleApplicationException(
+            ApplicationException exception) {
+        return ResponseEntity.status(exception.getExceptionType().getHttpStatus())
+                .body(ExceptionResponse.from(exception));
     }
 
     @ExceptionHandler(Exception.class)
     public ResponseEntity<ExceptionResponse> handleException(Exception exception) {
         log.error("Exception Occurred...", exception);
-        ApplicationExceptionType exceptionType = ApplicationExceptionType.resolveExceptionType(exception);
-        return ResponseEntity.status(exceptionType.getHttpStatus()).body(ExceptionResponse.from(exceptionType, exception.getMessage()));
+        ApplicationExceptionType exceptionType =
+                ApplicationExceptionType.resolveExceptionType(exception);
+        return ResponseEntity.status(exceptionType.getHttpStatus())
+                .body(ExceptionResponse.from(exceptionType, exception.getMessage()));
     }
-
 }

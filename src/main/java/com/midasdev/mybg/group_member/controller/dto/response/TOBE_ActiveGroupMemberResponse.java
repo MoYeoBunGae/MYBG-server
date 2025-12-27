@@ -11,18 +11,16 @@ public record TOBE_ActiveGroupMemberResponse(
         LocalDateTime createdAt,
         Long memberId,
         Long groupId,
-        String memberProfileImageUrl
-) {
+        String memberProfileImageUrl) {
 
     public static TOBE_ActiveGroupMemberResponse from(GroupMember groupMember) {
         return TOBE_ActiveGroupMemberResponse.builder()
-                                             .id(groupMember.getId())
-                                             .nickname(groupMember.getNickname())
-                                             .createdAt(groupMember.getAudit().getCreatedAt())
-                                             .memberId(groupMember.getMember().getId())
-                                             .groupId(groupMember.getGroup().getId())
-                                             .memberProfileImageUrl(groupMember.getMemberProfileImageUrl())
-                                             .build();
+                .id(groupMember.getId())
+                .nickname(groupMember.getNickname())
+                .createdAt(groupMember.getAudit().getCreatedAt())
+                .memberId(groupMember.getMember().getId())
+                .groupId(groupMember.getGroup().getId())
+                .memberProfileImageUrl(groupMember.getMemberProfileImageUrl())
+                .build();
     }
-
 }

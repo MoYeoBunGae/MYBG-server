@@ -47,8 +47,7 @@ public class Bungae implements LongIdentifiable {
     @Column(nullable = false)
     private String name;
 
-    @Column
-    private String description;
+    @Column private String description;
 
     @Column(nullable = false)
     private Integer minAttendees;
@@ -59,22 +58,17 @@ public class Bungae implements LongIdentifiable {
     @Column(nullable = false)
     private Boolean isOnline;
 
-    @Column
-    private String location;
+    @Column private String location;
 
-    @Embedded
-    private BungaeDateTime bungaeDateTime;
+    @Embedded private BungaeDateTime bungaeDateTime;
 
-    @Column
-    private LocalDateTime dateVoteClosedAt;
+    @Column private LocalDateTime dateVoteClosedAt;
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     private BungaeStatus status;
 
-    @Embedded
-    @Default
-    private Audit audit = new Audit();
+    @Embedded @Default private Audit audit = new Audit();
 
     @Column(nullable = false)
     @ColumnDefault("false")
@@ -115,9 +109,11 @@ public class Bungae implements LongIdentifiable {
 
     public void confirmDate(LocalDate date) {
         if (this.status != BungaeStatus.DATE_VOTING) {
-            throw new ApplicationException(ApplicationExceptionType.INVALID_BUNGAE_STATUS_FOR_DATE_CONFIRMATION, this.id, this.status);
+            throw new ApplicationException(
+                    ApplicationExceptionType.INVALID_BUNGAE_STATUS_FOR_DATE_CONFIRMATION,
+                    this.id,
+                    this.status);
         }
-
 
         // 확정된 날짜로 번개 날짜 업데이트
         if (this.bungaeDateTime == null) {
@@ -132,7 +128,11 @@ public class Bungae implements LongIdentifiable {
         } else if (minAttendees < maxAttendees) {
             this.status = BungaeStatus.RECRUITING;
         } else {
-            throw new ApplicationException(ApplicationExceptionType.INVALID_ATTENDEE_LIMITS, this.id, this.minAttendees, this.maxAttendees);
+            throw new ApplicationException(
+                    ApplicationExceptionType.INVALID_ATTENDEE_LIMITS,
+                    this.id,
+                    this.minAttendees,
+                    this.maxAttendees);
         }
     }
 
@@ -143,5 +143,4 @@ public class Bungae implements LongIdentifiable {
     public boolean canJoin() {
         return this.status == BungaeStatus.RECRUITING;
     }
-
 }

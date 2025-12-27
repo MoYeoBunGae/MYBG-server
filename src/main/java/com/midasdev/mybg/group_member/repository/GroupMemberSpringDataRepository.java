@@ -8,5 +8,6 @@ import org.springframework.data.jpa.repository.JpaRepository;
 
 public interface GroupMemberSpringDataRepository extends JpaRepository<GroupMember, Long> {
     Optional<GroupMember> findByMemberAndGroup(Member member, Group group);
+
     Integer countByGroup(Group group);
 }

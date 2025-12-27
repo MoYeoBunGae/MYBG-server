@@ -10,27 +10,29 @@ import lombok.Builder;
 
 @Builder
 public record GroupMembersInfoResponse(
-        Long groupId,
-        GroupMemberSimpleResponse owner,
-        List<GroupMemberSimpleResponse> members
-) {
+        Long groupId, GroupMemberSimpleResponse owner, List<GroupMemberSimpleResponse> members) {
     public static GroupMembersInfoResponse from(Group group, List<GroupMember> members) {
-        GroupMemberSimpleResponse owner = members.stream()
-                                                 .filter(m -> group.isOwnedBy(m.getMember()))
-                                                 .findFirst()
-                                                 .map(GroupMemberSimpleResponse::from)
-                                                 .orElseThrow(() -> new ApplicationException(
-                                                         ApplicationExceptionType.GROUP_MEMBER_NOT_FOUND, group.getOwner().getId()));
+        GroupMemberSimpleResponse owner =
+                members.stream()
+                        .filter(m -> group.isOwnedBy(m.getMember()))
+                        .findFirst()
+                        .map(GroupMemberSimpleResponse::from)
+                        .orElseThrow(
+                                () ->
+                                        new ApplicationException(
+                                                ApplicationExceptionType.GROUP_MEMBER_NOT_FOUND,
+                                                group.getOwner().getId()));
 
-        List<GroupMemberSimpleResponse> others = members.stream()
-                                                        .filter(m -> !group.isOwnedBy(m.getMember()))
-                                                        .map(GroupMemberSimpleResponse::from)
-                                                        .toList();
+        List<GroupMemberSimpleResponse> others =
+                members.stream()
+                        .filter(m -> !group.isOwnedBy(m.getMember()))
+                        .map(GroupMemberSimpleResponse::from)
+                        .toList();
 
         return GroupMembersInfoResponse.builder()
-                                       .groupId(group.getId())
-                                       .owner(owner)
-                                       .members(others)
-                                       .build();
+                .groupId(group.getId())
+                .owner(owner)
+                .members(others)
+                .build();
     }
 }

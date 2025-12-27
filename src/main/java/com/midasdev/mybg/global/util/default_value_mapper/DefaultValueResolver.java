@@ -18,7 +18,13 @@ public class DefaultValueResolver {
                     field.set(dto, value);
                 }
             } catch (IllegalAccessException e) {
-                throw new RuntimeException("Cannot apply default value '" + defaultAnnotation.value() + "' to field '" + field.getName() + "'", e);
+                throw new RuntimeException(
+                        "Cannot apply default value '"
+                                + defaultAnnotation.value()
+                                + "' to field '"
+                                + field.getName()
+                                + "'",
+                        e);
             }
         }
     }
@@ -42,9 +48,9 @@ public class DefaultValueResolver {
         if (type == float.class || type == Float.class) {
             return Float.parseFloat(value);
         }
-        throw new IllegalArgumentException("Unsupported type: " + type.getName()
-                                                   + ". Supported types are: String, Integer, Long, Boolean, Double, Float.");
+        throw new IllegalArgumentException(
+                "Unsupported type: "
+                        + type.getName()
+                        + ". Supported types are: String, Integer, Long, Boolean, Double, Float.");
     }
-
 }
-

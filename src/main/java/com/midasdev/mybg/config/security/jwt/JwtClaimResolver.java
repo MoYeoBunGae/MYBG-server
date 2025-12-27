@@ -20,19 +20,24 @@ public class JwtClaimResolver {
 
     private final JwtValidator jwtValidator;
 
-    public String extractValueWithoutValidation(String token, String key, JwtComponent jwtComponent) {
+    public String extractValueWithoutValidation(
+            String token, String key, JwtComponent jwtComponent) {
         String tokenComponent = token.split("\\.")[jwtComponent.getIndex()];
         byte[] decodedComponent = Base64.getDecoder().decode(tokenComponent);
         Map<String, Object> jwtComponentData;
         try {
-            jwtComponentData = new ObjectMapper().readValue(decodedComponent, new TypeReference<>() {
-            });
+            jwtComponentData =
+                    new ObjectMapper().readValue(decodedComponent, new TypeReference<>() {});
         } catch (IOException e) {
-            throw new ApplicationException(ApplicationExceptionType.JWT_PARSING_EXCEPTION, jwtComponent.getName());
+            throw new ApplicationException(
+                    ApplicationExceptionType.JWT_PARSING_EXCEPTION, jwtComponent.getName());
         }
         Assertion.with(key)
-                 .setValidation(jwtComponentData::containsKey)
-                 .validateOrThrow(() -> new ApplicationException(ApplicationExceptionType.JWT_CLAIMS_KEY_NOT_FOUND, key));
+                .setValidation(jwtComponentData::containsKey)
+                .validateOrThrow(
+                        () ->
+                                new ApplicationException(
+                                        ApplicationExceptionType.JWT_CLAIMS_KEY_NOT_FOUND, key));
         return jwtComponentData.get(key).toString();
     }
 
@@ -44,5 +49,4 @@ public class JwtClaimResolver {
     public String getFromClaim(Jws<Claims> claimsJws, String key) {
         return (String) claimsJws.getBody().get(key);
     }
-
 }

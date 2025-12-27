@@ -15,5 +15,4 @@ public class IdTokenValidatorFactory {
             case KAKAO -> kakaoIdTokenValidator;
         };
     }
-
 }

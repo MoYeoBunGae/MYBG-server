@@ -35,11 +35,12 @@ import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
 @EntityListeners(AuditingEntityListener.class)
-@Table(name = "group_member",
-        uniqueConstraints = @UniqueConstraint(
-                name = "uq__group_member__member_id__group_id",
-                columnNames = { "member_id", "group_id" }
-        ))
+@Table(
+        name = "group_member",
+        uniqueConstraints =
+                @UniqueConstraint(
+                        name = "uq__group_member__member_id__group_id",
+                        columnNames = {"member_id", "group_id"}))
 public class GroupMember {
 
     @Id
@@ -56,9 +57,7 @@ public class GroupMember {
     @Column(name = "member_profile_image_url", nullable = false)
     private String memberProfileImageUrl;
 
-    @Embedded
-    @Default
-    private Audit audit = new Audit();
+    @Embedded @Default private Audit audit = new Audit();
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "member_id", nullable = false)
@@ -74,15 +73,17 @@ public class GroupMember {
 
     public boolean belongsTo(Long memberId) {
         if (this.member == null) {
-            throw new ApplicationException(ApplicationExceptionType.GLOBAL_INTERNAL_SERVER_ERROR,
-                                           "GroupMember is not initialized. memberId: " + memberId);
+            throw new ApplicationException(
+                    ApplicationExceptionType.GLOBAL_INTERNAL_SERVER_ERROR,
+                    "GroupMember is not initialized. memberId: " + memberId);
         }
         return this.member.getId().equals(memberId);
     }
 
     public void updateNickname(String nickname) {
         if (nickname.isBlank()) {
-            throw new ApplicationException(ApplicationExceptionType.GROUP_MEMBER_NICKNAME_NOT_BLANK);
+            throw new ApplicationException(
+                    ApplicationExceptionType.GROUP_MEMBER_NICKNAME_NOT_BLANK);
         }
 
         this.nickname = nickname;
@@ -90,8 +91,9 @@ public class GroupMember {
 
     public void updateProfileImageUrl(String imageUrl) {
         if (imageUrl == null || imageUrl.isBlank()) {
-            throw new ApplicationException(ApplicationExceptionType.GLOBAL_INTERNAL_SERVER_ERROR,
-                                           "GroupMember image URL is not valid. imageUrl: " + imageUrl);
+            throw new ApplicationException(
+                    ApplicationExceptionType.GLOBAL_INTERNAL_SERVER_ERROR,
+                    "GroupMember image URL is not valid. imageUrl: " + imageUrl);
         }
 
         this.memberProfileImageUrl = imageUrl;
@@ -104,5 +106,4 @@ public class GroupMember {
         this.deleted = true;
         this.leftAt = LocalDateTime.now();
     }
-
 }

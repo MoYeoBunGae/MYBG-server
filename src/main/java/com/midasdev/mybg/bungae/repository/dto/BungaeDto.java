@@ -23,16 +23,14 @@ public record BungaeDto(
         Boolean deleted,
         Long groupId,
         Long hostGroupMemberId,
-        Integer attendeeCount
-) implements LongIdentifiable {
+        Integer attendeeCount)
+        implements LongIdentifiable {
 
     @QueryProjection
-    public BungaeDto {
-    }
+    public BungaeDto {}
 
     @Override
     public Long getId() {
         return id;
     }
-
 }

@@ -10,17 +10,17 @@ public record ExceptionResponse(String httpStatus, String errorCode, String mess
     public static ExceptionResponse from(ApplicationException exception) {
         ApplicationExceptionType exceptionType = exception.getExceptionType();
         return ExceptionResponse.builder()
-                                .httpStatus(exceptionType.getHttpStatus().toString())
-                                .errorCode(exceptionType.getExceptionCode())
-                                .message(exception.getMessage())
-                                .build();
+                .httpStatus(exceptionType.getHttpStatus().toString())
+                .errorCode(exceptionType.getExceptionCode())
+                .message(exception.getMessage())
+                .build();
     }
 
     public static ExceptionResponse from(ApplicationExceptionType exceptionType, Object... args) {
         return ExceptionResponse.builder()
-                                .httpStatus(exceptionType.getHttpStatus().toString())
-                                .errorCode(exceptionType.getExceptionCode())
-                                .message(exceptionType.getErrorMessage(args))
-                                .build();
+                .httpStatus(exceptionType.getHttpStatus().toString())
+                .errorCode(exceptionType.getExceptionCode())
+                .message(exceptionType.getErrorMessage(args))
+                .build();
     }
 }

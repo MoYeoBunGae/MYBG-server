@@ -1,23 +1,23 @@
 package com.midasdev.mybg;
 
+import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.testcontainers.containers.MySQLContainer;
 import org.testcontainers.junit.jupiter.Testcontainers;
 
-import lombok.extern.slf4j.Slf4j;
-
 /**
  * Base class for database integration tests.
- * <p>
- * Supports two test profiles:
+ *
+ * <p>Supports two test profiles:
+ *
  * <ul>
- * <li><b>test</b> (default): Uses local MySQL database</li>
- * <li><b>test-ci</b>: Uses Testcontainers for MySQL</li>
+ *   <li><b>test</b> (default): Uses local MySQL database
+ *   <li><b>test-ci</b>: Uses Testcontainers for MySQL
  * </ul>
- * <p>
- * To run tests with Testcontainers, activate the 'test_ci' profile:
- * 
+ *
+ * <p>To run tests with Testcontainers, activate the 'test_ci' profile:
+ *
  * <pre>
  * ./gradlew test -Dspring.profiles.active=test_ci
  * </pre>
@@ -34,10 +34,11 @@ public abstract class DatabaseTestSupport {
         String activeProfile = System.getProperty("spring.profiles.active", "test");
 
         if (activeProfile.equals(TESTCONTAINERS_PROFILE)) {
-            mysql = new MySQLContainer<>("mysql:8.0")
-                    .withDatabaseName("testdb")
-                    .withUsername("testuser")
-                    .withPassword("testpass");
+            mysql =
+                    new MySQLContainer<>("mysql:8.0")
+                            .withDatabaseName("testdb")
+                            .withUsername("testuser")
+                            .withPassword("testpass");
             log.info("Starting MySQL Testcontainer for profile '{}'", TESTCONTAINERS_PROFILE);
             mysql.start();
         }
@@ -49,5 +50,4 @@ public abstract class DatabaseTestSupport {
             mysql.stop();
         }
     }
-
 }

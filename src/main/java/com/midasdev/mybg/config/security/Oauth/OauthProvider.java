@@ -8,5 +8,4 @@ public enum OauthProvider {
     OauthProvider(String provider) {
         this.provider = provider;
     }
-
 }

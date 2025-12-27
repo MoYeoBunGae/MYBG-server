@@ -29,14 +29,17 @@ public abstract class IdTokenValidator {
 
         // 2. IdToken의 kid로 적절한 public key를 가져온다 -> kakao 검증 글 참고
         // 2-1. Kid 가져오기
-        String kid = jwtClaimResolver.extractValueWithoutValidation(idTokenFromRequest, TokenAttribute.KID.getAttribute(), JwtComponent.HEADER);
+        String kid =
+                jwtClaimResolver.extractValueWithoutValidation(
+                        idTokenFromRequest, TokenAttribute.KID.getAttribute(), JwtComponent.HEADER);
 
         // 2-2. kid에 맞는 public key 가져오기
         Key publicKey;
         try {
             publicKey = keySet.getKeyByKeyId(kid).toRSAKey().toRSAPublicKey();
         } catch (JOSEException e) {
-            throw new ApplicationException(ApplicationExceptionType.OIDC_PUBLIC_KEY_CONVERTING_EXCEPTION);
+            throw new ApplicationException(
+                    ApplicationExceptionType.OIDC_PUBLIC_KEY_CONVERTING_EXCEPTION);
         }
 
         // 3. Public key로 검증한다.
@@ -44,7 +47,8 @@ public abstract class IdTokenValidator {
 
         // 4. IdToken의 sub 와 nickname을 가져온다. (모두 OpenId 표준)
         String sub = jwtClaimResolver.getFromClaim(claims, TokenAttribute.SUB.getAttribute());
-        String nickname = jwtClaimResolver.getFromClaim(claims, TokenAttribute.NICKNAME.getAttribute());
+        String nickname =
+                jwtClaimResolver.getFromClaim(claims, TokenAttribute.NICKNAME.getAttribute());
 
         return new IdToken(sub, nickname);
     }
@@ -56,12 +60,12 @@ public abstract class IdTokenValidator {
         try {
             publicKeys = JWKSet.parse(publicKeysJson);
         } catch (ParseException e) {
-            throw new ApplicationException(ApplicationExceptionType.OIDC_PUBLIC_KEY_PARSING_EXCEPTION, oauthProvider);
+            throw new ApplicationException(
+                    ApplicationExceptionType.OIDC_PUBLIC_KEY_PARSING_EXCEPTION, oauthProvider);
         }
 
         return publicKeys;
     }
 
     public abstract String fetchPublicKeysJson();
-
 }

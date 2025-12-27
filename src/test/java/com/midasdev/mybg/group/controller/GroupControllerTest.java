@@ -26,29 +26,24 @@ import org.springframework.web.context.WebApplicationContext;
 @WebMvcTest(GroupController.class)
 class GroupControllerTest {
 
-    @Autowired
-    private WebApplicationContext context;
+    @Autowired private WebApplicationContext context;
 
     private MockMvc mockMvc;
 
-    @MockBean
-    private JwtAuthenticationFilter jwtAuthenticationFilter;
-    @MockBean
-    private GroupService groupService;
+    @MockBean private JwtAuthenticationFilter jwtAuthenticationFilter;
+    @MockBean private GroupService groupService;
 
     @BeforeEach
     public void setUp() {
-        mockMvc = MockMvcBuilders
-                .webAppContextSetup(context)
-                .apply(springSecurity())
-                .build();
+        mockMvc = MockMvcBuilders.webAppContextSetup(context).apply(springSecurity()).build();
     }
 
     @Test
     @DisplayName("Request Body에 그룹 이름이 없는 경우 400 Bad Request 반환")
     void 그룹_이름이_없는_경우_400_Bad_Request_반환() throws Exception {
         // given
-        String requestBody = """
+        String requestBody =
+                """
                 {
                     "profileImageUrl": "https://example.com/image.jpg"
                 }
@@ -56,12 +51,12 @@ class GroupControllerTest {
 
         // when
         // then
-        mockMvc.perform(post("/api/v1/groups")
+        mockMvc.perform(
+                        post("/api/v1/groups")
                                 .contentType(MediaType.APPLICATION_JSON)
                                 .with(SecurityMockMvcRequestPostProcessors.csrf())
                                 .with(SecurityMockMvcRequestPostProcessors.oidcLogin())
                                 .content(requestBody))
-               .andExpect(status().isBadRequest());
+                .andExpect(status().isBadRequest());
     }
-
 }

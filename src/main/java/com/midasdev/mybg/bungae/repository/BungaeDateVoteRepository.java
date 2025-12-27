@@ -8,5 +8,4 @@ import org.springframework.data.jpa.repository.JpaRepository;
 public interface BungaeDateVoteRepository extends JpaRepository<BungaeDateVote, Long> {
 
     List<BungaeDateVote> findBungaeDateVotesByDateOption(BungaeRecruitDateOption dateOption);
-
 }

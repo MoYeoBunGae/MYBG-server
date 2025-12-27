@@ -22,8 +22,10 @@ public class CursorPage<T extends LongIdentifiable> {
      */
     public CursorPage(List<T> fetchedContent, int pageSize) {
         if (fetchedContent.size() > pageSize + 1) {
-            throw new IllegalArgumentException(String.format("Invalid fetchedContent size: expected at most %d (pageSize + 1), but got %d",
-                                                             pageSize + 1, fetchedContent.size()));
+            throw new IllegalArgumentException(
+                    String.format(
+                            "Invalid fetchedContent size: expected at most %d (pageSize + 1), but got %d",
+                            pageSize + 1, fetchedContent.size()));
         }
 
         this.pageSize = pageSize;

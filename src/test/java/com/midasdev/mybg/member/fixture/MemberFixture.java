@@ -1,8 +1,8 @@
 package com.midasdev.mybg.member.fixture;
 
-import com.midasdev.mybg.member.domain.Member;
 import com.midasdev.mybg.config.security.Oauth.OauthAccount;
 import com.midasdev.mybg.config.security.Oauth.OauthProvider;
+import com.midasdev.mybg.member.domain.Member;
 
 public class MemberFixture {
     public static Member create() {
@@ -16,19 +16,19 @@ public class MemberFixture {
 
     public static Member createSecondMember() {
         return Member.builder()
-                     .name("테스트멤버2")
-                     .profileImageUrl("http://test.com/profile.png")
-                     .deleted(false)
-                     .oauthAccount(new OauthAccount(OauthProvider.KAKAO, "test-oauth-sub2"))
-                     .build();
+                .name("테스트멤버2")
+                .profileImageUrl("http://test.com/profile.png")
+                .deleted(false)
+                .oauthAccount(new OauthAccount(OauthProvider.KAKAO, "test-oauth-sub2"))
+                .build();
     }
 
     public static Member create(String name) {
         return Member.builder()
-                     .name(name)
-                     .profileImageUrl("http://test.com/profile.png")
-                     .deleted(false)
-                     .oauthAccount(new OauthAccount(OauthProvider.KAKAO, "test-oauth-"+name))
-                     .build();
+                .name(name)
+                .profileImageUrl("http://test.com/profile.png")
+                .deleted(false)
+                .oauthAccount(new OauthAccount(OauthProvider.KAKAO, "test-oauth-" + name))
+                .build();
     }
 }

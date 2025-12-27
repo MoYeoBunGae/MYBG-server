@@ -40,11 +40,8 @@ public class BungaeAttendee {
     @JoinColumn(name = "group_member_id", nullable = false)
     private GroupMember groupMember;
 
-    @Embedded
-    @Default
-    private Audit audit = new Audit();
+    @Embedded @Default private Audit audit = new Audit();
 
     @Column(nullable = false)
     private Boolean deleted;
-
 }

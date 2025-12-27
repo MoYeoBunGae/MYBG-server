@@ -1,6 +1,5 @@
 package com.midasdev.mybg.bungae.controller.dto.request;
 
-
 import com.midasdev.mybg.bungae.controller.dto.request.validation.VoteRequiredIfHasMultipleDateCandidates;
 import com.midasdev.mybg.global.util.validator.IsPositiveNumber;
 import com.midasdev.mybg.global.util.validator.WithinWeeks;
@@ -14,104 +13,71 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
-import lombok.Builder;
-
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.List;
+import lombok.Builder;
 
 @Schema(description = "번개 생성 요청")
 @Builder
 @VoteRequiredIfHasMultipleDateCandidates
 public record BungaeCreateRequest(
-
         @Schema(
-                title = "번개 이름",
-                description = "최대 30자까지 입력 가능합니다.",
-                requiredMode = RequiredMode.REQUIRED
-        )
-        @NotBlank
-        @Size(max = 30)
-        String name,
-
+                        title = "번개 이름",
+                        description = "최대 30자까지 입력 가능합니다.",
+                        requiredMode = RequiredMode.REQUIRED)
+                @NotBlank
+                @Size(max = 30)
+                String name,
         @Schema(
-                title = "번개 설명",
-                description = "최대 1000자까지 입력 가능합니다.",
-                requiredMode = RequiredMode.REQUIRED
-        )
-        @Size(max = 1000)
-        String description,
-
+                        title = "번개 설명",
+                        description = "최대 1000자까지 입력 가능합니다.",
+                        requiredMode = RequiredMode.REQUIRED)
+                @Size(max = 1000)
+                String description,
         @Schema(
-                title = "최소 인원 수",
-                description = "2 이상의 값을 입력해야 합니다.",
-                requiredMode = RequiredMode.REQUIRED
-        )
-        @NotNull
-        @Min(2)
-        Integer minAttendees,
-
+                        title = "최소 인원 수",
+                        description = "2 이상의 값을 입력해야 합니다.",
+                        requiredMode = RequiredMode.REQUIRED)
+                @NotNull
+                @Min(2)
+                Integer minAttendees,
         @Schema(
-                title = "최대 인원 수",
-                description = "2 이상의 값을 입력해야 하며, 최소 인원 수 이상이어야 합니다.",
-                requiredMode = RequiredMode.REQUIRED
-        )
-        @NotNull
-        @Min(2) @Max(1000)
-        Integer maxAttendees,
-
+                        title = "최대 인원 수",
+                        description = "2 이상의 값을 입력해야 하며, 최소 인원 수 이상이어야 합니다.",
+                        requiredMode = RequiredMode.REQUIRED)
+                @NotNull
+                @Min(2)
+                @Max(1000)
+                Integer maxAttendees,
+        @Schema(title = "온라인 여부", requiredMode = RequiredMode.REQUIRED) @NotNull Boolean isOnline,
         @Schema(
-                title = "온라인 여부",
-                requiredMode = RequiredMode.REQUIRED
-        )
-        @NotNull
-        Boolean isOnline,
-
+                        title = "모임 장소",
+                        description = "최대 100자까지 입력 가능합니다.",
+                        requiredMode = RequiredMode.NOT_REQUIRED)
+                @Size(max = 100)
+                String location,
+        @Schema(title = "번개 시간", example = "19:00", requiredMode = RequiredMode.NOT_REQUIRED)
+                LocalTime bungaeTime,
         @Schema(
-                title = "모임 장소",
-                description = "최대 100자까지 입력 가능합니다.",
-                requiredMode = RequiredMode.NOT_REQUIRED
-        )
-        @Size(max = 100)
-        String location,
-
+                        title = "날짜 후보 리스트",
+                        description = "모든 날짜는 오늘 이후여야 하며, 오늘로부터 4주 이내여야 합니다.",
+                        requiredMode = RequiredMode.REQUIRED)
+                @NotEmpty
+                List<@FutureOrPresent @WithinWeeks(4) LocalDate> dateCandidates,
         @Schema(
-                title = "번개 시간",
-                example = "19:00",
-                requiredMode = RequiredMode.NOT_REQUIRED
-        )
-        LocalTime bungaeTime,
-
-        @Schema(
-                title = "날짜 후보 리스트",
-                description = "모든 날짜는 오늘 이후여야 하며, 오늘로부터 4주 이내여야 합니다.",
-                requiredMode = RequiredMode.REQUIRED
-        )
-        @NotEmpty
-        List<@FutureOrPresent @WithinWeeks(4) LocalDate> dateCandidates,
-
-        @Schema(
-                title = "투표 마감 시각",
-                description = "날짜 후보가 2개 이상일 경우 필수입니다.",
-                requiredMode = RequiredMode.NOT_REQUIRED
-        )
-        @Future
-        LocalDateTime dateVoteClosedAt,
-
-        @Schema(
-                title = "그룹 ID",
-                example = "1",
-                requiredMode = RequiredMode.REQUIRED
-        )
-        @IsPositiveNumber
-        @NotNull
-        Long groupId
-
-) {
+                        title = "투표 마감 시각",
+                        description = "날짜 후보가 2개 이상일 경우 필수입니다.",
+                        requiredMode = RequiredMode.NOT_REQUIRED)
+                @Future
+                LocalDateTime dateVoteClosedAt,
+        @Schema(title = "그룹 ID", example = "1", requiredMode = RequiredMode.REQUIRED)
+                @IsPositiveNumber
+                @NotNull
+                Long groupId) {
 
     public boolean hasSingleDateCandidate() {
         return dateCandidates.size() == 1;
     }
-
 }

@@ -26,17 +26,22 @@ public class JwtValidator {
         Jws<Claims> claim = validateJWT(token);
         String type = (String) claim.getBody().get(TokenAttribute.TYPE.getAttribute());
         Assertion.with(type)
-                 .setValidation(tokenType::match)
-                 .validateOrThrow(() -> new ApplicationException(ApplicationExceptionType.TOKEN_TYPE_MISMATCH, type, tokenType));
+                .setValidation(tokenType::match)
+                .validateOrThrow(
+                        () ->
+                                new ApplicationException(
+                                        ApplicationExceptionType.TOKEN_TYPE_MISMATCH,
+                                        type,
+                                        tokenType));
         return claim;
     }
 
     public Jws<Claims> validateJWT(String token) {
         try {
             return Jwts.parserBuilder()
-                       .setSigningKey(jwtProperty.getKey())
-                       .build()
-                       .parseClaimsJws(token);
+                    .setSigningKey(jwtProperty.getKey())
+                    .build()
+                    .parseClaimsJws(token);
         } catch (ExpiredJwtException e) {
             throw new ApplicationException(ApplicationExceptionType.JWT_EXPIRED);
         } catch (UnsupportedJwtException e) {
@@ -47,16 +52,14 @@ public class JwtValidator {
             throw new ApplicationException(ApplicationExceptionType.JWT_INVALID_SIGNATURE);
         } catch (Exception e) {
             log.error("JWT parsing 중 처리되지 않은 Exception 발생", e);
-            throw new ApplicationException(ApplicationExceptionType.UNDEFINED_EXCEPTION, e.getMessage());
+            throw new ApplicationException(
+                    ApplicationExceptionType.UNDEFINED_EXCEPTION, e.getMessage());
         }
     }
 
     public Jws<Claims> validateJWT(String token, Key key) {
         try {
-            return Jwts.parserBuilder()
-                       .setSigningKey(key)
-                       .build()
-                       .parseClaimsJws(token);
+            return Jwts.parserBuilder().setSigningKey(key).build().parseClaimsJws(token);
         } catch (ExpiredJwtException e) {
             throw new ApplicationException(ApplicationExceptionType.JWT_EXPIRED);
         } catch (UnsupportedJwtException e) {
@@ -67,8 +70,8 @@ public class JwtValidator {
             throw new ApplicationException(ApplicationExceptionType.JWT_INVALID_SIGNATURE);
         } catch (Exception e) {
             log.error("JWT parsing 중 처리되지 않은 Exception 발생", e);
-            throw new ApplicationException(ApplicationExceptionType.UNDEFINED_EXCEPTION, e.getMessage());
+            throw new ApplicationException(
+                    ApplicationExceptionType.UNDEFINED_EXCEPTION, e.getMessage());
         }
     }
-
 }

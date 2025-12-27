@@ -10,8 +10,7 @@ import org.springframework.data.redis.core.RedisHash;
 @RedisHash(value = "refresh", timeToLive = 1209600)
 public class RefreshToken {
 
-    @Id
-    private Long memberId;
+    @Id private Long memberId;
     private String token;
 
     public static RefreshToken from(Long memberId, AuthorizationToken authorizationToken) {
@@ -21,5 +20,4 @@ public class RefreshToken {
     public boolean isSameToken(String refreshToken) {
         return this.token.equals(refreshToken);
     }
-
 }

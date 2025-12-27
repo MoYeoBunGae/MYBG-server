@@ -22,11 +22,10 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor(access = lombok.AccessLevel.PROTECTED)
 @AllArgsConstructor
 @Table(
-    uniqueConstraints = @UniqueConstraint(
-        name = "uk_bungae_date_vote_voter_date_option",
-        columnNames = {"group_member_id", "bungae_recruit_date_option_id"}
-    )
-)
+        uniqueConstraints =
+                @UniqueConstraint(
+                        name = "uk_bungae_date_vote_voter_date_option",
+                        columnNames = {"group_member_id", "bungae_recruit_date_option_id"}))
 public class BungaeDateVote {
 
     @Id
@@ -41,6 +40,4 @@ public class BungaeDateVote {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "bungae_recruit_date_option_id", nullable = false)
     private BungaeRecruitDateOption dateOption;
-
-
 }

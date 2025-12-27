@@ -16,12 +16,12 @@ public class DefaultProfileImageService {
     public String createRandomProfileImageUrl(DefaultProfileImageType defaultProfileImageType) {
         Random random = new Random();
         int randomProfileImageNumber = random.nextInt(defaultProfileImageType.getTotalImage()) + 1;
-        return resourceUrlGenerator.generateS3Url(defaultProfileImageType.getDirectory(),
-                                                  getFilename(defaultProfileImageType.getFilePrefix(), randomProfileImageNumber));
+        return resourceUrlGenerator.generateS3Url(
+                defaultProfileImageType.getDirectory(),
+                getFilename(defaultProfileImageType.getFilePrefix(), randomProfileImageNumber));
     }
 
     private String getFilename(String filePrefix, int number) {
         return filePrefix + number + "." + PNG_EXT;
     }
-
 }

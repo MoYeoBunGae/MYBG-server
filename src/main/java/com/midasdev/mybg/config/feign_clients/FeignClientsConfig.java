@@ -5,6 +5,4 @@ import org.springframework.context.annotation.Configuration;
 
 @Configuration
 @EnableFeignClients(basePackages = "com.midasdev.mybg")
-public class FeignClientsConfig {
-
-}
+public class FeignClientsConfig {}

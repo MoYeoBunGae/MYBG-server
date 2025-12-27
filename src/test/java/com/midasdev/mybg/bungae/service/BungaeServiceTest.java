@@ -41,32 +41,23 @@ import org.springframework.transaction.annotation.Transactional;
 @Transactional
 class BungaeServiceTest extends DatabaseTestSupport {
 
-    @Autowired
-    private BungaeService bungaeService;
+    @Autowired private BungaeService bungaeService;
 
-    @Autowired
-    private BungaeRepository bungaeRepository;
+    @Autowired private BungaeRepository bungaeRepository;
 
-    @Autowired
-    private GroupRepository groupRepository;
+    @Autowired private GroupRepository groupRepository;
 
-    @Autowired
-    private GroupMemberRepository groupMemberRepository;
+    @Autowired private GroupMemberRepository groupMemberRepository;
 
-    @Autowired
-    private MemberRepository memberRepository;
+    @Autowired private MemberRepository memberRepository;
 
-    @Autowired
-    private BungaeRecruitDateOptionRepository bungaeRecruitDateOptionRepository;
+    @Autowired private BungaeRecruitDateOptionRepository bungaeRecruitDateOptionRepository;
 
-    @Autowired
-    private BungaeDateVoteRepository bungaeDateVoteRepository;
+    @Autowired private BungaeDateVoteRepository bungaeDateVoteRepository;
 
-    @Autowired
-    private BungaeDateVoteTestRepository bungaeDateVoteTestRepository;
+    @Autowired private BungaeDateVoteTestRepository bungaeDateVoteTestRepository;
 
-    @Autowired
-    private BungaeAttendeeRepository bungaeAttendeeRepository;
+    @Autowired private BungaeAttendeeRepository bungaeAttendeeRepository;
 
     private Group group;
     private Member member;
@@ -87,19 +78,19 @@ class BungaeServiceTest extends DatabaseTestSupport {
     @DisplayName("B-1-S-1: 날짜 후보가 1개일 때 Bungae 생성")
     void B_1_S_1() {
         // given
-        BungaeCreateRequest request = BungaeCreateRequest.builder()
-                .name("테스트 번개")
-                .description("설명")
-                .minAttendees(2)
-                .maxAttendees(10)
-                .isOnline(false)
-                .location("서울")
-                .bungaeTime(LocalTime.of(18, 0))
-                .dateCandidates(List.of(LocalDate.now().plusDays(1)))
-                .dateVoteClosedAt(null)
-                .groupId(group.getId())
-                .build();
-        
+        BungaeCreateRequest request =
+                BungaeCreateRequest.builder()
+                        .name("테스트 번개")
+                        .description("설명")
+                        .minAttendees(2)
+                        .maxAttendees(10)
+                        .isOnline(false)
+                        .location("서울")
+                        .bungaeTime(LocalTime.of(18, 0))
+                        .dateCandidates(List.of(LocalDate.now().plusDays(1)))
+                        .dateVoteClosedAt(null)
+                        .groupId(group.getId())
+                        .build();
 
         // when
         Bungae bungae = bungaeService.createBungae(member, request);
@@ -116,25 +107,24 @@ class BungaeServiceTest extends DatabaseTestSupport {
     @DisplayName("B-1-S-2: 날짜 후보가 2개 이상 일 때 Bungae 생성")
     void B_1_S_2() {
         // given
-        List<LocalDate> dateCandidates = List.of(
-                LocalDate.now().plusDays(1),
-                LocalDate.now().plusDays(2)
-        );
+        List<LocalDate> dateCandidates =
+                List.of(LocalDate.now().plusDays(1), LocalDate.now().plusDays(2));
         LocalTime bungaeTime = LocalTime.of(19, 0);
         LocalDateTime voteClosedAt = LocalDateTime.now().plusDays(1);
 
-        BungaeCreateRequest request = BungaeCreateRequest.builder()
-                .name("테스트 번개2")
-                .description("설명2")
-                .minAttendees(2)
-                .maxAttendees(10)
-                .isOnline(false)
-                .location("서울")
-                .bungaeTime(bungaeTime)
-                .dateCandidates(dateCandidates)
-                .dateVoteClosedAt(voteClosedAt)
-                .groupId(group.getId())
-                .build();
+        BungaeCreateRequest request =
+                BungaeCreateRequest.builder()
+                        .name("테스트 번개2")
+                        .description("설명2")
+                        .minAttendees(2)
+                        .maxAttendees(10)
+                        .isOnline(false)
+                        .location("서울")
+                        .bungaeTime(bungaeTime)
+                        .dateCandidates(dateCandidates)
+                        .dateVoteClosedAt(voteClosedAt)
+                        .groupId(group.getId())
+                        .build();
 
         // when
         Bungae bungae = bungaeService.createBungae(member, request);
@@ -151,25 +141,24 @@ class BungaeServiceTest extends DatabaseTestSupport {
     @DisplayName("B-1-S-3: 날짜 후보가 2개 이상일 때 BungaeRecruitDateOption이 후보 개수만큼 저장됨")
     void B_1_S_3() {
         // given
-        List<LocalDate> dateCandidates = List.of(
-                LocalDate.now().plusDays(1),
-                LocalDate.now().plusDays(2)
-        );
+        List<LocalDate> dateCandidates =
+                List.of(LocalDate.now().plusDays(1), LocalDate.now().plusDays(2));
         LocalTime bungaeTime = LocalTime.of(19, 0);
         LocalDateTime voteClosedAt = LocalDateTime.now().plusDays(1);
 
-        BungaeCreateRequest request = BungaeCreateRequest.builder()
-                .name("테스트 번개2")
-                .description("설명2")
-                .minAttendees(2)
-                .maxAttendees(10)
-                .isOnline(false)
-                .location("서울")
-                .bungaeTime(bungaeTime)
-                .dateCandidates(dateCandidates)
-                .dateVoteClosedAt(voteClosedAt)
-                .groupId(group.getId())
-                .build();
+        BungaeCreateRequest request =
+                BungaeCreateRequest.builder()
+                        .name("테스트 번개2")
+                        .description("설명2")
+                        .minAttendees(2)
+                        .maxAttendees(10)
+                        .isOnline(false)
+                        .location("서울")
+                        .bungaeTime(bungaeTime)
+                        .dateCandidates(dateCandidates)
+                        .dateVoteClosedAt(voteClosedAt)
+                        .groupId(group.getId())
+                        .build();
 
         // when
         bungaeService.createBungae(member, request);
@@ -186,98 +175,109 @@ class BungaeServiceTest extends DatabaseTestSupport {
     @DisplayName("B-1-S-4: 생성된 번개가 날짜 투표를 필요로 할 경우, 각 날짜 후보마다 번개 주최자의 투표가 저장")
     void B_1_S_4() {
         // given
-        List<LocalDate> dateCandidates = List.of(
-                LocalDate.now().plusDays(1),
-                LocalDate.now().plusDays(2),
-                LocalDate.now().plusDays(3)
-        );
+        List<LocalDate> dateCandidates =
+                List.of(
+                        LocalDate.now().plusDays(1),
+                        LocalDate.now().plusDays(2),
+                        LocalDate.now().plusDays(3));
         LocalTime bungaeTime = LocalTime.of(19, 0);
         LocalDateTime voteClosedAt = LocalDateTime.now().plusDays(1);
 
-        BungaeCreateRequest request = BungaeCreateRequest.builder()
-                .name("테스트 번개")
-                .description("설명")
-                .minAttendees(2)
-                .maxAttendees(10)
-                .isOnline(false)
-                .location("서울")
-                .bungaeTime(bungaeTime)
-                .dateCandidates(dateCandidates)
-                .dateVoteClosedAt(voteClosedAt)
-                .groupId(group.getId())
-                .build();
+        BungaeCreateRequest request =
+                BungaeCreateRequest.builder()
+                        .name("테스트 번개")
+                        .description("설명")
+                        .minAttendees(2)
+                        .maxAttendees(10)
+                        .isOnline(false)
+                        .location("서울")
+                        .bungaeTime(bungaeTime)
+                        .dateCandidates(dateCandidates)
+                        .dateVoteClosedAt(voteClosedAt)
+                        .groupId(group.getId())
+                        .build();
 
         // when
         Bungae bungae = bungaeService.createBungae(member, request);
 
         // then
-        List<BungaeDateVote> hostVotes = bungaeDateVoteTestRepository.findByBungaeIdAndVoterId(
-                bungae.getId(),
-                hostGroupMember.getId()
-        );
+        List<BungaeDateVote> hostVotes =
+                bungaeDateVoteTestRepository.findByBungaeIdAndVoterId(
+                        bungae.getId(), hostGroupMember.getId());
 
-        List<LocalDate> votedDates = hostVotes.stream()
-                .map(vote -> vote.getDateOption().getDateOption())
-                .toList();
+        List<LocalDate> votedDates =
+                hostVotes.stream().map(vote -> vote.getDateOption().getDateOption()).toList();
 
-        SoftAssertions.assertSoftly(softly -> {
-            softly.assertThat(hostVotes).hasSize(dateCandidates.size());
-            softly.assertThat(votedDates).containsExactlyInAnyOrderElementsOf(dateCandidates);
-            softly.assertThat(hostVotes).allMatch(vote -> vote.getVoter().getId().equals(hostGroupMember.getId()));
-        });
+        SoftAssertions.assertSoftly(
+                softly -> {
+                    softly.assertThat(hostVotes).hasSize(dateCandidates.size());
+                    softly.assertThat(votedDates)
+                            .containsExactlyInAnyOrderElementsOf(dateCandidates);
+                    softly.assertThat(hostVotes)
+                            .allMatch(
+                                    vote ->
+                                            vote.getVoter()
+                                                    .getId()
+                                                    .equals(hostGroupMember.getId()));
+                });
     }
 
     @Test
     @DisplayName("B-1-S-5: 생성된 번개가 날짜 투표를 필요로 하지 않을 경우, 번개 주최자가 자동으로 참가자로 저장")
     void B_1_S_5() {
         // given
-        BungaeCreateRequest request = BungaeCreateRequest.builder()
-                .name("테스트 번개")
-                .description("설명")
-                .minAttendees(2)
-                .maxAttendees(10)
-                .isOnline(false)
-                .location("서울")
-                .bungaeTime(LocalTime.of(18, 0))
-                .dateCandidates(List.of(LocalDate.now().plusDays(1)))
-                .dateVoteClosedAt(null)
-                .groupId(group.getId())
-                .build();
+        BungaeCreateRequest request =
+                BungaeCreateRequest.builder()
+                        .name("테스트 번개")
+                        .description("설명")
+                        .minAttendees(2)
+                        .maxAttendees(10)
+                        .isOnline(false)
+                        .location("서울")
+                        .bungaeTime(LocalTime.of(18, 0))
+                        .dateCandidates(List.of(LocalDate.now().plusDays(1)))
+                        .dateVoteClosedAt(null)
+                        .groupId(group.getId())
+                        .build();
 
         // when
         Bungae bungae = bungaeService.createBungae(member, request);
 
         // then
-        List<BungaeAttendee> attendees = bungaeAttendeeRepository.findByBungaeIdAndDeletedFalse(bungae.getId());
+        List<BungaeAttendee> attendees =
+                bungaeAttendeeRepository.findByBungaeIdAndDeletedFalse(bungae.getId());
 
-        SoftAssertions.assertSoftly(softly -> {
-            softly.assertThat(attendees).hasSize(1);
-            softly.assertThat(attendees.get(0).getGroupMember().getId()).isEqualTo(hostGroupMember.getId());
-            softly.assertThat(attendees.get(0).getBungae().getId()).isEqualTo(bungae.getId());
-            softly.assertThat(attendees.get(0).getDeleted()).isFalse();
-        });
+        SoftAssertions.assertSoftly(
+                softly -> {
+                    softly.assertThat(attendees).hasSize(1);
+                    softly.assertThat(attendees.get(0).getGroupMember().getId())
+                            .isEqualTo(hostGroupMember.getId());
+                    softly.assertThat(attendees.get(0).getBungae().getId())
+                            .isEqualTo(bungae.getId());
+                    softly.assertThat(attendees.get(0).getDeleted()).isFalse();
+                });
     }
 
     @Test
     @DisplayName("B-4-S-1: 올바른 번개 투표 가능 날짜 조회")
     void B_4_S_1() {
         // given
-        Bungae bungae = bungaeRepository.save(BungaeFixture.createWithDateVoting(group, hostGroupMember));
+        Bungae bungae =
+                bungaeRepository.save(BungaeFixture.createWithDateVoting(group, hostGroupMember));
 
-        List<LocalDate> dateOptions = List.of(
-                LocalDate.now().plusDays(1),
-                LocalDate.now().plusDays(2),
-                LocalDate.now().plusDays(3)
-        );
+        List<LocalDate> dateOptions =
+                List.of(
+                        LocalDate.now().plusDays(1),
+                        LocalDate.now().plusDays(2),
+                        LocalDate.now().plusDays(3));
 
-        dateOptions.forEach(dateOption ->
-                                    bungaeRecruitDateOptionRepository.save(
-                                            BungaeRecruitDateOption.builder()
-                                                                   .dateOption(dateOption)
-                                                                   .bungae(bungae)
-                                                                   .build()
-                                    )
-        );
+        dateOptions.forEach(
+                dateOption ->
+                        bungaeRecruitDateOptionRepository.save(
+                                BungaeRecruitDateOption.builder()
+                                        .dateOption(dateOption)
+                                        .bungae(bungae)
+                                        .build()));
 
         // when
         List<LocalDate> result = bungaeService.getBungaeDateVoteOptions(member, bungae.getId());
@@ -291,7 +291,8 @@ class BungaeServiceTest extends DatabaseTestSupport {
     @DisplayName("B-5-S-1: 날짜 투표가 가능한 조건에서 투표가 성공합니다.")
     void B_5_S_1() {
         // given
-        Bungae bungae = bungaeRepository.save(BungaeFixture.createWithDateVoting(group, hostGroupMember));
+        Bungae bungae =
+                bungaeRepository.save(BungaeFixture.createWithDateVoting(group, hostGroupMember));
         LocalDate voteDate1 = LocalDate.now().plusDays(1);
         LocalDate voteDate2 = LocalDate.now().plusDays(2);
         LocalDate voteDate3 = LocalDate.now().plusDays(3);
@@ -299,116 +300,109 @@ class BungaeServiceTest extends DatabaseTestSupport {
         saveVoteDateOptions(bungae, voteDates);
 
         // when
-        BungaeDateVoteResponse response = bungaeService.voteBungaeDates(
-                member2,
-                bungae.getId(),
-                voteDates
-        );
+        BungaeDateVoteResponse response =
+                bungaeService.voteBungaeDates(member2, bungae.getId(), voteDates);
 
         // then
         // 해당 번개의 해당 투표자가 투표한 BungaeDateVote 리스트를 조회
-        List<BungaeDateVote> votes = bungaeDateVoteTestRepository.findByBungaeIdAndVoterId(
-                bungae.getId(),
-                groupMember2.getId()
-        );
+        List<BungaeDateVote> votes =
+                bungaeDateVoteTestRepository.findByBungaeIdAndVoterId(
+                        bungae.getId(), groupMember2.getId());
 
         // 투표한 날짜들 추출
-        List<LocalDate> votedDates = votes.stream()
-                .map(vote -> vote.getDateOption().getDateOption())
-                .toList();
+        List<LocalDate> votedDates =
+                votes.stream().map(vote -> vote.getDateOption().getDateOption()).toList();
 
-        SoftAssertions.assertSoftly(softly -> {
-            softly.assertThat(response.wasVotableBungae()).isTrue();
-            softly.assertThat(response.failedVoteDates()).isEmpty();
-            softly.assertThat(votedDates).containsAll(voteDates);
-        });
+        SoftAssertions.assertSoftly(
+                softly -> {
+                    softly.assertThat(response.wasVotableBungae()).isTrue();
+                    softly.assertThat(response.failedVoteDates()).isEmpty();
+                    softly.assertThat(votedDates).containsAll(voteDates);
+                });
     }
 
-    /**
-     * 번개와 날짜 리스트에 대해 BungaeRecruitDateOption을 저장하는 테스트 유틸 메서드
-     */
+    /** 번개와 날짜 리스트에 대해 BungaeRecruitDateOption을 저장하는 테스트 유틸 메서드 */
     private void saveVoteDateOptions(Bungae bungae, List<LocalDate> voteDates) {
-        voteDates.forEach(dateOption ->
-                bungaeRecruitDateOptionRepository.save(
-                        BungaeRecruitDateOption.builder()
-                                .dateOption(dateOption)
-                                .bungae(bungae)
-                                .build()
-                )
-        );
+        voteDates.forEach(
+                dateOption ->
+                        bungaeRecruitDateOptionRepository.save(
+                                BungaeRecruitDateOption.builder()
+                                        .dateOption(dateOption)
+                                        .bungae(bungae)
+                                        .build()));
     }
 
     @Test
     @DisplayName("B-5-S-2: 같은 날짜에 중복 투표를 할 수 없습니다.")
     void B_5_S_2() {
         // given
-        Bungae bungae = bungaeRepository.save(BungaeFixture.createWithDateVoting(group, hostGroupMember));
+        Bungae bungae =
+                bungaeRepository.save(BungaeFixture.createWithDateVoting(group, hostGroupMember));
         LocalDate voteDate = LocalDate.now().plusDays(1);
-        BungaeRecruitDateOption dateOption = bungaeRecruitDateOptionRepository.save(
-                BungaeRecruitDateOption.builder()
-                                       .dateOption(voteDate)
-                                       .bungae(bungae)
-                                       .build()
-        );
+        BungaeRecruitDateOption dateOption =
+                bungaeRecruitDateOptionRepository.save(
+                        BungaeRecruitDateOption.builder()
+                                .dateOption(voteDate)
+                                .bungae(bungae)
+                                .build());
 
         // 이미 groupMember2가 voteDate에 투표한 상태로 만듦
         bungaeDateVoteRepository.save(
-                BungaeDateVote.builder()
-                              .voter(groupMember2)
-                              .dateOption(dateOption)
-                              .build()
-        );
+                BungaeDateVote.builder().voter(groupMember2).dateOption(dateOption).build());
 
         // when
-        BungaeDateVoteResponse response = bungaeService.voteBungaeDates(member2, bungae.getId(), List.of(voteDate));
+        BungaeDateVoteResponse response =
+                bungaeService.voteBungaeDates(member2, bungae.getId(), List.of(voteDate));
 
         // then
-        SoftAssertions.assertSoftly(softly -> {
-            softly.assertThat(response.wasVotableBungae()).isTrue();
-            softly.assertThat(response.failedVoteDates()).contains(voteDate);
-        });
+        SoftAssertions.assertSoftly(
+                softly -> {
+                    softly.assertThat(response.wasVotableBungae()).isTrue();
+                    softly.assertThat(response.failedVoteDates()).contains(voteDate);
+                });
     }
 
     @Test
     @DisplayName("B-5-S-3: 최소 인원 도달 시 날짜가 확정되고 해당 날짜의 투표자들은 참가자로 전환됩니다.")
     void B_5_S_3() {
         // given
-        Bungae bungae = bungaeRepository.save(BungaeFixture.createWithDateVoting(group, hostGroupMember, 2, 10));
+        Bungae bungae =
+                bungaeRepository.save(
+                        BungaeFixture.createWithDateVoting(group, hostGroupMember, 2, 10));
         LocalDate voteDate = LocalDate.now().plusDays(1);
-        BungaeRecruitDateOption dateOption = bungaeRecruitDateOptionRepository.save(
-                BungaeRecruitDateOption.builder()
-                                       .dateOption(voteDate)
-                                       .bungae(bungae)
-                                       .build()
-        );
+        BungaeRecruitDateOption dateOption =
+                bungaeRecruitDateOptionRepository.save(
+                        BungaeRecruitDateOption.builder()
+                                .dateOption(voteDate)
+                                .bungae(bungae)
+                                .build());
         // 첫 번째 투표자(호스트)가 미리 투표
         bungaeDateVoteRepository.save(
-                BungaeDateVote.builder()
-                              .voter(hostGroupMember)
-                              .dateOption(dateOption)
-                              .build()
-        );
+                BungaeDateVote.builder().voter(hostGroupMember).dateOption(dateOption).build());
 
         // when
-        BungaeDateVoteResponse response = bungaeService.voteBungaeDates(member2, bungae.getId(), List.of(voteDate));
+        BungaeDateVoteResponse response =
+                bungaeService.voteBungaeDates(member2, bungae.getId(), List.of(voteDate));
 
         // then
         // 해당 날짜 투표자들이 모두 BungaeAttendee로 등록되었는지 확인
-        List<BungaeDateVote> votes = bungaeDateVoteRepository.findBungaeDateVotesByDateOption(dateOption);
+        List<BungaeDateVote> votes =
+                bungaeDateVoteRepository.findBungaeDateVotesByDateOption(dateOption);
         List<Long> voterIds = votes.stream().map(v -> v.getVoter().getId()).toList();
 
-        List<Long> attendeeIds = bungaeAttendeeRepository.findByBungaeIdAndDeletedFalse(bungae.getId())
-                                                         .stream()
-                                                         .map(attendee -> attendee.getGroupMember().getId())
-                                                         .toList();
+        List<Long> attendeeIds =
+                bungaeAttendeeRepository.findByBungaeIdAndDeletedFalse(bungae.getId()).stream()
+                        .map(attendee -> attendee.getGroupMember().getId())
+                        .toList();
 
-        SoftAssertions.assertSoftly(softly -> {
-            softly.assertThat(response.wasVotableBungae()).isTrue();
-            softly.assertThat(response.failedVoteDates()).isEmpty();
-            softly.assertThat(response.isDateFixed()).isTrue();
-            softly.assertThat(response.fixedDate()).isEqualTo(voteDate);
-            softly.assertThat(attendeeIds).containsExactlyInAnyOrderElementsOf(voterIds);
-        });
+        SoftAssertions.assertSoftly(
+                softly -> {
+                    softly.assertThat(response.wasVotableBungae()).isTrue();
+                    softly.assertThat(response.failedVoteDates()).isEmpty();
+                    softly.assertThat(response.isDateFixed()).isTrue();
+                    softly.assertThat(response.fixedDate()).isEqualTo(voteDate);
+                    softly.assertThat(attendeeIds).containsExactlyInAnyOrderElementsOf(voterIds);
+                });
     }
 
     @Test
@@ -419,41 +413,46 @@ class BungaeServiceTest extends DatabaseTestSupport {
         int minAttendees = 2;
         int maxAttendees = 10;
         LocalDate fixedDate = LocalDate.now().plusDays(1);
-        Bungae bungae = bungaeRepository.save(BungaeFixture.createWithRecruiting(group, hostGroupMember, fixedDate, minAttendees, maxAttendees));
+        Bungae bungae =
+                bungaeRepository.save(
+                        BungaeFixture.createWithRecruiting(
+                                group, hostGroupMember, fixedDate, minAttendees, maxAttendees));
 
         // minAttendees 이상, maxAttendees 미만의 BungaeAttendee 데이터 세팅
-        bungaeAttendeeRepository.saveAll(List.of(
-                BungaeAttendee.builder()
-                              .bungae(bungae)
-                              .groupMember(hostGroupMember)
-                              .deleted(false)
-                              .build(),
-                BungaeAttendee.builder()
-                              .bungae(bungae)
-                              .groupMember(groupMember2)
-                              .deleted(false)
-                              .build()
-        ));
+        bungaeAttendeeRepository.saveAll(
+                List.of(
+                        BungaeAttendee.builder()
+                                .bungae(bungae)
+                                .groupMember(hostGroupMember)
+                                .deleted(false)
+                                .build(),
+                        BungaeAttendee.builder()
+                                .bungae(bungae)
+                                .groupMember(groupMember2)
+                                .deleted(false)
+                                .build()));
 
         long voteCountBefore = bungaeDateVoteRepository.count();
 
         // when
-        BungaeDateVoteResponse response = bungaeService.voteBungaeDates(member2, bungae.getId(), List.of(fixedDate));
+        BungaeDateVoteResponse response =
+                bungaeService.voteBungaeDates(member2, bungae.getId(), List.of(fixedDate));
 
         // then
         long voteCountAfter = bungaeDateVoteRepository.count();
 
-        SoftAssertions.assertSoftly(softly -> {
-            softly.assertThat(response.wasVotableBungae()).isFalse();
-            softly.assertThat(response.failedVoteDates()).isNull();
-            softly.assertThat(response.isJoinable()).isTrue();
-            softly.assertThat(response.isDateFixed()).isTrue();
-            softly.assertThat(response.fixedDate()).isEqualTo(fixedDate);
-            softly.assertThat(response.bungaeStatus()).isEqualTo(BungaeStatus.RECRUITING);
+        SoftAssertions.assertSoftly(
+                softly -> {
+                    softly.assertThat(response.wasVotableBungae()).isFalse();
+                    softly.assertThat(response.failedVoteDates()).isNull();
+                    softly.assertThat(response.isJoinable()).isTrue();
+                    softly.assertThat(response.isDateFixed()).isTrue();
+                    softly.assertThat(response.fixedDate()).isEqualTo(fixedDate);
+                    softly.assertThat(response.bungaeStatus()).isEqualTo(BungaeStatus.RECRUITING);
 
-            // 투표는 처리되지 않음
-            softly.assertThat(voteCountAfter).isEqualTo(voteCountBefore);
-        });
+                    // 투표는 처리되지 않음
+                    softly.assertThat(voteCountAfter).isEqualTo(voteCountBefore);
+                });
     }
 
     @Test
@@ -464,62 +463,65 @@ class BungaeServiceTest extends DatabaseTestSupport {
         LocalDate fixedDate = LocalDate.now().plusDays(1);
         int minAttendees = 2;
         int maxAttendees = 2;
-        Bungae bungae = bungaeRepository.save(
-                BungaeFixture.createWithRecruitingClosed(group, hostGroupMember, fixedDate, minAttendees, maxAttendees));
+        Bungae bungae =
+                bungaeRepository.save(
+                        BungaeFixture.createWithRecruitingClosed(
+                                group, hostGroupMember, fixedDate, minAttendees, maxAttendees));
 
         // maxAttendees와 같은 BungaeAttendee 데이터 세팅
-        bungaeAttendeeRepository.saveAll(List.of(
-                BungaeAttendee.builder()
-                              .bungae(bungae)
-                              .groupMember(hostGroupMember)
-                              .deleted(false)
-                              .build(),
-                BungaeAttendee.builder()
-                              .bungae(bungae)
-                              .groupMember(groupMember2)
-                              .deleted(false)
-                              .build()
-        ));
+        bungaeAttendeeRepository.saveAll(
+                List.of(
+                        BungaeAttendee.builder()
+                                .bungae(bungae)
+                                .groupMember(hostGroupMember)
+                                .deleted(false)
+                                .build(),
+                        BungaeAttendee.builder()
+                                .bungae(bungae)
+                                .groupMember(groupMember2)
+                                .deleted(false)
+                                .build()));
 
         long voteCountBefore = bungaeDateVoteRepository.count();
 
         // when
-        BungaeDateVoteResponse response = bungaeService.voteBungaeDates(member2, bungae.getId(), List.of(fixedDate));
+        BungaeDateVoteResponse response =
+                bungaeService.voteBungaeDates(member2, bungae.getId(), List.of(fixedDate));
 
         // then
         long voteCountAfter = bungaeDateVoteRepository.count();
 
-        SoftAssertions.assertSoftly(softly -> {
-            softly.assertThat(response.wasVotableBungae()).isFalse();
-            softly.assertThat(response.failedVoteDates()).isNull();
-            softly.assertThat(response.isJoinable()).isFalse();
-            softly.assertThat(response.isDateFixed()).isTrue();
-            softly.assertThat(response.fixedDate()).isEqualTo(fixedDate);
-            softly.assertThat(response.bungaeStatus()).isEqualTo(BungaeStatus.RECRUITING_CLOSED);
+        SoftAssertions.assertSoftly(
+                softly -> {
+                    softly.assertThat(response.wasVotableBungae()).isFalse();
+                    softly.assertThat(response.failedVoteDates()).isNull();
+                    softly.assertThat(response.isJoinable()).isFalse();
+                    softly.assertThat(response.isDateFixed()).isTrue();
+                    softly.assertThat(response.fixedDate()).isEqualTo(fixedDate);
+                    softly.assertThat(response.bungaeStatus())
+                            .isEqualTo(BungaeStatus.RECRUITING_CLOSED);
 
-            // 투표는 처리되지 않음
-            softly.assertThat(voteCountAfter).isEqualTo(voteCountBefore);
-        });
+                    // 투표는 처리되지 않음
+                    softly.assertThat(voteCountAfter).isEqualTo(voteCountBefore);
+                });
     }
 
     @Test
     @DisplayName("B-5-S-6: 잘못된 날짜 투표할 수 없습니다.")
     void B_5_S_6() {
         // given
-        Bungae bungae = bungaeRepository.save(BungaeFixture.createWithDateVoting(group, hostGroupMember));
+        Bungae bungae =
+                bungaeRepository.save(BungaeFixture.createWithDateVoting(group, hostGroupMember));
         // 날짜 후보 세팅
-        List<LocalDate> dateOptions = List.of(
-                LocalDate.now().plusDays(1),
-                LocalDate.now().plusDays(2)
-        );
-        dateOptions.forEach(dateOption ->
-                bungaeRecruitDateOptionRepository.save(
-                        BungaeRecruitDateOption.builder()
-                                .dateOption(dateOption)
-                                .bungae(bungae)
-                                .build()
-                )
-        );
+        List<LocalDate> dateOptions =
+                List.of(LocalDate.now().plusDays(1), LocalDate.now().plusDays(2));
+        dateOptions.forEach(
+                dateOption ->
+                        bungaeRecruitDateOptionRepository.save(
+                                BungaeRecruitDateOption.builder()
+                                        .dateOption(dateOption)
+                                        .bungae(bungae)
+                                        .build()));
 
         // 투표 전 투표 수 확인
         long voteCountBefore = bungaeDateVoteRepository.count();
@@ -528,25 +530,29 @@ class BungaeServiceTest extends DatabaseTestSupport {
         // 존재하지 않는 날짜(후보에 없음)
         LocalDate invalidDate = LocalDate.now().plusDays(100);
 
-        BungaeDateVoteResponse response = bungaeService.voteBungaeDates(member2, bungae.getId(), List.of(invalidDate));
+        BungaeDateVoteResponse response =
+                bungaeService.voteBungaeDates(member2, bungae.getId(), List.of(invalidDate));
 
         // then
         long voteCountAfter = bungaeDateVoteRepository.count();
 
-        SoftAssertions.assertSoftly(softly -> {
-            softly.assertThat(response.wasVotableBungae()).isTrue();
-            softly.assertThat(response.failedVoteDates()).contains(invalidDate);
+        SoftAssertions.assertSoftly(
+                softly -> {
+                    softly.assertThat(response.wasVotableBungae()).isTrue();
+                    softly.assertThat(response.failedVoteDates()).contains(invalidDate);
 
-            // 투표는 처리되지 않음
-            softly.assertThat(voteCountAfter).isEqualTo(voteCountBefore);
-        });
+                    // 투표는 처리되지 않음
+                    softly.assertThat(voteCountAfter).isEqualTo(voteCountBefore);
+                });
     }
 
     @Test
     @DisplayName("B-5-S-8: 여러 개의 투표 후보가 동시에 최소 인원을 도달할 수 있는 상황이라면, 가장 빠른 날짜가 번개 날짜로 확정됩니다.")
     void B_5_S_8() {
         // given
-        Bungae bungae = bungaeRepository.save(BungaeFixture.createWithDateVoting(group, hostGroupMember, 3, 10));
+        Bungae bungae =
+                bungaeRepository.save(
+                        BungaeFixture.createWithDateVoting(group, hostGroupMember, 3, 10));
 
         // 3개의 날짜 후보 생성 (date3이 가장 빠른 날짜)
         LocalDate date1 = LocalDate.now().plusDays(3);
@@ -565,55 +571,53 @@ class BungaeServiceTest extends DatabaseTestSupport {
         // member3가 모든 날짜에 투표하면, 세 날짜 모두 최소 인원(3명)에 도달
         GroupMember groupMember3 = createNewGroupMember("테스트멤버3");
 
-        BungaeDateVoteResponse response = bungaeService.voteBungaeDates(
-                groupMember3.getMember(),
-                bungae.getId(),
-                dates
-        );
+        BungaeDateVoteResponse response =
+                bungaeService.voteBungaeDates(groupMember3.getMember(), bungae.getId(), dates);
 
         // then
         Bungae updatedBungae = bungaeRepository.findById(bungae.getId()).orElseThrow();
 
-        SoftAssertions.assertSoftly(softly -> {
-            softly.assertThat(response.wasVotableBungae()).isTrue();
-            softly.assertThat(response.failedVoteDates()).isEmpty();
-            softly.assertThat(response.isDateFixed()).isTrue();
-            softly.assertThat(response.fixedDate()).isEqualTo(date3);
-            softly.assertThat(updatedBungae.getStatus()).isEqualTo(BungaeStatus.RECRUITING);
-            softly.assertThat(updatedBungae.getBungaeDate()).isEqualTo(date3);
-        });
+        SoftAssertions.assertSoftly(
+                softly -> {
+                    softly.assertThat(response.wasVotableBungae()).isTrue();
+                    softly.assertThat(response.failedVoteDates()).isEmpty();
+                    softly.assertThat(response.isDateFixed()).isTrue();
+                    softly.assertThat(response.fixedDate()).isEqualTo(date3);
+                    softly.assertThat(updatedBungae.getStatus()).isEqualTo(BungaeStatus.RECRUITING);
+                    softly.assertThat(updatedBungae.getBungaeDate()).isEqualTo(date3);
+                });
     }
 
-    /**
-     * 번개와 날짜 리스트에 대해 BungaeRecruitDateOption을 저장하고 옵션 리스트를 반환하는 테스트 유틸 메서드
-     */
-    private List<BungaeRecruitDateOption> createAndSaveDateOptions(Bungae bungae, List<LocalDate> dates) {
+    /** 번개와 날짜 리스트에 대해 BungaeRecruitDateOption을 저장하고 옵션 리스트를 반환하는 테스트 유틸 메서드 */
+    private List<BungaeRecruitDateOption> createAndSaveDateOptions(
+            Bungae bungae, List<LocalDate> dates) {
         return dates.stream()
-                    .map(date -> bungaeRecruitDateOptionRepository.save(
-                            BungaeRecruitDateOption.builder()
-                                                   .dateOption(date)
-                                                   .bungae(bungae)
-                                                   .build()
-                    ))
-                    .toList();
+                .map(
+                        date ->
+                                bungaeRecruitDateOptionRepository.save(
+                                        BungaeRecruitDateOption.builder()
+                                                .dateOption(date)
+                                                .bungae(bungae)
+                                                .build()))
+                .toList();
     }
 
-    /**
-     * 특정 그룹 멤버가 여러 날짜 옵션에 투표하는 테스트 유틸 메서드
-     */
-    private void voteForMultipleDateOptions(GroupMember voter, List<BungaeRecruitDateOption> options) {
-        List<BungaeDateVote> votes = options.stream()
-                                            .map(option -> BungaeDateVote.builder()
-                                                                         .voter(voter)
-                                                                         .dateOption(option)
-                                                                         .build())
-                                            .toList();
+    /** 특정 그룹 멤버가 여러 날짜 옵션에 투표하는 테스트 유틸 메서드 */
+    private void voteForMultipleDateOptions(
+            GroupMember voter, List<BungaeRecruitDateOption> options) {
+        List<BungaeDateVote> votes =
+                options.stream()
+                        .map(
+                                option ->
+                                        BungaeDateVote.builder()
+                                                .voter(voter)
+                                                .dateOption(option)
+                                                .build())
+                        .toList();
         bungaeDateVoteRepository.saveAll(votes);
     }
 
-    /**
-     * 새로운 멤버와 그룹 멤버를 생성하는 테스트 유틸 메서드
-     */
+    /** 새로운 멤버와 그룹 멤버를 생성하는 테스트 유틸 메서드 */
     private GroupMember createNewGroupMember(String memberName) {
         Member newMember = memberRepository.save(MemberFixture.create(memberName));
         return groupMemberRepository.save(GroupMemberFixture.create(group, newMember));
@@ -623,7 +627,9 @@ class BungaeServiceTest extends DatabaseTestSupport {
     @DisplayName("B-5-S-9: 투표로 날짜가 확정되지 않은 경우, 올바른 반환값을 반환합니다.")
     void B_5_S_9() {
         // given
-        Bungae bungae = bungaeRepository.save(BungaeFixture.createWithDateVoting(group, hostGroupMember, 3, 10));
+        Bungae bungae =
+                bungaeRepository.save(
+                        BungaeFixture.createWithDateVoting(group, hostGroupMember, 3, 10));
 
         // 2개의 날짜 후보 생성
         LocalDate date1 = LocalDate.now().plusDays(1);
@@ -638,24 +644,23 @@ class BungaeServiceTest extends DatabaseTestSupport {
 
         // when
         // groupMember2가 모든 날짜에 투표해도 각 날짜는 2명이므로 최소 인원(3명)에 도달하지 못함
-        BungaeDateVoteResponse response = bungaeService.voteBungaeDates(
-                member2,
-                bungae.getId(),
-                dates
-        );
+        BungaeDateVoteResponse response =
+                bungaeService.voteBungaeDates(member2, bungae.getId(), dates);
 
         // then
         Bungae updatedBungae = bungaeRepository.findById(bungae.getId()).orElseThrow();
 
-        SoftAssertions.assertSoftly(softly -> {
-            softly.assertThat(response.wasVotableBungae()).isTrue();
-            softly.assertThat(response.failedVoteDates()).isEmpty();
-            softly.assertThat(response.isDateFixed()).isFalse();
-            softly.assertThat(response.fixedDate()).isNull();
-            softly.assertThat(response.isJoinable()).isNull();
-            softly.assertThat(response.bungaeStatus()).isEqualTo(BungaeStatus.DATE_VOTING);
-            softly.assertThat(updatedBungae.getStatus()).isEqualTo(BungaeStatus.DATE_VOTING);
-            softly.assertThat(updatedBungae.getBungaeDate()).isNull();
-        });
+        SoftAssertions.assertSoftly(
+                softly -> {
+                    softly.assertThat(response.wasVotableBungae()).isTrue();
+                    softly.assertThat(response.failedVoteDates()).isEmpty();
+                    softly.assertThat(response.isDateFixed()).isFalse();
+                    softly.assertThat(response.fixedDate()).isNull();
+                    softly.assertThat(response.isJoinable()).isNull();
+                    softly.assertThat(response.bungaeStatus()).isEqualTo(BungaeStatus.DATE_VOTING);
+                    softly.assertThat(updatedBungae.getStatus())
+                            .isEqualTo(BungaeStatus.DATE_VOTING);
+                    softly.assertThat(updatedBungae.getBungaeDate()).isNull();
+                });
     }
 }

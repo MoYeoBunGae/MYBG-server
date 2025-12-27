@@ -33,24 +33,30 @@ public class GroupMemberService {
 
         // group에 가입 가능한지 검증
         if (group.isFull()) {
-            throw new ApplicationException(ApplicationExceptionType.GROUP_MEMBER_CAPACITY_REACHED, group.getId());
+            throw new ApplicationException(
+                    ApplicationExceptionType.GROUP_MEMBER_CAPACITY_REACHED, group.getId());
         }
 
         // 이미 가입된 그룹인지 검증
         if (isAlreadyGroupMember(member, group)) {
-            throw new ApplicationException(ApplicationExceptionType.ALREADY_JOINED_GROUP, member.getId(), group.getId());
+            throw new ApplicationException(
+                    ApplicationExceptionType.ALREADY_JOINED_GROUP, member.getId(), group.getId());
         }
 
         // nickname 이 null이면 member의 name을 사용
-        String nickname = groupJoinRequest.nickname() == null ? member.getName() : groupJoinRequest.nickname();
+        String nickname =
+                groupJoinRequest.nickname() == null
+                        ? member.getName()
+                        : groupJoinRequest.nickname();
 
-        GroupMember groupMember = GroupMember.builder()
-                                             .nickname(nickname)
-                                             .member(member)
-                                             // TODO: 기본 프로필 이미지 URL로 변경
-                                             .memberProfileImageUrl(member.getProfileImageUrl())
-                                             .group(group)
-                                             .build();
+        GroupMember groupMember =
+                GroupMember.builder()
+                        .nickname(nickname)
+                        .member(member)
+                        // TODO: 기본 프로필 이미지 URL로 변경
+                        .memberProfileImageUrl(member.getProfileImageUrl())
+                        .group(group)
+                        .build();
         return saveGroupMember(groupMember, group);
     }
 
@@ -60,13 +66,14 @@ public class GroupMemberService {
         return savedGroupMember;
     }
 
-
     private boolean isAlreadyGroupMember(Member member, Group group) {
-        return group.isOwnedBy(member) || groupMemberRepository.findByMemberAndGroup(member, group).isPresent();
+        return group.isOwnedBy(member)
+                || groupMemberRepository.findByMemberAndGroup(member, group).isPresent();
     }
 
     @Transactional
-    public GroupMember updateProfile(Long groupMemberId, Member member, GroupMemberProfileUpdateRequest request) {
+    public GroupMember updateProfile(
+            Long groupMemberId, Member member, GroupMemberProfileUpdateRequest request) {
         // 1. 검증된 그룹 멤버 조회
         GroupMember groupMember = groupMemberFinder.findByIdAndMember(groupMemberId, member);
 
@@ -86,10 +93,7 @@ public class GroupMemberService {
         return groupMember;
     }
 
-    /**
-     * 그룹 나가기
-     * - 그룹의 소유자는 나갈 수 없음
-     */
+    /** 그룹 나가기 - 그룹의 소유자는 나갈 수 없음 */
     @Transactional
     public void leaveGroup(Long groupMemberId, Member loginMember) {
         GroupMember groupMember = groupMemberFinder.findByIdAndMember(groupMemberId, loginMember);
@@ -98,7 +102,8 @@ public class GroupMemberService {
 
         // 소유자는 나갈 수 없음
         if (group.isOwnedBy(loginMember)) {
-            throw new ApplicationException(ApplicationExceptionType.GROUP_OWNER_CANNOT_LEAVE, group.getId());
+            throw new ApplicationException(
+                    ApplicationExceptionType.GROUP_OWNER_CANNOT_LEAVE, group.getId());
         }
 
         groupMember.leave();

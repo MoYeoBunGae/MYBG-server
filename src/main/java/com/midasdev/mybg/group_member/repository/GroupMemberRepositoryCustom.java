@@ -13,5 +13,4 @@ public interface GroupMemberRepositoryCustom {
     Optional<GroupMember> findByMemberAndGroup(Member member, Group group);
 
     Optional<GroupMember> findEntityById(Long groupMemberId);
-
 }
