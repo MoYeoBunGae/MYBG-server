@@ -705,9 +705,10 @@ class BungaeServiceTest extends DatabaseTestSupport {
         SoftAssertions.assertSoftly(
                 softly -> {
                     softly.assertThat(attendees).hasSize(3);
-                    softly.assertThat(attendees.stream()
-                            .map(attendee -> attendee.getGroupMember().getId())
-                            .toList())
+                    softly.assertThat(
+                                    attendees.stream()
+                                            .map(attendee -> attendee.getGroupMember().getId())
+                                            .toList())
                             .contains(groupMember3.getId());
                     softly.assertThat(result.status()).isEqualTo(BungaeStatus.RECRUITING);
                     softly.assertThat(updatedBungae.getStatus()).isEqualTo(BungaeStatus.RECRUITING);

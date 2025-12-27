@@ -330,7 +330,8 @@ public class BungaeService {
         bungaeAttendeeRepository.save(attendee);
 
         // 7. 현재 참석자 수 조회
-        long currentAttendeeCount = bungaeAttendeeRepository.countByBungaeIdAndDeletedFalse(bungaeId);
+        long currentAttendeeCount =
+                bungaeAttendeeRepository.countByBungaeIdAndDeletedFalse(bungaeId);
 
         // 8. 최대 인원 도달 시 상태 변경 (도메인 로직 위임)
         bungae.closeRecruitingIfFull((int) currentAttendeeCount);

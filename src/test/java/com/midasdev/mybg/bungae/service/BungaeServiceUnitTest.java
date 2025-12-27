@@ -164,10 +164,7 @@ public class BungaeServiceUnitTest {
         GroupMember groupMember = GroupMemberFixture.create(group, member);
         Bungae bungae = BungaeFixture.createWithRecruiting(group, host);
         BungaeAttendee existingAttendee =
-                BungaeAttendee.builder()
-                        .bungae(bungae)
-                        .groupMember(groupMember)
-                        .build();
+                BungaeAttendee.builder().bungae(bungae).groupMember(groupMember).build();
         Long bungaeId = 1L;
 
         when(bungaeFinder.findById(bungaeId)).thenReturn(bungae);
