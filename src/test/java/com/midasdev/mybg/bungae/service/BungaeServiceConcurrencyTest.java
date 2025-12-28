@@ -144,4 +144,72 @@ class BungaeServiceConcurrencyTest extends DatabaseTestSupport {
 
         assertThat(attendees).hasSize(2);
     }
+
+    @Test
+    @DisplayName("B-6-S-3: 최대인원까지 1명 남은 번개에 동시에 100명이 참여할 경우 한 명만 성공한다")
+    void B_6_S_3() throws Exception {
+        // given
+        LocalDate fixedDate = LocalDate.now().plusDays(1);
+        int minAttendees = 2;
+        int maxAttendees = 3;
+        Bungae bungae =
+                bungaeRepository.save(
+                        BungaeFixture.createWithRecruiting(
+                                group, hostGroupMember, fixedDate, minAttendees, maxAttendees));
+
+        // 이미 2명이 참여한 상태로 만듦 (maxAttendees=3, 현재 2명 참여, 1명 남음)
+        bungaeAttendeeRepository.saveAll(
+                List.of(
+                        BungaeAttendee.builder()
+                                .bungae(bungae)
+                                .groupMember(hostGroupMember)
+                                .deleted(false)
+                                .build(),
+                        BungaeAttendee.builder()
+                                .bungae(bungae)
+                                .groupMember(groupMember2)
+                                .deleted(false)
+                                .build()));
+
+        // 100명의 멤버/그룹멤버 생성
+        Member[] members = new Member[100];
+        for (int i = 0; i < 100; i++) {
+            members[i] = memberRepository.save(MemberFixture.create(String.valueOf(i)));
+            groupMemberRepository.save(GroupMemberFixture.create(group, members[i]));
+        }
+
+        // when: 100명이 동시에 참여 시도
+        Thread[] threads = new Thread[100];
+
+        CountDownLatch startLatch = new CountDownLatch(1);
+        CountDownLatch doneLatch = new CountDownLatch(100);
+
+        for (int i = 0; i < 100; i++) {
+            final int idx = i;
+            threads[i] =
+                    new Thread(
+                            () -> {
+                                try {
+                                    startLatch.await(); // 모든 스레드가 준비될 때까지 대기
+                                    bungaeService.joinBungae(members[idx], bungae.getId());
+                                } catch (InterruptedException e) {
+                                    Thread.currentThread().interrupt();
+                                } catch (Exception e) {
+                                    // 참여 실패는 예상되는 상황이므로 무시
+                                } finally {
+                                    doneLatch.countDown(); // 작업 완료 신호
+                                }
+                            });
+        }
+
+        for (Thread thread : threads) thread.start();
+        startLatch.countDown(); // 모든 스레드 시작
+        doneLatch.await(); // 모든 스레드 완료 대기
+
+        // then: 참여 성공자는 1명만 추가되어 총 3명이어야 함
+        List<BungaeAttendee> attendees =
+                bungaeAttendeeRepository.findByBungaeIdAndDeletedFalse(bungae.getId());
+
+        assertThat(attendees).hasSize(3);
+    }
 }

@@ -306,4 +306,54 @@ class BungaeDomainTest {
         // then
         assertThat(result).isFalse();
     }
+
+    @Test
+    @DisplayName(
+            "BD-6-D-1: closeRecruitingIfFull - 현재 인원수가 최대 인원 도달 시 번개 상태가 RECRUITING_CLOSED로 변경")
+    void BD_6_D_1() {
+        // given
+        int maxAttendees = 5;
+        Bungae bungae =
+                Bungae.builder()
+                        .name("테스트 번개")
+                        .description("테스트용 번개 설명")
+                        .minAttendees(2)
+                        .maxAttendees(maxAttendees)
+                        .status(BungaeStatus.RECRUITING)
+                        .host(host)
+                        .group(group)
+                        .build();
+
+        int currentAttendeeCount = maxAttendees;
+
+        // when
+        bungae.closeRecruitingIfFull(currentAttendeeCount);
+
+        // then
+        assertThat(bungae.getStatus()).isEqualTo(BungaeStatus.RECRUITING_CLOSED);
+    }
+
+    @Test
+    @DisplayName("BD-6-D-2: closeRecruitingIfFull - 현재 인원수가 최대 인원에 미달 시 번개 상태가 변경되지 않음")
+    void BD_6_D_2() {
+        // given
+        int maxAttendees = 5;
+        int currentAttendeeCount = 3; // below max
+        Bungae bungae =
+                Bungae.builder()
+                        .name("테스트 번개")
+                        .description("테스트용 번개 설명")
+                        .minAttendees(2)
+                        .maxAttendees(maxAttendees)
+                        .status(BungaeStatus.RECRUITING)
+                        .host(host)
+                        .group(group)
+                        .build();
+
+        // when
+        bungae.closeRecruitingIfFull(currentAttendeeCount);
+
+        // then
+        assertThat(bungae.getStatus()).isEqualTo(BungaeStatus.RECRUITING);
+    }
 }

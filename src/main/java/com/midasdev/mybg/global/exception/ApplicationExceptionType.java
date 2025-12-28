@@ -66,8 +66,8 @@ public enum ApplicationExceptionType {
     BUNGAE_NOT_FOUND_BY_ID(HttpStatus.BAD_REQUEST, "ERR_BUNGAE_001", "해당 ID의 번개를 찾을 수 없습니다. : {0}"),
     /** - {0} : bungaeId */
     BUNGAE_VOTE_UNAVAILABLE(HttpStatus.BAD_REQUEST, "ERR_BUNGAE_002", "번개({0})에 대한 투표가 불가능합니다."),
-    BUNGAE_VOTE_CONCURRENCY_LOCK_FAILED(
-            HttpStatus.INTERNAL_SERVER_ERROR, "ERR_BUNGAE_003", "번개 날짜 투표 동시성 락 획득에 실패했습니다."),
+    BUNGAE_CONCURRENCY_LOCK_FAILED(
+            HttpStatus.INTERNAL_SERVER_ERROR, "ERR_BUNGAE_003", "번개({0}) 동시성 락 획득에 실패했습니다."),
     BUNGAE_DATE_OPTION_NOT_FOUND(
             HttpStatus.BAD_REQUEST, "ERR_BUNGAE_004", "번개({0})의 해당 날짜 후보({1})를 찾을 수 없습니다."),
     ALREADY_VOTED_FOR_BUNGAE_DATE(
@@ -78,6 +78,14 @@ public enum ApplicationExceptionType {
             HttpStatus.BAD_REQUEST,
             "ERR_BUNGAE_007",
             "번개({0})의 최소 인원({1})은 최대 인원({2})보다 클 수 없습니다."),
+    /** - {0} : bungaeId */
+    BUNGAE_NOT_JOINABLE_STATUS(
+            HttpStatus.BAD_REQUEST, "ERR_BUNGAE_008", "번개({0})의 상태로 인해 참여가 불가능합니다."),
+    /** - {0} : bungaeId - {1} : groupMemberId */
+    BUNGAE_ALREADY_JOINED(
+            HttpStatus.BAD_REQUEST,
+            "ERR_BUNGAE_009",
+            "이미 해당 번개({0})에 참여한 상태입니다. (GroupMemberId: {1})"),
 
     // authentication
     TOKEN_AUTHENTICATION_EXCEPTION(HttpStatus.FORBIDDEN, "ERR_AUTH_001", "토큰 인증에 실패했습니다. : {0}"),

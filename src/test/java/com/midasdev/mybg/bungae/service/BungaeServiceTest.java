@@ -16,6 +16,7 @@ import com.midasdev.mybg.bungae.repository.BungaeDateVoteRepository;
 import com.midasdev.mybg.bungae.repository.BungaeDateVoteTestRepository;
 import com.midasdev.mybg.bungae.repository.BungaeRecruitDateOptionRepository;
 import com.midasdev.mybg.bungae.repository.BungaeRepository;
+import com.midasdev.mybg.bungae.repository.dto.BungaeDto;
 import com.midasdev.mybg.group.domain.Group;
 import com.midasdev.mybg.group.fixture.GroupFixture;
 import com.midasdev.mybg.group.repository.GroupRepository;
@@ -661,6 +662,104 @@ class BungaeServiceTest extends DatabaseTestSupport {
                     softly.assertThat(updatedBungae.getStatus())
                             .isEqualTo(BungaeStatus.DATE_VOTING);
                     softly.assertThat(updatedBungae.getBungaeDate()).isNull();
+                });
+    }
+
+    @Test
+    @DisplayName("B-6-S-1: 올바른 조건에서 번개 참여에 성공한다")
+    void B_6_S_1() {
+        // given
+        LocalDate fixedDate = LocalDate.now().plusDays(1);
+        int minAttendees = 2;
+        int maxAttendees = 5;
+        Bungae bungae =
+                bungaeRepository.save(
+                        BungaeFixture.createWithRecruiting(
+                                group, hostGroupMember, fixedDate, minAttendees, maxAttendees));
+
+        // 2명이 이미 참여한 상태로 만듦 (호스트 + member2)
+        bungaeAttendeeRepository.saveAll(
+                List.of(
+                        BungaeAttendee.builder()
+                                .bungae(bungae)
+                                .groupMember(hostGroupMember)
+                                .deleted(false)
+                                .build(),
+                        BungaeAttendee.builder()
+                                .bungae(bungae)
+                                .groupMember(groupMember2)
+                                .deleted(false)
+                                .build()));
+
+        // 3번째 멤버 생성
+        GroupMember groupMember3 = createNewGroupMember("테스트멤버3");
+
+        // when
+        BungaeDto result = bungaeService.joinBungae(groupMember3.getMember(), bungae.getId());
+
+        // then
+        List<BungaeAttendee> attendees =
+                bungaeAttendeeRepository.findByBungaeIdAndDeletedFalse(bungae.getId());
+        Bungae updatedBungae = bungaeRepository.findById(bungae.getId()).orElseThrow();
+
+        SoftAssertions.assertSoftly(
+                softly -> {
+                    softly.assertThat(attendees).hasSize(3);
+                    softly.assertThat(
+                                    attendees.stream()
+                                            .map(attendee -> attendee.getGroupMember().getId())
+                                            .toList())
+                            .contains(groupMember3.getId());
+                    softly.assertThat(result.status()).isEqualTo(BungaeStatus.RECRUITING);
+                    softly.assertThat(updatedBungae.getStatus()).isEqualTo(BungaeStatus.RECRUITING);
+                    softly.assertThat(result.attendeeCount()).isEqualTo(3);
+                });
+    }
+
+    @Test
+    @DisplayName("B-6-S-2: 최대인원까지 1명 남은 번개에 참여할 경우 참여가 성공하고, 번개 상태가 RECRUITING_CLOSED로 변경된다")
+    void B_6_S_2() {
+        // given
+        LocalDate fixedDate = LocalDate.now().plusDays(1);
+        int minAttendees = 2;
+        int maxAttendees = 3;
+        Bungae bungae =
+                bungaeRepository.save(
+                        BungaeFixture.createWithRecruiting(
+                                group, hostGroupMember, fixedDate, minAttendees, maxAttendees));
+
+        // 2명이 이미 참여한 상태로 만듦 (호스트 + member2)
+        bungaeAttendeeRepository.saveAll(
+                List.of(
+                        BungaeAttendee.builder()
+                                .bungae(bungae)
+                                .groupMember(hostGroupMember)
+                                .deleted(false)
+                                .build(),
+                        BungaeAttendee.builder()
+                                .bungae(bungae)
+                                .groupMember(groupMember2)
+                                .deleted(false)
+                                .build()));
+
+        // 3번째 멤버 생성
+        GroupMember groupMember3 = createNewGroupMember("테스트멤버3");
+
+        // when
+        BungaeDto result = bungaeService.joinBungae(groupMember3.getMember(), bungae.getId());
+
+        // then
+        List<BungaeAttendee> attendees =
+                bungaeAttendeeRepository.findByBungaeIdAndDeletedFalse(bungae.getId());
+        Bungae updatedBungae = bungaeRepository.findById(bungae.getId()).orElseThrow();
+
+        SoftAssertions.assertSoftly(
+                softly -> {
+                    softly.assertThat(attendees).hasSize(3);
+                    softly.assertThat(result.status()).isEqualTo(BungaeStatus.RECRUITING_CLOSED);
+                    softly.assertThat(updatedBungae.getStatus())
+                            .isEqualTo(BungaeStatus.RECRUITING_CLOSED);
+                    softly.assertThat(result.attendeeCount()).isEqualTo(3);
                 });
     }
 }

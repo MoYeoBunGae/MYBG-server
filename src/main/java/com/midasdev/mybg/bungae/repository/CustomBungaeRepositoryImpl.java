@@ -14,6 +14,7 @@ import com.querydsl.jpa.JPAExpressions;
 import com.querydsl.jpa.JPQLQuery;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import java.util.List;
+import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 
 @RequiredArgsConstructor
@@ -78,6 +79,20 @@ public class CustomBungaeRepositoryImpl implements CustomBungaeRepository {
                         .fetch();
 
         return new CursorPage<>(fetchedContent, pageSize);
+    }
+
+    @Override
+    public Optional<BungaeDto> findBungaeDtoById(Long bungaeId) {
+        BungaeDto result =
+                queryFactory
+                        .select(createBungaeDtoProjection())
+                        .from(bungae)
+                        .join(bungae.group)
+                        .join(bungae.host)
+                        .where(bungae.id.eq(bungaeId).and(bungae.deleted.isFalse()))
+                        .fetchOne();
+
+        return Optional.ofNullable(result);
     }
 
     private BooleanExpression bungaeStatuesAndCursorCondition(

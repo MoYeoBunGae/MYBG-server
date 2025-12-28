@@ -5,6 +5,7 @@ import com.midasdev.mybg.bungae.repository.dto.BungaeDto;
 import com.midasdev.mybg.global.util.cursor_page.CursorPage;
 import com.midasdev.mybg.global.util.cursor_page.CursorPageable;
 import java.util.List;
+import java.util.Optional;
 
 public interface CustomBungaeRepository {
 
@@ -13,4 +14,6 @@ public interface CustomBungaeRepository {
 
     CursorPage<BungaeDto> findByGroupIdAndStatusIn(
             Long groupId, List<BungaeStatus> statuses, CursorPageable pageable);
+
+    Optional<BungaeDto> findBungaeDtoById(Long bungaeId);
 }
