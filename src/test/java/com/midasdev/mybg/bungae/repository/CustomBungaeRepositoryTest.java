@@ -540,7 +540,9 @@ class CustomBungaeRepositoryTest {
     @DisplayName("BR-1-6: 참가 여부와 투표 여부가 올바르게 매핑되어 조회됨 - 참가 O, 투표 O")
     void BR_1_6() {
         //  === given ===
-        Bungae testBungae = createBungaeAndSaveAttendee(BungaeFixture::createWithRecruiting, group, groupMember, groupMember2);
+        Bungae testBungae =
+                createBungaeAndSaveAttendee(
+                        BungaeFixture::createWithRecruiting, group, groupMember, groupMember2);
 
         // Create date option (to represent past voting)
         BungaeRecruitDateOption dateOption =
@@ -565,7 +567,9 @@ class CustomBungaeRepositoryTest {
         assertThat(result.getContent()).isNotEmpty();
 
         List<BungaeDto> target =
-                result.getContent().stream().filter(dto -> dto.id().equals(testBungae.getId())).toList();
+                result.getContent().stream()
+                        .filter(dto -> dto.id().equals(testBungae.getId()))
+                        .toList();
         assertThat(target).hasSize(1);
 
         BungaeDto targetBungae = target.get(0);
@@ -581,11 +585,13 @@ class CustomBungaeRepositoryTest {
     @DisplayName("BR-1-7: 참가 여부와 투표 여부가 올바르게 매핑되어 조회됨 - 참가 O, 투표 X")
     void BR_1_7() {
         // === given ===
-        Bungae testBungae = createBungaeAndSaveAttendee(BungaeFixture::createWithRecruiting, group, groupMember);
+        Bungae testBungae =
+                createBungaeAndSaveAttendee(
+                        BungaeFixture::createWithRecruiting, group, groupMember);
 
         CursorPageable cursorPageable = new CursorPageable(null, 10);
 
-        // === when === 
+        // === when ===
         CursorPage<BungaeDto> result =
                 bungaeRepository.findByGroupIdAndStatusIn(
                         group.getId(), null, cursorPageable, member.getId());
@@ -594,7 +600,9 @@ class CustomBungaeRepositoryTest {
         assertThat(result.getContent()).isNotEmpty();
 
         List<BungaeDto> target =
-                result.getContent().stream().filter(dto -> dto.id().equals(testBungae.getId())).toList();
+                result.getContent().stream()
+                        .filter(dto -> dto.id().equals(testBungae.getId()))
+                        .toList();
         assertThat(target).hasSize(1);
 
         BungaeDto targetBungae = target.get(0);
@@ -610,7 +618,9 @@ class CustomBungaeRepositoryTest {
     @DisplayName("BR-1-8: 참가 여부와 투표 여부가 올바르게 매핑되어 조회됨 - 참가 X, 투표 O")
     void BR_1_8() {
         // === given ===
-        Bungae testBungae = createBungaeAndSaveAttendee(BungaeFixture::createWithDateVoting, group, groupMember);
+        Bungae testBungae =
+                createBungaeAndSaveAttendee(
+                        BungaeFixture::createWithDateVoting, group, groupMember);
 
         // Create date option
         BungaeRecruitDateOption dateOption =
@@ -635,7 +645,9 @@ class CustomBungaeRepositoryTest {
         assertThat(result.getContent()).isNotEmpty();
 
         List<BungaeDto> target =
-                result.getContent().stream().filter(dto -> dto.id().equals(testBungae.getId())).toList();
+                result.getContent().stream()
+                        .filter(dto -> dto.id().equals(testBungae.getId()))
+                        .toList();
         assertThat(target).hasSize(1);
 
         BungaeDto targetBungae = target.get(0);
@@ -651,7 +663,9 @@ class CustomBungaeRepositoryTest {
     @DisplayName("BR-1-9: 참가 여부와 투표 여부가 올바르게 매핑되어 조회됨 - 참가 X, 투표 X")
     void BR_1_9() {
         // === given ===
-        Bungae testBungae = createBungaeAndSaveAttendee(BungaeFixture::createWithRecruiting, group, groupMember);
+        Bungae testBungae =
+                createBungaeAndSaveAttendee(
+                        BungaeFixture::createWithRecruiting, group, groupMember);
 
         // Member does NOT join and does NOT vote
         CursorPageable cursorPageable = new CursorPageable(null, 10);
@@ -665,7 +679,9 @@ class CustomBungaeRepositoryTest {
         assertThat(result.getContent()).isNotEmpty();
 
         List<BungaeDto> target =
-                result.getContent().stream().filter(dto -> dto.id().equals(testBungae.getId())).toList();
+                result.getContent().stream()
+                        .filter(dto -> dto.id().equals(testBungae.getId()))
+                        .toList();
         assertThat(target).hasSize(1);
 
         BungaeDto targetBungae = target.get(0);

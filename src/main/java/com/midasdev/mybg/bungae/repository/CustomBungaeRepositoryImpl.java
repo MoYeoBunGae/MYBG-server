@@ -138,7 +138,8 @@ public class CustomBungaeRepositoryImpl implements CustomBungaeRepository {
                 .setValidation(id -> id != null)
                 .validateOrThrow(
                         () ->
-                                new ApplicationException(ApplicationExceptionType.GLOBAL_INTERNAL_SERVER_ERROR,
+                                new ApplicationException(
+                                        ApplicationExceptionType.GLOBAL_INTERNAL_SERVER_ERROR,
                                         "MemberId for BungaeDto projection cannot be null"));
 
         return new QBungaeDto(
