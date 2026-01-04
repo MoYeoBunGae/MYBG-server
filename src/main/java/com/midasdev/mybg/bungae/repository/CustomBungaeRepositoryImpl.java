@@ -44,7 +44,7 @@ public class CustomBungaeRepositoryImpl implements CustomBungaeRepository {
 
         List<BungaeDto> fetchedContent =
                 queryFactory
-                        .select(createBungaeDtoProjection(memberId))
+                        .select(createBungaeDtoProjection())
                         .from(bungae)
                         .join(attendee)
                         .on(attendee.bungae.eq(bungae))
@@ -106,6 +106,28 @@ public class CustomBungaeRepositoryImpl implements CustomBungaeRepository {
                 (statuses == null || statuses.isEmpty()) ? null : bungae.status.in(statuses);
 
         return Expressions.allOf(statusCondition, cursorId != null ? bungae.id.lt(cursorId) : null);
+    }
+
+    private Expression<BungaeDto> createBungaeDtoProjection() {
+        return new QBungaeDto(
+                bungae.id,
+                bungae.name,
+                bungae.description,
+                bungae.minAttendees,
+                bungae.maxAttendees,
+                bungae.isOnline,
+                bungae.location,
+                bungae.bungaeDateTime.date,
+                bungae.bungaeDateTime.time,
+                bungae.dateVoteClosedAt,
+                bungae.status,
+                bungae.audit.createdAt,
+                bungae.deleted,
+                bungae.group.id,
+                bungae.host.id,
+                createAttendeeCountSubQuery(),
+                Expressions.nullExpression(Boolean.class),
+                Expressions.nullExpression(Boolean.class));
     }
 
     private Expression<BungaeDto> createBungaeDtoProjection(Long memberId) {
