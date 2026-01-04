@@ -45,7 +45,7 @@ public class GroupController {
     private final GroupService groupService;
 
     @Operation(
-            summary = "그룹 생성 API",
+            summary = "[GROUP-006] 그룹 생성 API",
             description = "특정 사용자가 그룹을 생성합니다.",
             security = @SecurityRequirement(name = SECURITY_SCHEME_NAME))
     @PostMapping
@@ -57,7 +57,7 @@ public class GroupController {
     }
 
     @Operation(
-            summary = "그룹 조회 By 초대코드",
+            summary = "[GROUP-005] 그룹 조회 By 초대코드",
             description = "초대 코드로 그룹을 조회합니다.",
             security = @SecurityRequirement(name = SECURITY_SCHEME_NAME))
     @GetMapping("/search")
@@ -68,7 +68,7 @@ public class GroupController {
     }
 
     @Operation(
-            summary = "참여 중인 그룹 조회 API",
+            summary = "[GROUP-001] 참여 중인 그룹 조회 API",
             description = "사용자가 참여 중인 그룹을 조회합니다.",
             security = @SecurityRequirement(name = SECURITY_SCHEME_NAME))
     @GetMapping("/participating")
@@ -80,7 +80,7 @@ public class GroupController {
     }
 
     @Operation(
-            summary = "그룹 인원 수 조회 API",
+            summary = "[GROUP-004] 그룹 인원 수 조회 API",
             description = "그룹의 인원 수를 조회합니다.",
             security = @SecurityRequirement(name = SECURITY_SCHEME_NAME))
     @GetMapping("/{groupId}/participants/count")
@@ -92,7 +92,7 @@ public class GroupController {
     }
 
     @Operation(
-            summary = "그룹 정보 수정 API",
+            summary = "[GROUP-003] 그룹 정보 수정 API",
             description =
                     """
                     그룹의 이름, 프로필 이미지, 최대 인원 수를 수정합니다.
@@ -112,7 +112,7 @@ public class GroupController {
     }
 
     @Operation(
-            summary = "그룹 전체 멤버 조회 API",
+            summary = "[GROUP-007] 그룹 전체 멤버 조회 API",
             description =
                     """
                         특정 그룹의 전체 멤버 정보를 조회합니다.
