@@ -3,6 +3,8 @@ package com.midasdev.mybg.bungae.repository;
 import com.midasdev.mybg.bungae.domain.BungaeStatus;
 import com.midasdev.mybg.bungae.domain.QBungae;
 import com.midasdev.mybg.bungae.domain.QBungaeAttendee;
+import com.midasdev.mybg.bungae.domain.QBungaeDateVote;
+import com.midasdev.mybg.bungae.domain.QBungaeRecruitDateOption;
 import com.midasdev.mybg.bungae.repository.dto.BungaeDto;
 import com.midasdev.mybg.bungae.repository.dto.QBungaeDto;
 import com.midasdev.mybg.global.util.cursor_page.CursorPage;
@@ -42,7 +44,7 @@ public class CustomBungaeRepositoryImpl implements CustomBungaeRepository {
 
         List<BungaeDto> fetchedContent =
                 queryFactory
-                        .select(createBungaeDtoProjection())
+                        .select(createBungaeDtoProjection(memberId))
                         .from(bungae)
                         .join(attendee)
                         .on(attendee.bungae.eq(bungae))
@@ -58,7 +60,10 @@ public class CustomBungaeRepositoryImpl implements CustomBungaeRepository {
 
     @Override
     public CursorPage<BungaeDto> findByGroupIdAndStatusIn(
-            Long groupId, List<BungaeStatus> statuses, CursorPageable cursorPageable) {
+            Long groupId,
+            List<BungaeStatus> statuses,
+            CursorPageable cursorPageable,
+            Long memberId) {
         Long cursorId = cursorPageable.lastCursorId();
         int pageSize = cursorPageable.pageSize();
 
@@ -69,7 +74,7 @@ public class CustomBungaeRepositoryImpl implements CustomBungaeRepository {
 
         List<BungaeDto> fetchedContent =
                 queryFactory
-                        .select(createBungaeDtoProjection())
+                        .select(createBungaeDtoProjection(memberId))
                         .from(bungae)
                         .join(bungae.group)
                         .join(bungae.host)
@@ -82,10 +87,10 @@ public class CustomBungaeRepositoryImpl implements CustomBungaeRepository {
     }
 
     @Override
-    public Optional<BungaeDto> findBungaeDtoById(Long bungaeId) {
+    public Optional<BungaeDto> findBungaeDtoById(Long bungaeId, Long memberId) {
         BungaeDto result =
                 queryFactory
-                        .select(createBungaeDtoProjection())
+                        .select(createBungaeDtoProjection(memberId))
                         .from(bungae)
                         .join(bungae.group)
                         .join(bungae.host)
@@ -103,7 +108,7 @@ public class CustomBungaeRepositoryImpl implements CustomBungaeRepository {
         return Expressions.allOf(statusCondition, cursorId != null ? bungae.id.lt(cursorId) : null);
     }
 
-    private Expression<BungaeDto> createBungaeDtoProjection() {
+    private Expression<BungaeDto> createBungaeDtoProjection(Long memberId) {
         return new QBungaeDto(
                 bungae.id,
                 bungae.name,
@@ -120,12 +125,43 @@ public class CustomBungaeRepositoryImpl implements CustomBungaeRepository {
                 bungae.deleted,
                 bungae.group.id,
                 bungae.host.id,
-                createAttendeeCountSubQuery());
+                createAttendeeCountSubQuery(),
+                createHasJoinedSubQuery(memberId),
+                createHasVotedSubQuery(memberId));
     }
 
     private JPQLQuery<Integer> createAttendeeCountSubQuery() {
         return JPAExpressions.select(attendee.count().intValue())
                 .from(attendee)
                 .where(attendee.bungae.eq(bungae).and(attendee.deleted.isFalse()));
+    }
+
+    private Expression<Boolean> createHasJoinedSubQuery(Long memberId) {
+        if (memberId == null) {
+            return Expressions.nullExpression(Boolean.class);
+        }
+
+        QBungaeAttendee subAttendee = new QBungaeAttendee("subAttendee");
+        return JPAExpressions.selectOne()
+                .from(subAttendee)
+                .where(
+                        subAttendee.bungae.eq(bungae),
+                        subAttendee.groupMember.member.id.eq(memberId),
+                        subAttendee.deleted.isFalse())
+                .exists();
+    }
+
+    private Expression<Boolean> createHasVotedSubQuery(Long memberId) {
+        if (memberId == null) {
+            return Expressions.nullExpression(Boolean.class);
+        }
+
+        QBungaeDateVote bungaeDateVote = QBungaeDateVote.bungaeDateVote;
+        QBungaeRecruitDateOption dateOption = QBungaeRecruitDateOption.bungaeRecruitDateOption;
+        return JPAExpressions.selectOne()
+                .from(bungaeDateVote)
+                .join(bungaeDateVote.dateOption, dateOption)
+                .where(dateOption.bungae.eq(bungae), bungaeDateVote.voter.member.id.eq(memberId))
+                .exists();
     }
 }

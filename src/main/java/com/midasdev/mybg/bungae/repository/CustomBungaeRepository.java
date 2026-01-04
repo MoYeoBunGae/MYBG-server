@@ -13,7 +13,7 @@ public interface CustomBungaeRepository {
             Long memberId, List<BungaeStatus> statuses, CursorPageable cursorPageable);
 
     CursorPage<BungaeDto> findByGroupIdAndStatusIn(
-            Long groupId, List<BungaeStatus> statuses, CursorPageable pageable);
+            Long groupId, List<BungaeStatus> statuses, CursorPageable pageable, Long memberId);
 
-    Optional<BungaeDto> findBungaeDtoById(Long bungaeId);
+    Optional<BungaeDto> findBungaeDtoById(Long bungaeId, Long memberId);
 }

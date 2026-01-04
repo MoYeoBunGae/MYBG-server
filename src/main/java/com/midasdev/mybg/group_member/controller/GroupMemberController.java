@@ -37,7 +37,9 @@ public class GroupMemberController {
 
     private final GroupMemberService groupMemberService;
 
-    @Operation(summary = "[GROUP_MEMBER-001] 그룹 참여 API", security = @SecurityRequirement(name = SECURITY_SCHEME_NAME))
+    @Operation(
+            summary = "[GROUP_MEMBER-001] 그룹 참여 API",
+            security = @SecurityRequirement(name = SECURITY_SCHEME_NAME))
     @PostMapping
     public ResponseEntity<ActiveGroupMemberResponse> joinGroup(
             @AuthenticationPrincipal Member member,

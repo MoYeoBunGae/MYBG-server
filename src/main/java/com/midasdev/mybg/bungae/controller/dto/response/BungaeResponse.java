@@ -25,7 +25,9 @@ public record BungaeResponse(
         BungaeStatus status,
         Long groupId,
         Long hostGroupMemberId,
-        LocalDateTime createdAt)
+        LocalDateTime createdAt,
+        Boolean hasJoined,
+        Boolean hasVoted)
         implements LongIdentifiable {
 
     public static BungaeResponse from(Bungae bungae) {
@@ -44,6 +46,8 @@ public record BungaeResponse(
                 .groupId(bungae.getGroup().getId())
                 .hostGroupMemberId(bungae.getHost().getId())
                 .createdAt(bungae.getCreatedAt())
+                .hasJoined(null)
+                .hasVoted(null)
                 .build();
     }
 
@@ -64,6 +68,8 @@ public record BungaeResponse(
                 .groupId(bungaeDto.groupId())
                 .hostGroupMemberId(bungaeDto.hostGroupMemberId())
                 .createdAt(bungaeDto.createdAt())
+                .hasJoined(bungaeDto.hasJoined())
+                .hasVoted(bungaeDto.hasVoted())
                 .build();
     }
 

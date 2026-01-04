@@ -260,7 +260,8 @@ class CustomBungaeRepositoryTest {
 
         // when
         CursorPage<BungaeDto> result =
-                bungaeRepository.findByGroupIdAndStatusIn(group.getId(), statuses, cursorPageable);
+                bungaeRepository.findByGroupIdAndStatusIn(
+                        group.getId(), statuses, cursorPageable, null);
 
         // then
         assertThat(result.getContent()).hasSize(pageSize);
@@ -278,7 +279,7 @@ class CustomBungaeRepositoryTest {
         // when
         CursorPage<BungaeDto> result =
                 bungaeRepository.findByGroupIdAndStatusIn(
-                        group.getId(), targetStatuses, cursorPageable);
+                        group.getId(), targetStatuses, cursorPageable, null);
 
         // then
         assertThat(result.getContent()).hasSize(2);
@@ -299,7 +300,8 @@ class CustomBungaeRepositoryTest {
 
         // when
         CursorPage<BungaeDto> result =
-                bungaeRepository.findByGroupIdAndStatusIn(group.getId(), null, cursorPageable);
+                bungaeRepository.findByGroupIdAndStatusIn(
+                        group.getId(), null, cursorPageable, null);
 
         // then
         assertThat(result.getContent()).hasSize(5);
@@ -314,7 +316,8 @@ class CustomBungaeRepositoryTest {
 
         // when
         CursorPage<BungaeDto> result =
-                bungaeRepository.findByGroupIdAndStatusIn(group.getId(), null, cursorPageable);
+                bungaeRepository.findByGroupIdAndStatusIn(
+                        group.getId(), null, cursorPageable, null);
 
         // then
         // ID 기준 내림차순 정렬 확인 (최신순)
@@ -476,7 +479,8 @@ class CustomBungaeRepositoryTest {
 
         // when
         CursorPage<BungaeDto> result =
-                bungaeRepository.findByGroupIdAndStatusIn(testGroup.getId(), null, cursorPageable);
+                bungaeRepository.findByGroupIdAndStatusIn(
+                        testGroup.getId(), null, cursorPageable, null);
 
         // then
         assertThat(result.getContent()).isNotEmpty();

@@ -23,7 +23,9 @@ public record BungaeDto(
         Boolean deleted,
         Long groupId,
         Long hostGroupMemberId,
-        Integer attendeeCount)
+        Integer attendeeCount,
+        Boolean hasJoined,
+        Boolean hasVoted)
         implements LongIdentifiable {
 
     @QueryProjection
