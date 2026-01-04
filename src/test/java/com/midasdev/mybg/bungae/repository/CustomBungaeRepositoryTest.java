@@ -250,8 +250,8 @@ class CustomBungaeRepositoryTest {
     }
 
     @Test
-    @DisplayName("B-3-R-1: 조건에 맞는 올바른 그룹 번개 조회 - lastCursorId, size")
-    void B_3_R_1() {
+    @DisplayName("BR-1-1: 조건에 맞는 올바른 그룹 번개 조회 - lastCursorId, size")
+    void BR_1_1() {
         // given
         Long lastCursorId = Long.MAX_VALUE;
         int pageSize = 2;
@@ -270,8 +270,8 @@ class CustomBungaeRepositoryTest {
     }
 
     @Test
-    @DisplayName("B-3-R-2: 조건에 맞는 올바른 그룹 번개 조회 - status")
-    void B_3_R_2() {
+    @DisplayName("BR-1-2: 조건에 맞는 올바른 그룹 번개 조회 - status")
+    void BR_1_2() {
         // given
         List<BungaeStatus> targetStatuses = List.of(BungaeStatus.RECRUITING, BungaeStatus.CLOSED);
         CursorPageable cursorPageable = new CursorPageable(null, 10);
@@ -293,8 +293,8 @@ class CustomBungaeRepositoryTest {
     }
 
     @Test
-    @DisplayName("B-3-R-3: 조건에 맞는 올바른 그룹 번개 조회 - status가 null일 경우")
-    void B_3_R_3() {
+    @DisplayName("BR-1-3: 조건에 맞는 올바른 그룹 번개 조회 - status가 null일 경우")
+    void BR_1_3() {
         // given
         CursorPageable cursorPageable = new CursorPageable(null, 10);
 
@@ -309,8 +309,8 @@ class CustomBungaeRepositoryTest {
     }
 
     @Test
-    @DisplayName("B-3-R-4: lastCursorId가 null일 경우 가장 최근 것부터 그룹 번개 조회")
-    void B_3_R_4() {
+    @DisplayName("BR-1-4: lastCursorId가 null일 경우 가장 최근 것부터 그룹 번개 조회")
+    void BR_1_4() {
         // given
         CursorPageable cursorPageable = new CursorPageable(null, 3);
 
@@ -429,13 +429,13 @@ class CustomBungaeRepositoryTest {
     }
 
     @Test
-    @DisplayName("B-3-R-5: 정확한 값이 있는 그룹 번개 조회")
-    void B_3_R_5() {
+    @DisplayName("BR-1-5: 정확한 값이 있는 그룹 번개 조회")
+    void BR_1_5() {
         // given
-        Member testMember = memberRepository.save(MemberFixture.create("B-3-R-5"));
+        Member testMember = memberRepository.save(MemberFixture.create("BR-1-5"));
         Group testGroup =
                 groupRepository.save(
-                        GroupFixture.create(testMember, "B-3-R-5 그룹", "B-3-R-5-invitation-code"));
+                        GroupFixture.create(testMember, "BR-1-5 그룹", "BR-1-5-invitation-code"));
         GroupMember testGroupMember =
                 groupMemberRepository.save(GroupMemberFixture.create(testGroup, testMember));
         GroupMember testGroupMember2 =
