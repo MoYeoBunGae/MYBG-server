@@ -7,6 +7,9 @@ import com.midasdev.mybg.bungae.domain.QBungaeDateVote;
 import com.midasdev.mybg.bungae.domain.QBungaeRecruitDateOption;
 import com.midasdev.mybg.bungae.repository.dto.BungaeDto;
 import com.midasdev.mybg.bungae.repository.dto.QBungaeDto;
+import com.midasdev.mybg.global.exception.ApplicationException;
+import com.midasdev.mybg.global.exception.ApplicationExceptionType;
+import com.midasdev.mybg.global.util.assertion.Assertion;
 import com.midasdev.mybg.global.util.cursor_page.CursorPage;
 import com.midasdev.mybg.global.util.cursor_page.CursorPageable;
 import com.querydsl.core.types.Expression;
@@ -131,6 +134,13 @@ public class CustomBungaeRepositoryImpl implements CustomBungaeRepository {
     }
 
     private Expression<BungaeDto> createBungaeDtoProjection(Long memberId) {
+        Assertion.with(memberId)
+                .setValidation(id -> id != null)
+                .validateOrThrow(
+                        () ->
+                                new ApplicationException(ApplicationExceptionType.GLOBAL_INTERNAL_SERVER_ERROR,
+                                        "MemberId for BungaeDto projection cannot be null"));
+
         return new QBungaeDto(
                 bungae.id,
                 bungae.name,
@@ -159,10 +169,6 @@ public class CustomBungaeRepositoryImpl implements CustomBungaeRepository {
     }
 
     private Expression<Boolean> createHasJoinedSubQuery(Long memberId) {
-        if (memberId == null) {
-            return Expressions.nullExpression(Boolean.class);
-        }
-
         QBungaeAttendee subAttendee = new QBungaeAttendee("subAttendee");
         return JPAExpressions.selectOne()
                 .from(subAttendee)
@@ -174,10 +180,6 @@ public class CustomBungaeRepositoryImpl implements CustomBungaeRepository {
     }
 
     private Expression<Boolean> createHasVotedSubQuery(Long memberId) {
-        if (memberId == null) {
-            return Expressions.nullExpression(Boolean.class);
-        }
-
         QBungaeDateVote bungaeDateVote = QBungaeDateVote.bungaeDateVote;
         QBungaeRecruitDateOption dateOption = QBungaeRecruitDateOption.bungaeRecruitDateOption;
         return JPAExpressions.selectOne()

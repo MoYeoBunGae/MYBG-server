@@ -261,7 +261,7 @@ class CustomBungaeRepositoryTest {
         // when
         CursorPage<BungaeDto> result =
                 bungaeRepository.findByGroupIdAndStatusIn(
-                        group.getId(), statuses, cursorPageable, null);
+                        group.getId(), statuses, cursorPageable, member.getId());
 
         // then
         assertThat(result.getContent()).hasSize(pageSize);
@@ -279,7 +279,7 @@ class CustomBungaeRepositoryTest {
         // when
         CursorPage<BungaeDto> result =
                 bungaeRepository.findByGroupIdAndStatusIn(
-                        group.getId(), targetStatuses, cursorPageable, null);
+                        group.getId(), targetStatuses, cursorPageable, member.getId());
 
         // then
         assertThat(result.getContent()).hasSize(2);
@@ -301,7 +301,7 @@ class CustomBungaeRepositoryTest {
         // when
         CursorPage<BungaeDto> result =
                 bungaeRepository.findByGroupIdAndStatusIn(
-                        group.getId(), null, cursorPageable, null);
+                        group.getId(), null, cursorPageable, member.getId());
 
         // then
         assertThat(result.getContent()).hasSize(5);
@@ -317,7 +317,7 @@ class CustomBungaeRepositoryTest {
         // when
         CursorPage<BungaeDto> result =
                 bungaeRepository.findByGroupIdAndStatusIn(
-                        group.getId(), null, cursorPageable, null);
+                        group.getId(), null, cursorPageable, member.getId());
 
         // then
         // ID 기준 내림차순 정렬 확인 (최신순)
@@ -480,7 +480,7 @@ class CustomBungaeRepositoryTest {
         // when
         CursorPage<BungaeDto> result =
                 bungaeRepository.findByGroupIdAndStatusIn(
-                        testGroup.getId(), null, cursorPageable, null);
+                        testGroup.getId(), null, cursorPageable, member.getId());
 
         // then
         assertThat(result.getContent()).isNotEmpty();
