@@ -7,6 +7,8 @@ import static org.assertj.core.api.SoftAssertions.assertSoftly;
 import com.midasdev.mybg.bungae.domain.Bungae;
 import com.midasdev.mybg.bungae.domain.BungaeAttendee;
 import com.midasdev.mybg.bungae.domain.BungaeDateTime;
+import com.midasdev.mybg.bungae.domain.BungaeDateVote;
+import com.midasdev.mybg.bungae.domain.BungaeRecruitDateOption;
 import com.midasdev.mybg.bungae.domain.BungaeStatus;
 import com.midasdev.mybg.bungae.fixture.BungaeFixture;
 import com.midasdev.mybg.bungae.repository.dto.BungaeDto;
@@ -33,6 +35,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.context.annotation.Import;
 
@@ -44,12 +47,17 @@ import org.springframework.context.annotation.Import;
  * otherGroup의 RECRUITING, CLOSED 번개에도 참여
  */
 @DataJpaTest
+@AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
 @Import({QueryDslConfig.class, AuditingTestConfig.class})
 class CustomBungaeRepositoryTest {
 
     @Autowired private BungaeRepository bungaeRepository;
 
     @Autowired private BungaeAttendeeRepository bungaeAttendeeRepository;
+
+    @Autowired private BungaeRecruitDateOptionRepository bungaeRecruitDateOptionRepository;
+
+    @Autowired private BungaeDateVoteRepository bungaeDateVoteRepository;
 
     @Autowired private GroupRepository groupRepository;
 
@@ -60,6 +68,7 @@ class CustomBungaeRepositoryTest {
     private Member member, otherMember;
     private Group group, otherGroup;
     private GroupMember groupMember;
+    private GroupMember groupMember2;
     private GroupMember otherGroupMember;
     private GroupMember memberInOtherGroup;
     private List<Bungae> groupSavedBungaes;
@@ -75,6 +84,7 @@ class CustomBungaeRepositoryTest {
                 groupRepository.save(
                         GroupFixture.create(otherMember, "다른 그룹", "other-group-invitation-code"));
         groupMember = groupMemberRepository.save(GroupMemberFixture.create(group, member));
+        groupMember2 = groupMemberRepository.save(GroupMemberFixture.create(group, otherMember));
         otherGroupMember =
                 groupMemberRepository.save(GroupMemberFixture.create(otherGroup, otherMember));
         memberInOtherGroup =
@@ -109,7 +119,7 @@ class CustomBungaeRepositoryTest {
     }
 
     /** 번개 생성과 참여자 저장을 통합한 헬퍼 메서드 */
-    private void createBungaeAndSaveAttendee(
+    private Bungae createBungaeAndSaveAttendee(
             BiFunction<Group, GroupMember, Bungae> bungaeCreator,
             Group group,
             GroupMember host,
@@ -120,21 +130,25 @@ class CustomBungaeRepositoryTest {
             groupSavedBungaes.add(bungae);
         }
 
-        saveAttendee(bungae, host);
+        if (bungae.getStatus() != BungaeStatus.DATE_VOTING) {
+            saveAttendee(bungae, host);
 
-        // host가 member인 경우 memberJoinedBungaeIds에 추가
-        if (host.getMember().getId().equals(member.getId())) {
-            memberJoinedBungaeIds.add(bungae.getId());
-        }
-
-        for (GroupMember attendee : additionalAttendees) {
-            saveAttendee(bungae, attendee);
-
-            // 추가 참여자가 member인 경우 memberJoinedBungaeIds에 추가
-            if (attendee.getMember().getId().equals(member.getId())) {
+            // host가 member인 경우 memberJoinedBungaeIds에 추가
+            if (host.getMember().getId().equals(member.getId())) {
                 memberJoinedBungaeIds.add(bungae.getId());
             }
+
+            for (GroupMember attendee : additionalAttendees) {
+                saveAttendee(bungae, attendee);
+
+                // 추가 참여자가 member인 경우 memberJoinedBungaeIds에 추가
+                if (attendee.getMember().getId().equals(member.getId())) {
+                    memberJoinedBungaeIds.add(bungae.getId());
+                }
+            }
         }
+
+        return bungae;
     }
 
     private void saveAttendee(Bungae bungae, GroupMember groupMember) {
@@ -182,7 +196,7 @@ class CustomBungaeRepositoryTest {
                         member.getId(), targetStatuses, cursorPageable);
 
         // then
-        assertThat(result.getContent()).hasSize(3); // DATE_VOTING 1개 + RECRUITING 2개
+        assertThat(result.getContent()).hasSize(2); // RECRUITING 2개
         assertThat(result.getContent())
                 .extracting(BungaeDto::id)
                 .allMatch(memberJoinedBungaeIds::contains);
@@ -215,7 +229,6 @@ class CustomBungaeRepositoryTest {
         assertThat(result.getContent())
                 .extracting(BungaeDto::status)
                 .contains(
-                        BungaeStatus.DATE_VOTING,
                         BungaeStatus.RECRUITING,
                         BungaeStatus.RECRUITING_CLOSED,
                         BungaeStatus.CLOSED,
@@ -520,6 +533,147 @@ class CustomBungaeRepositoryTest {
                     softly.assertThat(targetBungae.hostGroupMemberId())
                             .isEqualTo(testGroupMember.getId());
                     softly.assertThat(targetBungae.attendeeCount()).isEqualTo(2);
+                });
+    }
+
+    @Test
+    @DisplayName("BR-1-6: 참가 여부와 투표 여부가 올바르게 매핑되어 조회됨 - 참가 O, 투표 O")
+    void BR_1_6() {
+        //  === given ===
+        Bungae testBungae = createBungaeAndSaveAttendee(BungaeFixture::createWithRecruiting, group, groupMember, groupMember2);
+
+        // Create date option (to represent past voting)
+        BungaeRecruitDateOption dateOption =
+                bungaeRecruitDateOptionRepository.save(
+                        BungaeRecruitDateOption.builder()
+                                .dateOption(LocalDate.now().plusDays(2))
+                                .bungae(testBungae)
+                                .build());
+
+        // Member votes
+        bungaeDateVoteRepository.save(
+                BungaeDateVote.builder().voter(groupMember).dateOption(dateOption).build());
+
+        CursorPageable cursorPageable = new CursorPageable(null, 10);
+
+        // === when ===
+        CursorPage<BungaeDto> result =
+                bungaeRepository.findByGroupIdAndStatusIn(
+                        group.getId(), null, cursorPageable, member.getId());
+
+        // === then ===
+        assertThat(result.getContent()).isNotEmpty();
+
+        List<BungaeDto> target =
+                result.getContent().stream().filter(dto -> dto.id().equals(testBungae.getId())).toList();
+        assertThat(target).hasSize(1);
+
+        BungaeDto targetBungae = target.get(0);
+
+        assertSoftly(
+                softly -> {
+                    softly.assertThat(targetBungae.hasJoined()).isTrue();
+                    softly.assertThat(targetBungae.hasVoted()).isTrue();
+                });
+    }
+
+    @Test
+    @DisplayName("BR-1-7: 참가 여부와 투표 여부가 올바르게 매핑되어 조회됨 - 참가 O, 투표 X")
+    void BR_1_7() {
+        // === given ===
+        Bungae testBungae = createBungaeAndSaveAttendee(BungaeFixture::createWithRecruiting, group, groupMember);
+
+        CursorPageable cursorPageable = new CursorPageable(null, 10);
+
+        // === when === 
+        CursorPage<BungaeDto> result =
+                bungaeRepository.findByGroupIdAndStatusIn(
+                        group.getId(), null, cursorPageable, member.getId());
+
+        // === then ===
+        assertThat(result.getContent()).isNotEmpty();
+
+        List<BungaeDto> target =
+                result.getContent().stream().filter(dto -> dto.id().equals(testBungae.getId())).toList();
+        assertThat(target).hasSize(1);
+
+        BungaeDto targetBungae = target.get(0);
+
+        assertSoftly(
+                softly -> {
+                    softly.assertThat(targetBungae.hasJoined()).isTrue();
+                    softly.assertThat(targetBungae.hasVoted()).isFalse();
+                });
+    }
+
+    @Test
+    @DisplayName("BR-1-8: 참가 여부와 투표 여부가 올바르게 매핑되어 조회됨 - 참가 X, 투표 O")
+    void BR_1_8() {
+        // === given ===
+        Bungae testBungae = createBungaeAndSaveAttendee(BungaeFixture::createWithDateVoting, group, groupMember);
+
+        // Create date option
+        BungaeRecruitDateOption dateOption =
+                bungaeRecruitDateOptionRepository.save(
+                        BungaeRecruitDateOption.builder()
+                                .dateOption(LocalDate.now().plusDays(1))
+                                .bungae(testBungae)
+                                .build());
+
+        // Member votes but does NOT join
+        bungaeDateVoteRepository.save(
+                BungaeDateVote.builder().voter(groupMember).dateOption(dateOption).build());
+
+        CursorPageable cursorPageable = new CursorPageable(null, 10);
+
+        // === when ===
+        CursorPage<BungaeDto> result =
+                bungaeRepository.findByGroupIdAndStatusIn(
+                        group.getId(), null, cursorPageable, member.getId());
+
+        // === then ===
+        assertThat(result.getContent()).isNotEmpty();
+
+        List<BungaeDto> target =
+                result.getContent().stream().filter(dto -> dto.id().equals(testBungae.getId())).toList();
+        assertThat(target).hasSize(1);
+
+        BungaeDto targetBungae = target.get(0);
+
+        assertSoftly(
+                softly -> {
+                    softly.assertThat(targetBungae.hasJoined()).isFalse();
+                    softly.assertThat(targetBungae.hasVoted()).isTrue();
+                });
+    }
+
+    @Test
+    @DisplayName("BR-1-9: 참가 여부와 투표 여부가 올바르게 매핑되어 조회됨 - 참가 X, 투표 X")
+    void BR_1_9() {
+        // === given ===
+        Bungae testBungae = createBungaeAndSaveAttendee(BungaeFixture::createWithRecruiting, group, groupMember);
+
+        // Member does NOT join and does NOT vote
+        CursorPageable cursorPageable = new CursorPageable(null, 10);
+
+        // === when ===
+        CursorPage<BungaeDto> result =
+                bungaeRepository.findByGroupIdAndStatusIn(
+                        group.getId(), null, cursorPageable, otherMember.getId());
+
+        // === then ===
+        assertThat(result.getContent()).isNotEmpty();
+
+        List<BungaeDto> target =
+                result.getContent().stream().filter(dto -> dto.id().equals(testBungae.getId())).toList();
+        assertThat(target).hasSize(1);
+
+        BungaeDto targetBungae = target.get(0);
+
+        assertSoftly(
+                softly -> {
+                    softly.assertThat(targetBungae.hasJoined()).isFalse();
+                    softly.assertThat(targetBungae.hasVoted()).isFalse();
                 });
     }
 }
