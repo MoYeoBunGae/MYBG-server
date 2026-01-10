@@ -18,6 +18,7 @@ import com.midasdev.mybg.bungae.service.event.BungaeVoteCreatedEvent;
 import com.midasdev.mybg.global.exception.ApplicationException;
 import com.midasdev.mybg.global.exception.ApplicationExceptionType;
 import com.midasdev.mybg.global.lock.NamedLockManager;
+import com.midasdev.mybg.global.util.assertion.Assertion;
 import com.midasdev.mybg.global.util.cursor_page.CursorPage;
 import com.midasdev.mybg.global.util.cursor_page.CursorPageable;
 import com.midasdev.mybg.group.domain.Group;
@@ -139,9 +140,20 @@ public class BungaeService {
     }
 
     public CursorPage<BungaeDto> findBungaesByMemberIdAndStatuses(
-            Member member, List<BungaeStatus> statuses, CursorPageable cursorPageable) {
+            Member member, List<BungaeStatus> bungaeStatuses, CursorPageable cursorPageable) {
+        Assertion.with(bungaeStatuses)
+                .setValidation(this::doesNotContainDateVotingStatus)
+                .validateOrThrow(
+                        () ->
+                                new ApplicationException(
+                                        ApplicationExceptionType.INVALID_BUNGAE_STATUS,
+                                        BungaeStatus.DATE_VOTING));
         return bungaeRepository.findAllByAttendeeMemberIdAndStatusIn(
-                member.getId(), statuses, cursorPageable);
+                member.getId(), bungaeStatuses, cursorPageable);
+    }
+
+    private boolean doesNotContainDateVotingStatus(List<BungaeStatus> statuses) {
+        return statuses.stream().noneMatch(status -> status == BungaeStatus.DATE_VOTING);
     }
 
     public CursorPage<BungaeDto> findBungaesByGroupIdAndStatuses(

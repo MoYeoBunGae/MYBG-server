@@ -63,7 +63,7 @@ public class BungaeController {
     }
 
     @Operation(
-            summary = "[BUNGAE-002] 내 번개모임 목록 조회 API",
+            summary = "[BUNGAE-002] 내가 참여한 번개모임 목록 조회 API",
             description =
                     """
                     로그인한 사용자가 참여한 번개모임 목록을 조회합니다.
@@ -72,6 +72,7 @@ public class BungaeController {
                     - Response DTO : CursorPage<BungaeResponse>
                     - 세부사항:
                         1. 가장 마지막 번개가 포함되어 있을 경우, nextCursorId가 null이고 hasNext가 false로 반환됩니다.
+                        2. BungaeStatus가 DATE_VOTING인 번개는 조회되지 않습니다.
                     """,
             security = @SecurityRequirement(name = SECURITY_SCHEME_NAME))
     @GetMapping(value = "/me")

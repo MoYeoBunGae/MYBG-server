@@ -86,6 +86,7 @@ public enum ApplicationExceptionType {
             HttpStatus.BAD_REQUEST,
             "ERR_BUNGAE_009",
             "이미 해당 번개({0})에 참여한 상태입니다. (GroupMemberId: {1})"),
+    INVALID_BUNGAE_STATUS(HttpStatus.BAD_REQUEST, "ERR_BUNGAE_010", "유효하지 않은 번개 상태값입니다. : {0}"),
 
     // authentication
     TOKEN_AUTHENTICATION_EXCEPTION(HttpStatus.FORBIDDEN, "ERR_AUTH_001", "토큰 인증에 실패했습니다. : {0}"),
