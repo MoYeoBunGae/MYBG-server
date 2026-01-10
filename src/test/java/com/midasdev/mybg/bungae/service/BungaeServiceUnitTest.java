@@ -60,6 +60,25 @@ public class BungaeServiceUnitTest {
     @InjectMocks private BungaeService bungaeService;
 
     @Test
+    @DisplayName("B-2-SU-1: BungaeStatus가 DATE_VOTING인 번개는 내가 참여한 번개로 조회할 수 없습니다.")
+    void B_2_SU_1() {
+        // given
+        Member member = MemberFixture.create();
+        List<BungaeStatus> statuses = List.of(BungaeStatus.RECRUITING, BungaeStatus.DATE_VOTING);
+        CursorPageable cursorPageable = CursorPageableFixture.create();
+
+        // when & then
+        assertThatThrownBy(
+                        () ->
+                                bungaeService.findBungaesByMemberIdAndStatuses(
+                                        member, statuses, cursorPageable))
+                .isInstanceOf(ApplicationException.class)
+                .hasFieldOrPropertyWithValue(
+                        TestConstant.EXCEPTION_TYPE_FIELD,
+                        ApplicationExceptionType.INVALID_BUNGAE_STATUS);
+    }
+
+    @Test
     @DisplayName("B-3-SU-1: 멤버가 그룹에 속하는지 검증 기능 호출")
     void B_3_SU_1() {
         // given

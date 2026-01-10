@@ -26,8 +26,17 @@ public class GetMyBungaesRequest extends CursorPageRequest {
             description =
                     """
         조회할 번개 상태값 리스트
-        - 가능한 값: RECRUITING, RECRUITING_CLOSED, DATE_VOTING, CLOSED, CANCELLED
+        - 가능한 값: RECRUITING, RECRUITING_CLOSED, CLOSED, CANCELLED
         """,
-            array = @ArraySchema(schema = @Schema(implementation = BungaeStatus.class)))
+            array =
+                    @ArraySchema(
+                            schema =
+                                    @Schema(
+                                            allowableValues = {
+                                                "RECRUITING",
+                                                "RECRUITING_CLOSED",
+                                                "CLOSED",
+                                                "CANCELLED"
+                                            })))
     private List<BungaeStatus> statuses;
 }
