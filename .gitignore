@@ -5,7 +5,10 @@ problems
 gradle.properties
 debug/
 instructions/
+!.github/instructions/
 scripts/
+.claude/
+.vscode/
 
 # Prompt files
 prompt/
