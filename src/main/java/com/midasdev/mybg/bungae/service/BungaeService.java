@@ -153,7 +153,8 @@ public class BungaeService {
         groupMemberFinder.findByMemberAndGroup(member, group);
 
         // 3. 해당 그룹에 속하고 statuses에 포함된 번개모임 조회
-        return bungaeRepository.findByGroupIdAndStatusIn(groupId, statuses, pageable);
+        return bungaeRepository.findByGroupIdAndStatusIn(
+                groupId, statuses, pageable, member.getId());
     }
 
     public List<LocalDate> getBungaeDateVoteOptions(Member member, Long bungaeId) {
@@ -338,7 +339,7 @@ public class BungaeService {
 
         // 9. 상태 변경 후 최신 번개 정보를 다시 조회하여 반환
         return bungaeRepository
-                .findBungaeDtoById(bungaeId)
+                .findBungaeDtoById(bungaeId, member.getId())
                 .orElseThrow(
                         () ->
                                 new ApplicationException(

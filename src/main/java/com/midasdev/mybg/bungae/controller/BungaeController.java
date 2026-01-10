@@ -43,7 +43,7 @@ public class BungaeController {
     private final BungaeService bungaeService;
 
     @Operation(
-            summary = "번개 생성 API",
+            summary = "[BUNGAE-001] 번개 생성 API",
             description =
                     """
                     번개를 생성합니다.
@@ -63,7 +63,7 @@ public class BungaeController {
     }
 
     @Operation(
-            summary = "내 번개모임 목록 조회 API",
+            summary = "[BUNGAE-002] 내 번개모임 목록 조회 API",
             description =
                     """
                     로그인한 사용자가 참여한 번개모임 목록을 조회합니다.
@@ -85,7 +85,7 @@ public class BungaeController {
     }
 
     @Operation(
-            summary = "그룹별 번개모임 목록 조회 API",
+            summary = "[BUNGAE-005] 그룹별 번개모임 목록 조회 API",
             description =
                     """
                     특정 그룹의 번개모임 목록을 조회합니다.
@@ -109,7 +109,7 @@ public class BungaeController {
     }
 
     @Operation(
-            summary = "번개 투표 가능한 날짜들 조회 API",
+            summary = "[BUNGAE-003] 번개 투표 가능한 날짜들 조회 API",
             description =
                     """
                     번개의 투표 가능한 날짜들을 조회합니다.
@@ -125,7 +125,7 @@ public class BungaeController {
     }
 
     @Operation(
-            summary = "번개 날짜 투표 API",
+            summary = "[BUNGAE-009] 번개 날짜 투표 API",
             description =
                     """
                     번개 날짜에 투표합니다.
@@ -143,7 +143,7 @@ public class BungaeController {
     }
 
     @Operation(
-            summary = "번개 참여 API",
+            summary = "[BUNGAE-010] 번개 참여 API",
             description =
                     """
                     번개에 참여합니다.

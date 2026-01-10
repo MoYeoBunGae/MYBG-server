@@ -37,7 +37,9 @@ public class GroupMemberController {
 
     private final GroupMemberService groupMemberService;
 
-    @Operation(summary = "그룹 참여 API", security = @SecurityRequirement(name = SECURITY_SCHEME_NAME))
+    @Operation(
+            summary = "[GROUP_MEMBER-001] 그룹 참여 API",
+            security = @SecurityRequirement(name = SECURITY_SCHEME_NAME))
     @PostMapping
     public ResponseEntity<ActiveGroupMemberResponse> joinGroup(
             @AuthenticationPrincipal Member member,
@@ -47,7 +49,7 @@ public class GroupMemberController {
     }
 
     @Operation(
-            summary = "그룹 멤버 프로필 수정 API",
+            summary = "[GROUP_MEMBER-002] 그룹 멤버 프로필 수정 API",
             description = "그룹에 참여 중인 사용자의 닉네임과 프로필 이미지를 수정합니다.",
             security = @SecurityRequirement(name = SECURITY_SCHEME_NAME))
     @PatchMapping(
@@ -63,7 +65,7 @@ public class GroupMemberController {
     }
 
     @Operation(
-            summary = "그룹 나가기 API",
+            summary = "[GROUP_MEMBER-003] 그룹 나가기 API",
             description =
                     """
                 사용자가 참여한 그룹에서 나갑니다.
